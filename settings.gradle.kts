@@ -1,0 +1,1 @@
+rootProject.name = "pgi-les-inntekt-skatt"
