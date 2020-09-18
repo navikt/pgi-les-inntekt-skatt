@@ -3,7 +3,7 @@ name: Deploy to dev gcp
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy-to-dev:
