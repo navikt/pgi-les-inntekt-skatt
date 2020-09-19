@@ -68,10 +68,7 @@ class KafkaTestEnvironment {
 
     internal fun writeHendelse(hendelseKey: String, hendelse: String) {
         val record = ProducerRecord(KafkaConfig.PGI_HENDELSE_TOPIC, hendelseKey, hendelse)
-        hendelseTestProducer.send(record) { metadata, exception ->
-            if (exception != null) println(exception.stackTrace) else println(metadata.serializedValueSize())
-        }
-        hendelseTestProducer.flush()
+        hendelseTestProducer.send(record).get()
     }
 
     fun getFirstRecordOnInntektTopic() = consumeInntektTopic()[0]

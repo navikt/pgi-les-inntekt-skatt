@@ -1,6 +1,9 @@
 package no.nav.pgi.skatt.inntekt
 
+import org.apache.kafka.streams.KafkaStreams
+import org.apache.kafka.streams.KafkaStreams.*
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -36,6 +39,13 @@ internal class ApplicationTest {
 
     @Test
     fun `crude test of kafka test environment`() {
-        kafkaTestEnvironment.writeHendelse("hendelseKey", "hendelse")
+        val hendelseKey = "hendelseKey"
+        val hendelse = "hendelse"
+        kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
+        val pensjonsgivendeInntektStream = PensjonsgivendeInntektStream().buildStreams(kafkaConfig.streamConfig())
+        pensjonsgivendeInntektStream.start()
+        //assertEquals(hendelse, kafkaTestEnvironment.getFirstRecordOnInntektTopic())
     }
+
+
 }

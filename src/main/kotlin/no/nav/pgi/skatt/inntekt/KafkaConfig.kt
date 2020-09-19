@@ -7,6 +7,7 @@ import org.apache.kafka.common.config.SaslConfigs
 import org.apache.kafka.common.security.auth.SecurityProtocol.SASL_SSL
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.StreamsConfig
+import java.util.*
 
 
 internal const val APPLICATION_ID_CONFIG = "pgi-les-inntekt-skatt"
@@ -21,19 +22,16 @@ internal class KafkaConfig(environment: Map<String, String> = System.getenv()) {
             environment.getVal(PASSWORD_ENV_KEY)
     )
 
-    internal fun streamConfig() = commonConfig() + mapOf(
+    internal fun streamConfig(): Properties = mapOf(
+            BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
+            SECURITY_PROTOCOL_CONFIG to securityProtocol,
+            SaslConfigs.SASL_MECHANISM to saslMechanism,
+            SaslConfigs.SASL_JAAS_CONFIG to saslJaasConfig,
             StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG to Serdes.String().javaClass.name,
             StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG to Serdes.String().javaClass.name,
             StreamsConfig.APPLICATION_ID_CONFIG to APPLICATION_ID_CONFIG,
             AUTO_OFFSET_RESET_CONFIG to "earliest"
-    )
-
-    private fun commonConfig() = mapOf(
-            BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
-            SECURITY_PROTOCOL_CONFIG to securityProtocol,
-            SaslConfigs.SASL_MECHANISM to saslMechanism,
-            SaslConfigs.SASL_JAAS_CONFIG to saslJaasConfig
-    )
+    ).toProperties()
 
     private fun createSaslJaasConfig(username: String, password: String) =
             """org.apache.kafka.common.security.plain.PlainLoginModule required username="$username" password="$password";"""
