@@ -38,7 +38,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-metrics-micrometer:$ktorVersion")
     implementation("no.nav.pensjonsamhandling:pensjon-samhandling-ktor-support:$ktorSupportVersion")
-
+    implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
 
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
