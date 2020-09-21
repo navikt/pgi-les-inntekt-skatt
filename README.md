@@ -5,7 +5,7 @@ og publiserer deretter inntektene til kafka topicen ```privat-pgi-inntekt```.
 
 For å se hvordan hendelsene publiseres til ```privat-pgi-hendelse```, se følgende github repo: [pgi-les-hendelse-skatt](https://github.com/navikt/pgi-les-hendelse-skatt/)
 
-Dokumentasjonen REST tjeneste vi bruker fra SKE: [SKE pensjonsgivende inntekt](https://skatteetaten.github.io/datasamarbeid-api-dokumentasjon/reference_pgi.html)
+Dokumentasjon REST tjeneste vi bruker fra SKE: [pensjonsgivende inntekt API](https://skatteetaten.github.io/datasamarbeid-api-dokumentasjon/reference_pgi.html)
 
 #### Metrikker
 Grafana dashboards brukes for å f.eks. monitorere minne, cpu-bruk og andre metrikker.
