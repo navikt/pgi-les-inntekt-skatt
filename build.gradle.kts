@@ -56,10 +56,7 @@ dependencies {
         exclude(group = "org.slf4j", module = "slf4j-log4j12")
     }
 
-
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-
-
 }
 
 
