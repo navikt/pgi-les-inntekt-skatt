@@ -26,7 +26,7 @@ internal class KafkaConfig(environment: Map<String, String> = System.getenv(), p
     }
 
     companion object EnvironmentKeys {
-        internal const val BOOTSTRAP_SERVERS_ENV_KEY = "KAFKA_BOOTSTRAP_SERVERS"
+        internal const val BOOTSTRAP_SERVERS_ENV_KEY = "KAFKA_BROKERS"
         internal const val SCHEMA_REGISTRY_URL_ENV_KEY = "KAFKA_SCHEMA_REGISTRY"
     }
 
