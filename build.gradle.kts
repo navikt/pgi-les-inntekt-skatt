@@ -101,6 +101,6 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "6.5"
+    gradleVersion = "6.7"
 }
 
