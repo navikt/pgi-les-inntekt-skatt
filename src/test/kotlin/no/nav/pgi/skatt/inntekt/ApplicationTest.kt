@@ -1,5 +1,6 @@
 package no.nav.pgi.skatt.inntekt
 
+import no.nav.pgi.skatt.inntekt.kafka.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import org.junit.jupiter.api.*
@@ -8,24 +9,21 @@ import java.net.http.HttpResponse
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ApplicationTest {
-    private val application = createApplication()
     private val kafkaTestEnvironment = KafkaTestEnvironment()
-    private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration())
-    private val pensjonsgivendeInntektStream = PensjonsgivendeInntektStream(kafkaConfig.streamConfig())
+    private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
+    private val application = Application(kafkaConfig)
     private val skattInntektMock = SkattInntektMock()
 
 
     @BeforeAll
     fun init() {
-        application.start()
-        pensjonsgivendeInntektStream.start()
+        application.startPensjonsgivendeInntektStream()
         skattInntektMock.`stub inntekt fra skatt`()
     }
 
     @AfterAll
     fun tearDown() {
-        application.stop(100, 100)
-        pensjonsgivendeInntektStream.close()
+        application.stopPensjonsgivendeInntektStream()
         skattInntektMock.stop()
         kafkaTestEnvironment.tearDown()
         kafkaTestEnvironment.closeTestConsumer()
@@ -38,7 +36,7 @@ internal class ApplicationTest {
         println(response.body())
     }
 
-    @Disabled("Test environment works, but kafka stream does not")
+    @Disabled
     @Test
     fun `crude test of kafka test environment`() {
         val hendelseKey = HendelseKey("1234", "2018")
@@ -46,6 +44,4 @@ internal class ApplicationTest {
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
         assertEquals(hendelse, kafkaTestEnvironment.getFirstRecordOnInntektTopic())
     }
-
-
 }
