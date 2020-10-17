@@ -1,7 +1,7 @@
 package no.nav.pgi.skatt.inntekt.kafka
 
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
-import no.nav.pgi.skatt.inntekt.getVal
+import no.nav.pensjon.samhandling.env.getVal
 import org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
 import org.apache.kafka.streams.StreamsConfig.*

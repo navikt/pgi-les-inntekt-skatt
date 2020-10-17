@@ -23,10 +23,7 @@ class KafkaTestEnvironment {
 
     private val kafkaTestEnvironment: KafkaEnvironment = KafkaEnvironment(
             withSchemaRegistry = true,
-            topicNames = listOf(
-                    PGI_HENDELSE_TOPIC,
-                    PGI_INNTEKT_TOPIC
-            )
+            topicNames = listOf(PGI_HENDELSE_TOPIC, PGI_INNTEKT_TOPIC)
     )
 
     private val inntektTestConsumer = inntektTestConsumer()
