@@ -3,17 +3,17 @@ package no.nav.pgi.skatt.inntekt
 import no.nav.pgi.skatt.inntekt.kafka.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
+import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.net.http.HttpResponse
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class ApplicationTest {
+internal class ComponentTest {
     private val kafkaTestEnvironment = KafkaTestEnvironment()
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
-    private val application = Application(kafkaConfig)
     private val skattInntektMock = SkattInntektMock()
-
+    private val application = Application(kafkaConfig)
 
     @BeforeAll
     fun init() {
@@ -29,6 +29,7 @@ internal class ApplicationTest {
         kafkaTestEnvironment.closeTestConsumer()
     }
 
+    @Disabled("Under construction")
     @Test
     fun `crude test of skatt mock`() {
         val client = SkattClient()
@@ -36,12 +37,12 @@ internal class ApplicationTest {
         println(response.body())
     }
 
-    @Disabled
     @Test
-    fun `crude test of kafka test environment`() {
-        val hendelseKey = HendelseKey("1234", "2018")
-        val hendelse = Hendelse(12345L, "1234", "2018")
+    fun `reads hendelser from topic, gets pgi based on hendelse, produces inntekt to topic`() {
+        val hendelseKey = HendelseKey("12345678901", "2020")
+        val hendelse = Hendelse(12345L, "12345678901", "2020")
+
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
-        assertEquals(hendelse, kafkaTestEnvironment.getFirstRecordOnInntektTopic())
+        assertEquals(hendelseKey, kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
     }
 }

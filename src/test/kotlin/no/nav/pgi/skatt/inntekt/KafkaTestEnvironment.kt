@@ -1,6 +1,7 @@
 package no.nav.pgi.skatt.inntekt
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import no.nav.common.KafkaEnvironment
 import no.nav.pgi.skatt.inntekt.kafka.KafkaConfig
@@ -44,10 +45,11 @@ class KafkaTestEnvironment {
             KafkaConfig.SCHEMA_REGISTRY_URL_ENV_KEY to schemaRegistryUrl,
     )
 
-    internal fun inntektTestConsumer() = KafkaConsumer<HendelseKey, PensjonsgivendeInntekt>(
+    private fun inntektTestConsumer() = KafkaConsumer<HendelseKey, PensjonsgivendeInntekt>(
             mapOf(
                     CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to kafkaTestEnvironment.brokersURL,
                     "schema.registry.url" to schemaRegistryUrl,
+                    KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to true,
                     KEY_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
                     VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
                     GROUP_ID_CONFIG to "LOL",
@@ -56,7 +58,7 @@ class KafkaTestEnvironment {
             )
     )
 
-    internal fun hendelseTestProducer() = KafkaProducer<HendelseKey, Hendelse>(
+    private fun hendelseTestProducer() = KafkaProducer<HendelseKey, Hendelse>(
             mapOf(
                     CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to kafkaTestEnvironment.brokersURL,
                     "schema.registry.url" to schemaRegistryUrl,
@@ -68,13 +70,11 @@ class KafkaTestEnvironment {
     )
 
     //Duration 4 seconds to allow for hendelse to be added to topic
-    internal fun consumeInntektTopic(): List<ConsumerRecord<HendelseKey, PensjonsgivendeInntekt>> = inntektTestConsumer.poll(ofSeconds(15L)).records(PGI_HENDELSE_TOPIC).toList()
+    private fun consumeInntektTopic(): List<ConsumerRecord<HendelseKey, PensjonsgivendeInntekt>> = inntektTestConsumer.poll(ofSeconds(4L)).records(PGI_INNTEKT_TOPIC).toList()
 
     internal fun writeHendelse(hendelseKey: HendelseKey, hendelse: Hendelse) {
         val record = ProducerRecord(PGI_HENDELSE_TOPIC, hendelseKey, hendelse)
-        hendelseTestProducer.send(record)
-        { metadata, exception -> if (exception == null) println(metadata.serializedValueSize()) }
-        hendelseTestProducer.flush()
+        hendelseTestProducer.send(record).get()
     }
 
     fun getFirstRecordOnInntektTopic() = consumeInntektTopic()[0]
