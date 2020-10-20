@@ -5,8 +5,8 @@ import io.ktor.server.netty.*
 import no.nav.pensjon.samhandling.liveness.isAlive
 import no.nav.pensjon.samhandling.liveness.isReady
 import no.nav.pensjon.samhandling.metrics.metrics
-import no.nav.pgi.skatt.inntekt.kafka.KafkaConfig
-import no.nav.pgi.skatt.inntekt.kafka.PensjonsgivendeInntektStream
+import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
+import no.nav.pgi.skatt.inntekt.stream.PensjonsgivendeInntektStream
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

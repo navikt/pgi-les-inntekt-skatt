@@ -4,9 +4,9 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import no.nav.common.KafkaEnvironment
-import no.nav.pgi.skatt.inntekt.kafka.KafkaConfig
-import no.nav.pgi.skatt.inntekt.kafka.PGI_HENDELSE_TOPIC
-import no.nav.pgi.skatt.inntekt.kafka.PGI_INNTEKT_TOPIC
+import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
+import no.nav.pgi.skatt.inntekt.stream.PGI_HENDELSE_TOPIC
+import no.nav.pgi.skatt.inntekt.stream.PGI_INNTEKT_TOPIC
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt

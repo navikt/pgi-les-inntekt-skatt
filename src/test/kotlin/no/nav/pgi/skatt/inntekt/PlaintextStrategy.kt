@@ -1,6 +1,6 @@
 package no.nav.pgi.skatt.inntekt
 
-import no.nav.pgi.skatt.inntekt.kafka.KafkaConfig
+import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.common.security.auth.SecurityProtocol
 

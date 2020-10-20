@@ -1,4 +1,4 @@
-package no.nav.pgi.skatt.inntekt.kafka
+package no.nav.pgi.skatt.inntekt.stream
 
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import no.nav.pensjon.samhandling.env.getVal

@@ -1,4 +1,4 @@
-package no.nav.pgi.skatt.inntekt.kafka
+package no.nav.pgi.skatt.inntekt.stream
 
 import no.nav.pensjon.samhandling.env.getVal
 import org.apache.kafka.clients.CommonClientConfigs

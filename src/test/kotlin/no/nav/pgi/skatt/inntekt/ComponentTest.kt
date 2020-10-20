@@ -1,9 +1,8 @@
 package no.nav.pgi.skatt.inntekt
 
-import no.nav.pgi.skatt.inntekt.kafka.KafkaConfig
+import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.net.http.HttpResponse
