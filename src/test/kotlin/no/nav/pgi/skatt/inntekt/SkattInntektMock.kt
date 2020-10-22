@@ -2,6 +2,7 @@ package no.nav.pgi.skatt.inntekt
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
 
 private const val SKATT_INNTEKT_PORT = 8085
 private const val SKATT_INNTEKT_PATH = "/api/skatteoppgjoer/ekstern/grunnlag-pgi/hendelse/start"
@@ -25,12 +26,6 @@ internal class SkattInntektMock {
         skattApiMock.stop()
     }
 
-    private fun pgiJson() = "{\n" +
-            "  \"personidentifikator\": \"01234567890\",\n" +
-            "  \"inntektsaar\": \"2017\",\n" +
-            "  \"pensjonsgivendeInntekt\": 100000,\n" +
-            "  \"pensjonsgivendeInntektFastland\": 50000,\n" +
-            "  \"pensjonsgivendeInntektSvalbard\": 50000\n" +
-            "}"
+    private fun pgiJson() = PensjonsgivendeInntekt("12345678901", "2017").toString()
 
 }

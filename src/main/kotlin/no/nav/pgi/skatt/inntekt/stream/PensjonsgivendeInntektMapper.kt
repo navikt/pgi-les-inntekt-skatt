@@ -1,12 +1,17 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import no.nav.samordning.pgi.schema.Hendelse
-import no.nav.samordning.pgi.schema.HendelseKey
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
-import org.apache.kafka.streams.kstream.ValueMapperWithKey
+import org.apache.kafka.streams.kstream.ValueMapper
+import java.net.http.HttpResponse
 
-internal class PensjonsgivendeInntektMapper : ValueMapperWithKey<HendelseKey, Hendelse, PensjonsgivendeInntekt> {
-    override fun apply(key: HendelseKey, value: Hendelse): PensjonsgivendeInntekt {
+class PensjonsgivendeInntektMapper : ValueMapper<HttpResponse<String>, PensjonsgivendeInntekt> {
+    override fun apply(response: HttpResponse<String>): PensjonsgivendeInntekt {
+        return responseToPgi(response.body())
+    }
+
+    fun responseToPgi(responseBody: String): PensjonsgivendeInntekt {
+        //string response body to pensjonsgivendeInntekt. PgiDto?
         return PensjonsgivendeInntekt("12345678901", "2020")
     }
+
 }

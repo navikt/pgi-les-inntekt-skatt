@@ -16,9 +16,9 @@ fun main() {
     application.startPensjonsgivendeInntektStream()
 }
 
-internal class Application(kafkaConfig: KafkaConfig = KafkaConfig()) {
+internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), skattClient: SkattClient = SkattClient()) {
     private val log: Logger = LoggerFactory.getLogger(Application::class.java)
-    private val pensjonsgivendeInntektStream = PensjonsgivendeInntektStream(kafkaConfig.streamConfig())
+    private val pensjonsgivendeInntektStream = PensjonsgivendeInntektStream(kafkaConfig.streamConfig(), skattClient)
 
     init {
         val naisServer = embeddedServer(Netty, createApplicationEnvironment())

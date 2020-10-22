@@ -12,7 +12,8 @@ internal class ComponentTest {
     private val kafkaTestEnvironment = KafkaTestEnvironment()
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
     private val skattInntektMock = SkattInntektMock()
-    private val application = Application(kafkaConfig)
+    private val skattClient = SkattClient(mapOf("SKATT_URL" to SKATT_INNTEKT_URL))
+    private val application = Application(kafkaConfig, skattClient)
 
     @BeforeAll
     fun init() {
@@ -26,14 +27,6 @@ internal class ComponentTest {
         skattInntektMock.stop()
         kafkaTestEnvironment.tearDown()
         kafkaTestEnvironment.closeTestConsumer()
-    }
-
-    @Disabled("Under construction")
-    @Test
-    fun `crude test of skatt mock`() {
-        val client = SkattClient()
-        val response = client.send(createGetRequest(SKATT_INNTEKT_URL), HttpResponse.BodyHandlers.ofString())
-        println(response.body())
     }
 
     @Test
