@@ -8,10 +8,10 @@ import org.apache.kafka.streams.StreamsConfig.*
 import java.util.*
 
 internal const val STREAM_APPLICATION_ID = "pgi-les-inntekt-skatt-12341234"
-internal const val PGI_INNTEKT_TOPIC = "pensjonsamhandling.privat-pgi-inntekt"
-internal const val PGI_HENDELSE_TOPIC = "pensjonsamhandling.privat-pgi-hendelse"
+internal const val PGI_INNTEKT_TOPIC = "privat-pgi-inntekt"
+internal const val PGI_HENDELSE_TOPIC = "privat-pgi-hendelse"
 
-internal class KafkaConfig(environment: Map<String, String> = System.getenv(), private val securityStrategy: SecurityStrategy = SslStrategy()) {
+internal class KafkaConfig(environment: Map<String, String> = System.getenv(), private val securityStrategy: SecurityStrategy = SaslSslStrategy()) {
     private val bootstrapServers = environment.getVal(BOOTSTRAP_SERVERS_ENV_KEY)
     private val schemaRegistryUrl = environment.getVal(SCHEMA_REGISTRY_URL_ENV_KEY)
 
@@ -26,8 +26,8 @@ internal class KafkaConfig(environment: Map<String, String> = System.getenv(), p
     }
 
     companion object EnvironmentKeys {
-        internal const val BOOTSTRAP_SERVERS_ENV_KEY = "KAFKA_BROKERS"
-        internal const val SCHEMA_REGISTRY_URL_ENV_KEY = "KAFKA_SCHEMA_REGISTRY"
+        internal const val BOOTSTRAP_SERVERS_ENV_KEY = "ONPREM_KAFKA_BROKERS"
+        internal const val SCHEMA_REGISTRY_URL_ENV_KEY = "ONPREM_SCHEMA_REGISTRY"
     }
 
     internal interface SecurityStrategy {
