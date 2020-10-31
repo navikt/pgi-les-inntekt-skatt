@@ -22,6 +22,11 @@ internal class SkattInntektMock {
                 .willReturn(WireMock.okJson(pgiJson())))
     }
 
+    internal fun `stub 401 fra skatt`() {
+        skattApiMock.stubFor(WireMock.get(WireMock.urlPathEqualTo(SKATT_INNTEKT_PATH))
+                .willReturn(WireMock.unauthorized()))
+    }
+
     internal fun stop() {
         skattApiMock.stop()
     }
