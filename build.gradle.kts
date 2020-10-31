@@ -1,9 +1,9 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-import org.jetbrains.kotlin.gradle.tasks.*
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.6.0"
 val ktorVersion = "1.3.2-1.4.0-rc"
-val ktorSupportVersion ="0.0.6"
+val ktorSupportVersion = "0.0.6"
 val micrometerVersion = "1.3.5"
 val slf4jVersion = "1.7.30"
 val log4jVersion = "2.13.3"
@@ -12,6 +12,8 @@ val wiremockVersion = "2.27.1"
 val kafkaVersion = "2.5.0"
 val confluentVersion = "5.5.1"
 val kafkaEmbeddedEnvVersion = "2.5.0"
+
+val joseJwtVersion = "9.0.1"
 
 group = "no.nav.pgi"
 
@@ -25,7 +27,7 @@ repositories {
     mavenCentral()
     maven("https://packages.confluent.io/maven/")
     maven("https://jitpack.io")
-    maven("https://maven.pkg.github.com/navikt/pensjon-samhandling-ktor-support"){
+    maven("https://maven.pkg.github.com/navikt/pensjon-samhandling-ktor-support") {
         credentials {
             username = System.getenv("GITHUB_ACTOR")
             password = System.getenv("GITHUB_TOKEN")
@@ -58,6 +60,8 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion")
+
+    implementation("com.nimbusds:nimbus-jose-jwt:$joseJwtVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
