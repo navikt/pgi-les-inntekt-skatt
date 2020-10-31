@@ -1,12 +1,12 @@
 package no.nav.pgi.skatt.inntekt.stream
 
+import no.nav.pensjon.samhandling.maskfnr.maskFnr
 import no.nav.pgi.skatt.inntekt.SkattClient
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
-import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.KStream
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -34,7 +34,7 @@ internal class PensjonsgivendeInntektStream(streamProperties: Properties, skattC
     }
 
     private fun logHendelseAboutToBeProcessed(): (HendelseKey, Hendelse) -> Unit =
-            { _: HendelseKey, hendelse: Hendelse -> LOG.info("Started processing hendelse ${maskFnrFrom(hendelse.toString())}") }
+            { _: HendelseKey, hendelse: Hendelse -> LOG.info("Started processing hendelse ${hendelse.toString().maskFnr()}") }
 
     private fun setUncaughtStreamExceptionHandler() {
         pensjonsgivendeInntektStream.setUncaughtExceptionHandler { thread: Thread?, e: Throwable? ->
@@ -58,5 +58,3 @@ internal class PensjonsgivendeInntektStream(streamProperties: Properties, skattC
     }
 }
 
-private val fnrRegex = "(\\d{6})\\d{5}".toRegex()
-internal fun maskFnrFrom(unmaskedString: String) = fnrRegex.replace(unmaskedString, "\$1*****")
