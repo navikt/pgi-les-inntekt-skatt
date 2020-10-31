@@ -1,14 +1,8 @@
 package no.nav.pgi.skatt.inntekt
 
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import no.nav.pensjon.samhandling.liveness.isAlive
-import no.nav.pensjon.samhandling.liveness.isReady
-import no.nav.pensjon.samhandling.metrics.metrics
+import no.nav.pensjon.samhandling.naisserver.naisServer
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PensjonsgivendeInntektStream
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 
 fun main() {
@@ -17,24 +11,12 @@ fun main() {
 }
 
 internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), skattClient: SkattClient = SkattClient()) {
-    private val log: Logger = LoggerFactory.getLogger(Application::class.java)
     private val pensjonsgivendeInntektStream = PensjonsgivendeInntektStream(kafkaConfig.streamConfig(), skattClient)
 
     init {
-        val naisServer = embeddedServer(Netty, createApplicationEnvironment())
+        val naisServer = naisServer()
         naisServer.start()
-        log.info("Nais server started")
     }
-
-    private fun createApplicationEnvironment(serverPort: Int = 8080) =
-            applicationEngineEnvironment {
-                connector { port = serverPort }
-                module {
-                    isAlive()
-                    isReady()
-                    metrics()
-                }
-            }
 
     internal fun startPensjonsgivendeInntektStream() {
         pensjonsgivendeInntektStream.start()
