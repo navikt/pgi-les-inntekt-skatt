@@ -1,13 +1,14 @@
 package no.nav.pgi.skatt.inntekt
 
 import no.nav.pensjon.samhandling.env.getVal
+import no.nav.pensjon.samhandling.maskinporten.Maskinporten
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 class SkattClient(env: Map<String, String> = System.getenv()) {
-    //private val maskinportenClient: MaskinportenClient = MaskinportenClient(env)
+    private val maskinporten: Maskinporten = Maskinporten(env)
     private val httpClient: HttpClient = HttpClient.newHttpClient()
     private val skattUrl = env.getVal("SKATT_URL")
 
@@ -17,7 +18,7 @@ class SkattClient(env: Map<String, String> = System.getenv()) {
     internal fun createGetRequest(queryParameters: Map<String, Any> = emptyMap()) = HttpRequest.newBuilder()
             .uri(URI.create(skattUrl + queryParameters.createQueryString()))
             .GET()
-            //.setHeader("Authorization", "Bearer ${maskinportenClient.getMaskinportenToken()}")
+            .setHeader("Authorization", "Bearer ${maskinporten.token}")
             .build()
 }
 

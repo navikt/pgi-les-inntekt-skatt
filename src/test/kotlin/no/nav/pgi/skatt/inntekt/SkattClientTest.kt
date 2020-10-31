@@ -2,6 +2,7 @@ package no.nav.pgi.skatt.inntekt
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import no.nav.pgi.skatt.inntekt.MaskinportenMock.Companion.MASKINPORTEN_ENV_VARIABLES
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import java.net.http.HttpResponse
@@ -14,17 +15,20 @@ private const val URL = "http://localhost:$PORT$PATH"
 class SkattClientTest {
 
     private val environment = mapOf("SKATT_URL" to URL)
-    private val skattClient: SkattClient = SkattClient(environment)
+    private val skattClient: SkattClient = SkattClient(environment + MASKINPORTEN_ENV_VARIABLES)
     private val skattMock = WireMockServer(PORT)
+    private val maskinportenMock = MaskinportenMock()
 
     @BeforeAll
     internal fun init() {
         skattMock.start()
+        maskinportenMock.`stub maskinporten token endpoint`()
     }
 
     @AfterAll
     internal fun teardown() {
         skattMock.stop()
+        maskinportenMock.stop()
     }
 
     @Test

@@ -1,30 +1,36 @@
 package no.nav.pgi.skatt.inntekt
 
+import no.nav.pgi.skatt.inntekt.MaskinportenMock.Companion.MASKINPORTEN_ENV_VARIABLES
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
-import java.net.http.HttpResponse
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ComponentTest {
     private val kafkaTestEnvironment = KafkaTestEnvironment()
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
     private val skattInntektMock = SkattInntektMock()
-    private val skattClient = SkattClient(mapOf("SKATT_URL" to SKATT_INNTEKT_URL))
+    private val maskinportenMock = MaskinportenMock()
+    private val skattClient = SkattClient(mapOf("SKATT_URL" to SKATT_INNTEKT_URL) + MASKINPORTEN_ENV_VARIABLES)
     private val application = Application(kafkaConfig, skattClient)
 
     @BeforeAll
     fun init() {
         application.startPensjonsgivendeInntektStream()
         skattInntektMock.`stub inntekt fra skatt`()
+        maskinportenMock.`stub maskinporten token endpoint`()
     }
 
     @AfterAll
     fun tearDown() {
         application.stopPensjonsgivendeInntektStream()
         skattInntektMock.stop()
+        maskinportenMock.stop()
         kafkaTestEnvironment.tearDown()
         kafkaTestEnvironment.closeTestConsumer()
     }

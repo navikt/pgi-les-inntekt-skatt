@@ -10,6 +10,7 @@ import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
+import no.nav.pensjon.samhandling.maskinporten.*
 import java.util.*
 
 private const val PORT = 8096
@@ -28,7 +29,7 @@ internal class MaskinportenMock {
         mock.stop()
     }
 
-    internal fun `mock  maskinporten token enpoint`() {
+    internal fun `stub maskinporten token endpoint`() {
         mock.stubFor(WireMock.post(WireMock.urlPathEqualTo(TOKEN_PATH))
                 .willReturn(WireMock.ok("""{
                       "access_token" : "${createMaskinportenToken()}",
@@ -52,4 +53,14 @@ internal class MaskinportenMock {
         signedJWT.sign(signer)
         return signedJWT.serialize()
     }
+
+    companion object {
+        val MASKINPORTEN_ENV_VARIABLES: Map<String, String> = mapOf(
+                SCOPE_ENV_KEY to "testScope",
+                CLIENT_ID_ENV_KEY to "testClient",
+                VALID_IN_SECONDS_ENV_KEY to "120",
+                PRIVATE_JWK_ENV_KEY to RSAKeyGenerator(2048).keyID("123").generate().toJSONString(),
+                MASKINPORTEN_TOKEN_HOST_ENV_KEY to MASKINPORTEN_MOCK_HOST)
+    }
+
 }
