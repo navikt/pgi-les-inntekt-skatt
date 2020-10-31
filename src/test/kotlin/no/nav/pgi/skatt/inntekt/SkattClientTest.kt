@@ -45,7 +45,7 @@ class SkattClientTest {
                 ))
                 .willReturn(WireMock.ok()))
 
-        val response = skattClient.send(skattClient.createGetRequest(mapOf(key1 to value1, key2 to value2)), HttpResponse.BodyHandlers.discarding())
+        val response = skattClient.getPensjonsgivendeInntekter(skattClient.createGetRequest(mapOf(key1 to value1, key2 to value2)), HttpResponse.BodyHandlers.discarding())
 
         assertEquals(200, response.statusCode())
     }

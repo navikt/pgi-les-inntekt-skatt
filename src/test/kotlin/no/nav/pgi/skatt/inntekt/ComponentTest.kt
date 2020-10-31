@@ -4,11 +4,8 @@ import no.nav.pgi.skatt.inntekt.MaskinportenMock.Companion.MASKINPORTEN_ENV_VARI
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
-import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ComponentTest {
@@ -23,6 +20,7 @@ internal class ComponentTest {
     fun init() {
         application.startPensjonsgivendeInntektStream()
         skattInntektMock.`stub inntekt fra skatt`()
+        skattInntektMock.`stub 401 fra skatt`()
         maskinportenMock.`stub maskinporten token endpoint`()
     }
 
@@ -43,4 +41,15 @@ internal class ComponentTest {
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
         assertEquals(hendelseKey, kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
     }
+
+    @Disabled("Under construction")
+    @Test
+    fun `reads hendelser from topic, gets 401 from skatt`() {
+        val hendelseKey = HendelseKey("12345678901", "2020")
+        val hendelse = Hendelse(12345L, "12345678901", "2020")
+
+        kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
+    }
+
+
 }

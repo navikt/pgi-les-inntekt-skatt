@@ -9,7 +9,7 @@ internal class HendelseToSkattResponseMapper(private val skattClient: SkattClien
 
     override fun apply(hendelse: Hendelse): HttpResponse<String> {
         val request = skattClient.createGetRequest(pgiQueryParams(hendelse))
-        return skattClient.send(request, HttpResponse.BodyHandlers.ofString())
+        return skattClient.getPensjonsgivendeInntekter(request, HttpResponse.BodyHandlers.ofString())
     }
 
     private fun pgiQueryParams(hendelse: Hendelse) =
