@@ -31,6 +31,11 @@ internal class SkattInntektMock {
         skattApiMock.stop()
     }
 
+    fun reset() {
+        skattApiMock.resetAll()
+    }
+
     private fun pgiJson() = PensjonsgivendeInntekt("12345678901", "2017").toString()
+
 
 }

@@ -19,9 +19,12 @@ internal class ComponentTest {
     @BeforeAll
     fun init() {
         application.startPensjonsgivendeInntektStream()
-        skattInntektMock.`stub inntekt fra skatt`()
-        //skattInntektMock.`stub 401 fra skatt`()
         maskinportenMock.`stub maskinporten token endpoint`()
+    }
+
+    @BeforeEach
+    fun beforeEach(){
+        skattInntektMock.reset()
     }
 
     @AfterAll
@@ -37,17 +40,18 @@ internal class ComponentTest {
     fun `reads hendelser from topic, gets pgi based on hendelse, produces inntekt to topic`() {
         val hendelseKey = HendelseKey("12345678901", "2020")
         val hendelse = Hendelse(12345L, "12345678901", "2020")
+        skattInntektMock.`stub inntekt fra skatt`()
 
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
         assertEquals(hendelseKey, kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
     }
 
-    @Disabled("Under construction")
     @Test
     fun `reads hendelser from topic, gets 401 from skatt`() {
         val hendelseKey = HendelseKey("12345678901", "2020")
         val hendelse = Hendelse(12345L, "12345678901", "2020")
 
+        skattInntektMock.`stub 401 fra skatt`()
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
     }
 
