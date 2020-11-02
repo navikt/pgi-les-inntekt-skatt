@@ -20,7 +20,7 @@ internal class ComponentTest {
     fun init() {
         application.startPensjonsgivendeInntektStream()
         skattInntektMock.`stub inntekt fra skatt`()
-        skattInntektMock.`stub 401 fra skatt`()
+        //skattInntektMock.`stub 401 fra skatt`()
         maskinportenMock.`stub maskinporten token endpoint`()
     }
 
