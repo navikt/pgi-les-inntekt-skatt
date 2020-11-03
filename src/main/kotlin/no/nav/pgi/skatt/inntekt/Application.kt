@@ -10,8 +10,8 @@ fun main() {
     application.startPensjonsgivendeInntektStream()
 }
 
-internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), skattClient: SkattClient = SkattClient()) {
-    private val pensjonsgivendeInntektStream = PensjonsgivendeInntektStream(kafkaConfig.streamConfig(), skattClient)
+internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pensjonsgivendeInntektClient: PensjonsgivendeInntektClient = PensjonsgivendeInntektClient()) {
+    private val pensjonsgivendeInntektStream = PensjonsgivendeInntektStream(kafkaConfig.streamConfig(), pensjonsgivendeInntektClient)
 
     init {
         val naisServer = naisServer()

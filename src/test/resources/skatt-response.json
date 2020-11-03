@@ -1,0 +1,30 @@
+{
+  "norskPersonidentifikator": "07021063625",
+  "inntektsaar": 2019,
+  "pensjonsgivendeInntekt": [
+    {
+      "skatteordning": "FASTLAND",
+      "datoForFastetting": "2020-11-02",
+      "pensjonsgivendeInntektAvLoennsinntekt": 9656805,
+      "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 8124969,
+      "pensjonsgivendeInntektAvNaeringsinntekt": 6171061,
+      "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 2407046
+    },
+    {
+      "skatteordning": "KILDESKATT_PAA_LOENN",
+      "datoForFastetting": "2020-11-02",
+      "pensjonsgivendeInntektAvLoennsinntekt": 1981769,
+      "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 2973637,
+      "pensjonsgivendeInntektAvNaeringsinntekt": 8331534,
+      "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 187334
+    },
+    {
+      "skatteordning": "SVALBARD",
+      "datoForFastetting": "2020-11-02",
+      "pensjonsgivendeInntektAvLoennsinntekt": 4889051,
+      "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 2915688,
+      "pensjonsgivendeInntektAvNaeringsinntekt": 6764601,
+      "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 3050771
+    }
+  ]
+}

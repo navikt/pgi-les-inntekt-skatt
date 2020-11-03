@@ -1,7 +1,7 @@
 package no.nav.pgi.skatt.inntekt.stream
 
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
-import no.nav.pgi.skatt.inntekt.SkattClient
+import no.nav.pgi.skatt.inntekt.PensjonsgivendeInntektClient
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import org.apache.kafka.streams.KafkaStreams
@@ -12,21 +12,21 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 
-internal class PensjonsgivendeInntektStream(streamProperties: Properties, skattClient: SkattClient = SkattClient()) {
+internal class PensjonsgivendeInntektStream(streamProperties: Properties, pensjonsgivendeInntektClient: PensjonsgivendeInntektClient = PensjonsgivendeInntektClient()) {
 
-    private val pensjonsgivendeInntektStream = KafkaStreams(setupStreamTopology(skattClient), streamProperties)
+    private val pensjonsgivendeInntektStream = KafkaStreams(setupStreamTopology(pensjonsgivendeInntektClient), streamProperties)
 
     init {
         setStreamStateListener()
         setUncaughtStreamExceptionHandler()
     }
 
-    private fun setupStreamTopology(skattClient: SkattClient): Topology {
+    private fun setupStreamTopology(pensjonsgivendeInntektClient: PensjonsgivendeInntektClient): Topology {
         val streamBuilder = StreamsBuilder()
         val stream: KStream<HendelseKey, Hendelse> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
 
         stream.peek(logHendelseAboutToBeProcessed())
-                .mapValues(HendelseToSkattResponseMapper(skattClient))
+                .mapValues(HendelseToPensjonsgivendeInntektResponseMapper(pensjonsgivendeInntektClient))
                 .mapValues(PensjonsgivendeInntektMapper())
                 .to(PGI_INNTEKT_TOPIC)
 

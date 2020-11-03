@@ -1,4 +1,4 @@
-package no.nav.pgi.skatt.inntekt
+package no.nav.pgi.skatt.inntekt.mock
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -18,12 +18,8 @@ private const val TOKEN_PATH = "/token"
 internal const val MASKINPORTEN_MOCK_HOST = "http://localhost:$PORT"
 
 internal class MaskinportenMock {
-    private var mock = WireMockServer(PORT)
+    private var mock = WireMockServer(PORT).also { it.start() }
     private val privateKey: RSAKey = RSAKeyGenerator(2048).keyID("123").generate()
-
-    init {
-        mock.start()
-    }
 
     internal fun stop() {
         mock.stop()
