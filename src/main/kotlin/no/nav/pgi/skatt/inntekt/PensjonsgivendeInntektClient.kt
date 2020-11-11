@@ -7,7 +7,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import javax.ws.rs.core.UriBuilder
 
-internal const val PENSJONGIVENDE_INNTEKT_URL_ENV_KEY = "SKATT_INNTAKT_URL"
+internal const val PENSJONGIVENDE_INNTEKT_URL_ENV_KEY = "SKATT_INNTEKT_URL"
 
 class PensjonsgivendeInntektClient(env: Map<String, String> = System.getenv()) {
     private val maskinporten: Maskinporten = Maskinporten(env)
