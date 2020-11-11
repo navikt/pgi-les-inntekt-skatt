@@ -1,5 +1,6 @@
 package no.nav.pgi.skatt.inntekt.stream
 
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.*
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import no.nav.pensjon.samhandling.env.getVal
 import org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG
@@ -8,26 +9,36 @@ import org.apache.kafka.streams.StreamsConfig.*
 import java.util.*
 
 internal const val STREAM_APPLICATION_ID = "pgi-les-inntekt-skatt-12341234"
-internal const val PGI_INNTEKT_TOPIC = "privat-pgi-inntekt"
-internal const val PGI_HENDELSE_TOPIC = "privat-pgi-hendelse"
+internal const val PGI_INNTEKT_TOPIC = "pensjonsamhandling.privat-pgi-inntekt"
+internal const val PGI_HENDELSE_TOPIC = "pensjonsamhandling.privat-pgi-hendelse"
 
-internal class KafkaConfig(environment: Map<String, String> = System.getenv(), private val securityStrategy: SecurityStrategy = SaslSslStrategy()) {
-    private val bootstrapServers = environment.getVal(BOOTSTRAP_SERVERS_ENV_KEY)
-    private val schemaRegistryUrl = environment.getVal(SCHEMA_REGISTRY_URL_ENV_KEY)
+internal class KafkaConfig(environment: Map<String, String> = System.getenv(), private val securityStrategy: SecurityStrategy = SslStrategy()) {
+    private val bootstrapServers = environment.getVal(BOOTSTRAP_SERVERS)
+    private val schemaRegUsername = environment.getVal(SCHEMA_REGISTRY_USERNAME)
+    private val schemaRegPassword = environment.getVal(SCHEMA_REGISTRY_PASSWORD)
+    private val schemaRegistryUrl = environment.getVal(SCHEMA_REGISTRY)
 
     internal fun streamConfig(): Properties = Properties().apply {
         put(BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-        put("schema.registry.url", schemaRegistryUrl)
         put(DEFAULT_KEY_SERDE_CLASS_CONFIG, SpecificAvroSerde::class.java)
         put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, SpecificAvroSerde::class.java)
         put(APPLICATION_ID_CONFIG, STREAM_APPLICATION_ID)
         put(AUTO_OFFSET_RESET_CONFIG, "earliest")
         putAll(securityStrategy.securityConfig())
+        putAll(schemaRegistryConfig())
     }
 
-    companion object EnvironmentKeys {
-        internal const val BOOTSTRAP_SERVERS_ENV_KEY = "ONPREM_KAFKA_BROKERS"
-        internal const val SCHEMA_REGISTRY_URL_ENV_KEY = "ONPREM_SCHEMA_REGISTRY"
+    private fun schemaRegistryConfig() = mapOf(
+            BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO",
+            USER_INFO_CONFIG to "$schemaRegUsername:$schemaRegPassword",
+            SCHEMA_REGISTRY_URL_CONFIG to schemaRegistryUrl
+    )
+
+    internal companion object EnvironmentKeys {
+        const val BOOTSTRAP_SERVERS = "KAFKA_BROKERS"
+        const val SCHEMA_REGISTRY = "KAFKA_SCHEMA_REGISTRY"
+        const val SCHEMA_REGISTRY_USERNAME = "KAFKA_SCHEMA_REGISTRY_USER"
+        const val SCHEMA_REGISTRY_PASSWORD = "KAFKA_SCHEMA_REGISTRY_PASSWORD"
     }
 
     internal interface SecurityStrategy {

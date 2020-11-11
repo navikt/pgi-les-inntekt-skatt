@@ -20,7 +20,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import java.time.Duration.ofSeconds
 
 
-class KafkaTestEnvironment {
+internal class KafkaTestEnvironment {
 
     private val kafkaTestEnvironment: KafkaEnvironment = KafkaEnvironment(
             withSchemaRegistry = true,
@@ -43,9 +43,11 @@ class KafkaTestEnvironment {
 
     internal fun tearDown() = kafkaTestEnvironment.tearDown()
 
-    internal fun testConfiguration() = mapOf<String, String>(
-            KafkaConfig.BOOTSTRAP_SERVERS_ENV_KEY to kafkaTestEnvironment.brokersURL,
-            KafkaConfig.SCHEMA_REGISTRY_URL_ENV_KEY to schemaRegistryUrl,
+    internal fun testConfiguration() = mapOf(
+            KafkaConfig.BOOTSTRAP_SERVERS to kafkaTestEnvironment.brokersURL,
+            KafkaConfig.SCHEMA_REGISTRY to schemaRegistryUrl,
+            KafkaConfig.SCHEMA_REGISTRY_USERNAME to "mrOpenSource",
+            KafkaConfig.SCHEMA_REGISTRY_PASSWORD to "opensourcedPassword"
     )
 
     private fun inntektTestConsumer() = KafkaConsumer<HendelseKey, PensjonsgivendeInntekt>(
