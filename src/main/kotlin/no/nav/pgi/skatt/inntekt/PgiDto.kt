@@ -30,7 +30,7 @@ data class PgiPerOrdningDto(
         val pensjonsgivendeInntektAvLoennsinntekt: Long?,
         val pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel: Long?,
         val pensjonsgivendeInntektAvNaeringsinntekt: Long?,
-        val pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage: Long?,
+        val pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage: Long?
 ) {
     @JsonIgnore
     internal fun validate() {
@@ -39,5 +39,5 @@ data class PgiPerOrdningDto(
     }
 }
 
-internal class InntektDtoException(MissingVariableName: String) : Exception("""$MissingVariableName is missing in ${PgiDto::class.simpleName}""")
-internal class InntektPerOrdningDtoException(MissingVariableName: String) : Exception("""$MissingVariableName is missing in ${PgiPerOrdningDto::class.simpleName}""")
+internal class InntektDtoException(missingVariableName: String) : Exception("""$missingVariableName is missing in ${PgiDto::class.simpleName}""")
+internal class InntektPerOrdningDtoException(missingVariableName: String) : Exception("""$missingVariableName is missing in ${PgiPerOrdningDto::class.simpleName}""")
