@@ -27,8 +27,8 @@ internal class PGIStream(streamProperties: Properties, pgiClient: PgiClient = Pg
 
         stream.peek(logHendelseAboutToBeProcessed())
                 .mapValues(FetchPgiFromSkatt(pgiClient))
-                .mapValues(mapToPgiDto())
-                .mapValues(mapToPgiAvro())
+                .mapValues(MapToPgiDto())
+                .mapValues(MapToPgiAvro())
                 .to(PGI_INNTEKT_TOPIC)
 
         return streamBuilder.build()

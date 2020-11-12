@@ -5,7 +5,7 @@ import no.nav.pgi.skatt.inntekt.mapToPGIDto
 import org.apache.kafka.streams.kstream.ValueMapper
 import java.net.http.HttpResponse
 
-class mapToPgiDto : ValueMapper<HttpResponse<String>, PgiDto> {
+class MapToPgiDto : ValueMapper<HttpResponse<String>, PgiDto> {
     override fun apply(response: HttpResponse<String>): PgiDto {
         return responseDto(response.body())
     }

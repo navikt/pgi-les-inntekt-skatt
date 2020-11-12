@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory
 private val logger = LoggerFactory.getLogger(PgiDto::class.java)
 private val objectMapper = ObjectMapper().registerModule(KotlinModule())
 
-internal fun String.mapToPGIDto(): PgiDto {
-    return objectMapper.readValue<PgiDto>(this)
-            .also { it.validate() }
-}
+internal fun String.mapToPGIDto(): PgiDto = objectMapper.readValue<PgiDto>(this).also { it.validate() }
 
 data class PgiDto(
         val norskPersonidentifikator: String?,
@@ -37,10 +34,10 @@ data class PgiPerOrdningDto(
 ) {
     @JsonIgnore
     internal fun validate() {
-        if (skatteordning == null) throw inntektPerOrdningDtoException("skatteordning").also { logger.error(it.message) }
-        if (datoForFastetting == null) throw inntektPerOrdningDtoException("datoForFastetting").also { logger.error(it.message) }
+        if (skatteordning == null) throw InntektPerOrdningDtoException("skatteordning").also { logger.error(it.message) }
+        if (datoForFastetting == null) throw InntektPerOrdningDtoException("datoForFastetting").also { logger.error(it.message) }
     }
 }
 
 internal class InntektDtoException(MissingVariableName: String) : Exception("""$MissingVariableName is missing in ${PgiDto::class.simpleName}""")
-internal class inntektPerOrdningDtoException(MissingVariableName: String) : Exception("""$MissingVariableName is missing in ${PgiPerOrdningDto::class.simpleName}""")
+internal class InntektPerOrdningDtoException(MissingVariableName: String) : Exception("""$MissingVariableName is missing in ${PgiPerOrdningDto::class.simpleName}""")

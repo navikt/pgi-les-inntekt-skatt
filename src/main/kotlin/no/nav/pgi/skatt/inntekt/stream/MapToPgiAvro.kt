@@ -7,22 +7,19 @@ import no.nav.samordning.pgi.schema.PensjonsgivendeInntektPerOrdning
 import no.nav.samordning.pgi.schema.Skatteordning
 import org.apache.kafka.streams.kstream.ValueMapper
 
-class mapToPgiAvro : ValueMapper<PgiDto, PensjonsgivendeInntekt> {
-    override fun apply(PgiDto: PgiDto): PensjonsgivendeInntekt {
-        return dtoToPensjonsgivendeInntekt(PgiDto)
-    }
+internal class MapToPgiAvro : ValueMapper<PgiDto, PensjonsgivendeInntekt> {
 
-    internal fun dtoToPensjonsgivendeInntekt(pgiDto: PgiDto): PensjonsgivendeInntekt {
-        return PensjonsgivendeInntekt(
-                pgiDto.norskPersonidentifikator,
-                pgiDto.inntektsaar.toString(),
-                mapToPensjonsgivendeInntektPerOrdning(pgiDto.pensjonsgivendeInntekt))
-    }
+    override fun apply(pgiDto: PgiDto): PensjonsgivendeInntekt = toPensjonsgivendeInntekt(pgiDto)
 
-    internal fun mapToPensjonsgivendeInntektPerOrdning(pensjonsgivendeInntekt: List<PgiPerOrdningDto>) =
+    private fun toPensjonsgivendeInntekt(pgiDto: PgiDto): PensjonsgivendeInntekt = PensjonsgivendeInntekt(
+            pgiDto.norskPersonidentifikator,
+            pgiDto.inntektsaar.toString(),
+            toPensjonsgivendeInntektPerOrdning(pgiDto.pensjonsgivendeInntekt))
+
+    private fun toPensjonsgivendeInntektPerOrdning(pensjonsgivendeInntekt: List<PgiPerOrdningDto>) =
             pensjonsgivendeInntekt.map {
                 PensjonsgivendeInntektPerOrdning(
-                        mapToSkatteordningEnum(it.skatteordning),
+                        toSkatteordningEnum(it.skatteordning),
                         it.datoForFastetting,
                         it.pensjonsgivendeInntektAvLoennsinntekt,
                         it.pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel,
@@ -31,7 +28,7 @@ class mapToPgiAvro : ValueMapper<PgiDto, PensjonsgivendeInntekt> {
                 )
             }
 
-    private fun mapToSkatteordningEnum(skatteordning: String?): Skatteordning =
+    private fun toSkatteordningEnum(skatteordning: String?): Skatteordning =
             when (skatteordning) {
                 "FASTLAND" -> Skatteordning.FASTLAND
                 "SVALBARD" -> Skatteordning.SVALBARD
@@ -40,5 +37,5 @@ class mapToPgiAvro : ValueMapper<PgiDto, PensjonsgivendeInntekt> {
             }
 }
 
-internal class MissingSkatteordningException(MissingSkatteordning: String?) :
-        Exception("""Cant find $MissingSkatteordning in ${Skatteordning::class.simpleName} enum when converting from DTO to avro. """)
+internal class MissingSkatteordningException(missingSkatteordning: String?) :
+        Exception("""Cant find $missingSkatteordning in ${Skatteordning::class.simpleName} enum when converting from DTO to avro. """)
