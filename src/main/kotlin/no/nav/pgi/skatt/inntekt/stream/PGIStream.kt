@@ -1,7 +1,7 @@
 package no.nav.pgi.skatt.inntekt.stream
 
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
-import no.nav.pgi.skatt.inntekt.PensjonsgivendeInntektClient
+import no.nav.pgi.skatt.inntekt.PgiClient
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import org.apache.kafka.streams.KafkaStreams
@@ -12,22 +12,23 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 
-internal class PensjonsgivendeInntektStream(streamProperties: Properties, pensjonsgivendeInntektClient: PensjonsgivendeInntektClient = PensjonsgivendeInntektClient()) {
+internal class PGIStream(streamProperties: Properties, pgiClient: PgiClient = PgiClient()) {
 
-    private val pensjonsgivendeInntektStream = KafkaStreams(setupStreamTopology(pensjonsgivendeInntektClient), streamProperties)
+    private val pensjonsgivendeInntektStream = KafkaStreams(setupStreamTopology(pgiClient), streamProperties)
 
     init {
         setStreamStateListener()
         setUncaughtStreamExceptionHandler()
     }
 
-    private fun setupStreamTopology(pensjonsgivendeInntektClient: PensjonsgivendeInntektClient): Topology {
+    private fun setupStreamTopology(pgiClient: PgiClient): Topology {
         val streamBuilder = StreamsBuilder()
         val stream: KStream<HendelseKey, Hendelse> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
 
         stream.peek(logHendelseAboutToBeProcessed())
-                .mapValues(HendelseToPensjonsgivendeInntektResponseMapper(pensjonsgivendeInntektClient))
-                .mapValues(PensjonsgivendeInntektMapper())
+                .mapValues(FetchPgiFromSkatt(pgiClient))
+                .mapValues(mapToPgiDto())
+                .mapValues(mapToPgiAvro())
                 .to(PGI_INNTEKT_TOPIC)
 
         return streamBuilder.build()
@@ -49,12 +50,11 @@ internal class PensjonsgivendeInntektStream(streamProperties: Properties, pensjo
         }
     }
 
-
     internal fun start() = pensjonsgivendeInntektStream.start()
     internal fun close() = pensjonsgivendeInntektStream.close()
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(PensjonsgivendeInntektStream::class.java)
+        private val LOG = LoggerFactory.getLogger(PGIStream::class.java)
     }
 }
 

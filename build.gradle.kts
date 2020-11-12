@@ -49,7 +49,7 @@ dependencies {
     implementation("no.nav.pensjonsamhandling:pensjon-samhandling-ktor-support:$ktorSupportVersion")
     implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
-    implementation("no.nav.pensjonsamhandling:pgi-schema:0.0.0")
+    implementation("no.nav.pensjonsamhandling:pgi-schema:0.0.2")
 
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
     implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")

@@ -16,7 +16,7 @@ internal class ComponentTest {
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
-    private val skattClient = PensjonsgivendeInntektClient(mapOf(PENSJONGIVENDE_INNTEKT_URL_ENV_KEY to PENSJONGIVENDE_INNTEKT_MOCK_URL) + MASKINPORTEN_ENV_VARIABLES)
+    private val skattClient = PgiClient(mapOf(PENSJONGIVENDE_INNTEKT_URL_ENV_KEY to PENSJONGIVENDE_INNTEKT_MOCK_URL) + MASKINPORTEN_ENV_VARIABLES)
     private val application = Application(kafkaConfig, skattClient)
 
     @BeforeAll

@@ -9,7 +9,7 @@ import javax.ws.rs.core.UriBuilder
 
 internal const val PENSJONGIVENDE_INNTEKT_URL_ENV_KEY = "SKATT_INNTEKT_URL"
 
-class PensjonsgivendeInntektClient(env: Map<String, String> = System.getenv()) {
+class PgiClient(env: Map<String, String> = System.getenv()) {
     private val maskinporten: Maskinporten = Maskinporten(env)
     private val httpClient: HttpClient = HttpClient.newHttpClient()
     private val skattUrl = env.getVal(PENSJONGIVENDE_INNTEKT_URL_ENV_KEY)

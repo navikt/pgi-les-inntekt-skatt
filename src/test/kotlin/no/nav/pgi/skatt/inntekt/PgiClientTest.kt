@@ -10,10 +10,10 @@ import java.net.http.HttpResponse
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class PensjonsgivendeInntektClientTest {
+class PgiClientTest {
 
     private val environment = mapOf(PENSJONGIVENDE_INNTEKT_URL_ENV_KEY to PENSJONGIVENDE_INNTEKT_MOCK_URL)
-    private val pensjonsgivendeInntektClient: PensjonsgivendeInntektClient = PensjonsgivendeInntektClient(environment + MASKINPORTEN_ENV_VARIABLES)
+    private val pgiClient: PgiClient = PgiClient(environment + MASKINPORTEN_ENV_VARIABLES)
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
 
@@ -35,7 +35,7 @@ class PensjonsgivendeInntektClientTest {
 
         pensjonsgivendeInntektMock.`stub pensjongivende inntekt`(inntektsaar,norskPersonidentifikator)
 
-        val response = pensjonsgivendeInntektClient.getPensjonsgivendeInntekter(pensjonsgivendeInntektClient.createPensjonsgivendeInntekterRequest(inntektsaar, norskPersonidentifikator), HttpResponse.BodyHandlers.discarding())
+        val response = pgiClient.getPensjonsgivendeInntekter(pgiClient.createPensjonsgivendeInntekterRequest(inntektsaar, norskPersonidentifikator), HttpResponse.BodyHandlers.discarding())
 
         assertEquals(200, response.statusCode())
     }
