@@ -7,11 +7,10 @@ import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 
 private const val FNR = "12345678901"
-private const val INNTEKTS_AAR = 2018
+private const val INNTEKTS_AAR = 2018L
 
 private const val SKATTEORDNING_FASTLAND = "FASTLAND"
 private const val SKATTEORDNING_KILDESKATT_PAA_LOENN = "KILDESKATT_PAA_LOENN"
@@ -32,7 +31,7 @@ internal class MapToPgiAvroTest {
         val pensjonsgivendeInntekt: PensjonsgivendeInntekt = mapper.apply(createPgiDto(pensjonsgivendeInntekt = emptyList()))
 
         assertEquals(FNR, pensjonsgivendeInntekt.getNorskPersonidentifikator())
-        assertEquals(INNTEKTS_AAR.toString(), pensjonsgivendeInntekt.getInntektsaar())
+        assertEquals(INNTEKTS_AAR, pensjonsgivendeInntekt.getInntektsaar())
         assertTrue(pensjonsgivendeInntekt.getPensjonsgivendeInntekt().isEmpty())
     }
 
@@ -45,6 +44,7 @@ internal class MapToPgiAvroTest {
         val svalbardInntekt = pensjonsgivendeInntekt.getPgiPerOrdning(SKATTEORDNING_SVALBARD)
 
         assertEquals(SKATTEORDNING_FASTLAND, fastlandInntekt!!.getSkatteordning().name)
+        assertEquals(DATO_FOR_FASTSETTING, fastlandInntekt.getDatoForFastsetting())
         assertEquals(INNTEKT_AV_LOENNSINNTEKT, fastlandInntekt.getPensjonsgivendeInntektAvLoennsinntekt())
         assertEquals(INNTEKT_AV_LOENNSINNTEKT_BARE_PENSJONSDEL, fastlandInntekt.getPensjonsgivendeInntektAvLoennsinntektBarePensjonsdel())
         assertEquals(INNTEKT_AV_NAERINGSINNTEKT, fastlandInntekt.getPensjonsgivendeInntektAvNaeringsinntekt())
@@ -61,7 +61,7 @@ internal class MapToPgiAvroTest {
 
     private fun createPgiDto(
             norskPersonidentifikator: String = FNR,
-            inntektsaar: Int = INNTEKTS_AAR,
+            inntektsaar: Long = INNTEKTS_AAR,
             pensjonsgivendeInntekt: List<PgiPerOrdningDto> =
                     listOf(
                             createPgiPerOrdningDto(skatteordning = SKATTEORDNING_FASTLAND),

@@ -13,7 +13,7 @@ internal fun String.mapToPGIDto(): PgiDto = objectMapper.readValue<PgiDto>(this)
 
 data class PgiDto(
         val norskPersonidentifikator: String?,
-        val inntektsaar: Int?,
+        val inntektsaar: Long?,
         val pensjonsgivendeInntekt: List<PgiPerOrdningDto> = emptyList()
 ) {
     @JsonIgnore

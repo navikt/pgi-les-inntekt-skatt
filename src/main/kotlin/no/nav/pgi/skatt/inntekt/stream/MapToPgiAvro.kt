@@ -13,7 +13,7 @@ internal class MapToPgiAvro : ValueMapper<PgiDto, PensjonsgivendeInntekt> {
 
     private fun toPensjonsgivendeInntekt(pgiDto: PgiDto): PensjonsgivendeInntekt = PensjonsgivendeInntekt(
             pgiDto.norskPersonidentifikator,
-            pgiDto.inntektsaar.toString(),
+            pgiDto.inntektsaar,
             toPensjonsgivendeInntektPerOrdning(pgiDto.pensjonsgivendeInntekt))
 
     private fun toPensjonsgivendeInntektPerOrdning(pensjonsgivendeInntekt: List<PgiPerOrdningDto>) =
