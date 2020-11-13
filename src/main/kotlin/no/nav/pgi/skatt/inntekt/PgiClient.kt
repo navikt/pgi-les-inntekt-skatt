@@ -22,7 +22,6 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
         }
     }
 
-
     internal fun createPensjonsgivendeInntekterRequest(inntektsaar: String, norskPersonidentifikator: String) = HttpRequest.newBuilder()
             .uri(UriBuilder.fromPath(skattUrl).path(inntektsaar).path(norskPersonidentifikator).build())
             .GET()

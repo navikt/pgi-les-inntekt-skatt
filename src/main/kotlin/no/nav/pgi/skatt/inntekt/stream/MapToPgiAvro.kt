@@ -7,6 +7,10 @@ import no.nav.samordning.pgi.schema.PensjonsgivendeInntektPerOrdning
 import no.nav.samordning.pgi.schema.Skatteordning
 import org.apache.kafka.streams.kstream.ValueMapper
 
+private const val FASTLAND = "FASTLAND"
+private const val SVALBARD = "SVALBARD"
+private const val KILDESKATT_PAA_LOENN = "KILDESKATT_PAA_LOENN"
+
 internal class MapToPgiAvro : ValueMapper<PgiDto, PensjonsgivendeInntekt> {
 
     override fun apply(pgiDto: PgiDto): PensjonsgivendeInntekt = toPensjonsgivendeInntekt(pgiDto)
@@ -30,9 +34,9 @@ internal class MapToPgiAvro : ValueMapper<PgiDto, PensjonsgivendeInntekt> {
 
     private fun toSkatteordningEnum(skatteordning: String?): Skatteordning =
             when (skatteordning) {
-                "FASTLAND" -> Skatteordning.FASTLAND
-                "SVALBARD" -> Skatteordning.SVALBARD
-                "KILDESKATT_PAA_LOENN" -> Skatteordning.KILDESKATT_PAA_LOENN
+                FASTLAND -> Skatteordning.FASTLAND
+                SVALBARD -> Skatteordning.SVALBARD
+                KILDESKATT_PAA_LOENN -> Skatteordning.KILDESKATT_PAA_LOENN
                 else -> throw MissingSkatteordningException(skatteordning)
             }
 }
