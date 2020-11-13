@@ -1,13 +1,15 @@
 package no.nav.pgi.skatt.inntekt
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
 
+//TODO Diskuter DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES = false
 private val logger = LoggerFactory.getLogger(PgiDto::class.java)
-private val objectMapper = ObjectMapper().registerModule(KotlinModule())
+private val objectMapper = ObjectMapper().registerModule(KotlinModule()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
 internal fun String.mapToPGIDto(): PgiDto = objectMapper.readValue<PgiDto>(this).also { it.validate() }
 
