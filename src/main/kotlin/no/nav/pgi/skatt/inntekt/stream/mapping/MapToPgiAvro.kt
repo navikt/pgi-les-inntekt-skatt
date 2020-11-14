@@ -1,4 +1,4 @@
-package no.nav.pgi.skatt.inntekt.stream
+package no.nav.pgi.skatt.inntekt.stream.mapping
 
 import no.nav.pgi.skatt.inntekt.PgiDto
 import no.nav.pgi.skatt.inntekt.PgiPerOrdningDto

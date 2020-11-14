@@ -2,6 +2,10 @@ package no.nav.pgi.skatt.inntekt.stream
 
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
 import no.nav.pgi.skatt.inntekt.PgiClient
+import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiAvro
+import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiDto
+import no.nav.pgi.skatt.inntekt.stream.mapping.FetchPgiFromSkatt
+import no.nav.pgi.skatt.inntekt.stream.mapping.HandleErrorCodesFromSkatt
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import org.apache.kafka.streams.KafkaStreams
@@ -27,6 +31,7 @@ internal class PGIStream(streamProperties: Properties, pgiClient: PgiClient = Pg
 
         stream.peek(logHendelseAboutToBeProcessed())
                 .mapValues(FetchPgiFromSkatt(pgiClient))
+                .mapValues(HandleErrorCodesFromSkatt())
                 .mapValues(MapToPgiDto())
                 .mapValues(MapToPgiAvro())
                 .to(PGI_INNTEKT_TOPIC)

@@ -3,6 +3,8 @@ package no.nav.pgi.skatt.inntekt.stream
 import no.nav.pgi.skatt.inntekt.InntektDtoException
 import no.nav.pgi.skatt.inntekt.InntektPerOrdningDtoException
 import no.nav.pgi.skatt.inntekt.PgiDto
+import no.nav.pgi.skatt.inntekt.stream.mapping.InvalidJsonMappingException
+import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiDto
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -52,30 +54,9 @@ internal class MapToPgiDtoTest {
     }
 
     @Test
-    fun `when response contains more than we need then the correct values are mapped`() {
-        val pgiResponse = createPgiResponse(extraValue = 10L, pensjonsgivendeInntekt = listOf(
-                createInntektPerSkatteordning(skatteordning = SKATTEORDNING_FASTLAND),
-                createInntektPerSkatteordning(skatteordning = SKATTEORDNING_KILDESKATT_PAA_LOENN),
-                createInntektPerSkatteordning(skatteordning = SKATTEORDNING_SVALBARD)
-        ))
-        val pgiDto: PgiDto = mapper.apply(pgiResponse)
-        val fastland = pgiDto.getPgiDtoPerOrdning(SKATTEORDNING_FASTLAND)
-        val kildeskattPaaLoenn = pgiDto.getPgiDtoPerOrdning(SKATTEORDNING_KILDESKATT_PAA_LOENN)
-        val svalbard = pgiDto.getPgiDtoPerOrdning(SKATTEORDNING_SVALBARD)
-
-        assertEquals(FNR, pgiDto.norskPersonidentifikator)
-        assertEquals(INNTEKTS_AAR, pgiDto.inntektsaar)
-        assertEquals(3, pgiDto.pensjonsgivendeInntekt.size)
-
-        assertEquals(SKATTEORDNING_FASTLAND, fastland!!.skatteordning)
-        assertEquals(DATO_FOR_FASTSETTING, fastland.datoForFastetting)
-        assertEquals(INNTEKT_AV_LOENNSINNTEKT, fastland.pensjonsgivendeInntektAvLoennsinntekt)
-        assertEquals(INNTEKT_AV_LOENNSINNTEKT_BARE_PENSJONSDEL, fastland.pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel)
-        assertEquals(INNTEKT_AV_NAERINGSINNTEKT, fastland.pensjonsgivendeInntektAvNaeringsinntekt)
-        assertEquals(INNTEKT_AV_NAERINGSINNTEKT_FRA_FISKE_FANGST_ELLER_FAMILIEBARNEHAGE, fastland.pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage)
-
-        assertEquals(SKATTEORDNING_KILDESKATT_PAA_LOENN, kildeskattPaaLoenn!!.skatteordning)
-        assertEquals(SKATTEORDNING_SVALBARD, svalbard!!.skatteordning)
+    fun `when response contains unrecognized properties then throw InvalidJsonMappingException`() {
+        val pgiResponse = createPgiResponse(extraValue = 10L, pensjonsgivendeInntekt = emptyList())
+        assertThrows<InvalidJsonMappingException> { mapper.apply(pgiResponse) }
     }
 
     @Test

@@ -14,13 +14,7 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
     private val httpClient: HttpClient = HttpClient.newHttpClient()
     private val skattUrl = env.getVal(PENSJONGIVENDE_INNTEKT_URL_ENV_KEY)
 
-    internal fun <T> getPensjonsgivendeInntekter(httpRequest: HttpRequest, responseBodyHandler: HttpResponse.BodyHandler<T>): HttpResponse<T> {
-        val response = httpClient.send(httpRequest, responseBodyHandler)
-        return when {
-            response.statusCode() == 200 -> response
-            else -> throw PensjonsgivendeInntektClientException("Call to pgi failed with code: ${response.statusCode()} and body: ${response.body()}")
-        }
-    }
+    internal fun <T> getPensjonsgivendeInntekter(httpRequest: HttpRequest, responseBodyHandler: HttpResponse.BodyHandler<T>): HttpResponse<T> = httpClient.send(httpRequest, responseBodyHandler)
 
     internal fun createPensjonsgivendeInntekterRequest(inntektsaar: String, norskPersonidentifikator: String) = HttpRequest.newBuilder()
             .uri(UriBuilder.fromPath(skattUrl).path(inntektsaar).path(norskPersonidentifikator).build())
@@ -28,5 +22,3 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
             .setHeader("Authorization", "Bearer ${maskinporten.token}")
             .build()
 }
-
-class PensjonsgivendeInntektClientException(message: String) : RuntimeException(message)

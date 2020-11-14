@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import java.net.http.HttpResponse
 
-
+//TODO Error håndtering på exception nivo
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PgiClientTest {
 
