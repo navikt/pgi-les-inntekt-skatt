@@ -12,9 +12,9 @@ fun main() {
 
 internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: PgiClient = PgiClient()) {
     private val pensjonsgivendeInntektStream = PGIStream(kafkaConfig.streamConfig(), pgiClient)
+    private val naisServer = naisServer()
 
     init {
-        val naisServer = naisServer()
         naisServer.start()
     }
 
@@ -22,8 +22,9 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
         pensjonsgivendeInntektStream.start()
     }
 
-    internal fun stopPensjonsgivendeInntektStream() {
+    internal fun stop() {
         pensjonsgivendeInntektStream.close()
+        naisServer.stop(500, 500)
     }
 }
 

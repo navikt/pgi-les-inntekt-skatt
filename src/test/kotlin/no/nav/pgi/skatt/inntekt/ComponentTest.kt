@@ -32,7 +32,7 @@ internal class ComponentTest {
 
     @AfterAll
     fun tearDown() {
-        application.stopPensjonsgivendeInntektStream()
+        application.stop()
         pensjonsgivendeInntektMock.stop()
         maskinportenMock.stop()
         kafkaTestEnvironment.tearDown()
