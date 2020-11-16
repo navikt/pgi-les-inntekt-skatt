@@ -43,7 +43,7 @@ internal class MapToPgiDtoTest {
         assertEquals(3, pgiDto.pensjonsgivendeInntekt.size)
 
         assertEquals(SKATTEORDNING_FASTLAND, fastland!!.skatteordning)
-        assertEquals(DATO_FOR_FASTSETTING, fastland.datoForFastetting)
+        assertEquals(DATO_FOR_FASTSETTING, fastland.datoForFastsetting)
         assertEquals(INNTEKT_AV_LOENNSINNTEKT, fastland.pensjonsgivendeInntektAvLoennsinntekt)
         assertEquals(INNTEKT_AV_LOENNSINNTEKT_BARE_PENSJONSDEL, fastland.pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel)
         assertEquals(INNTEKT_AV_NAERINGSINNTEKT, fastland.pensjonsgivendeInntektAvNaeringsinntekt)
@@ -76,7 +76,7 @@ internal class MapToPgiDtoTest {
         assertEquals(INNTEKTS_AAR, pgiDto.inntektsaar)
         assertEquals(1, pgiDto.pensjonsgivendeInntekt.size)
         assertEquals(SKATTEORDNING_FASTLAND, fastland!!.skatteordning)
-        assertEquals(DATO_FOR_FASTSETTING, fastland.datoForFastetting)
+        assertEquals(DATO_FOR_FASTSETTING, fastland.datoForFastsetting)
     }
 
     @Test
@@ -109,8 +109,8 @@ internal class MapToPgiDtoTest {
     }
 
     @Test
-    fun `datoForFastetting is null throw InntektPerOrdningDtoException`() {
-        val pgiResponse = createPgiResponse(pensjonsgivendeInntekt = listOf(createInntektPerSkatteordning(datoForFastetting = null)))
+    fun `datoForFastsetting is null throw InntektPerOrdningDtoException`() {
+        val pgiResponse = createPgiResponse(pensjonsgivendeInntekt = listOf(createInntektPerSkatteordning(datoForFastsetting = null)))
 
         assertThrows<InntektPerOrdningDtoException> { mapper.apply(pgiResponse) }
     }
@@ -126,13 +126,13 @@ internal class MapToPgiDtoTest {
 
     private fun createInntektPerSkatteordning(
             skatteordning: String? = SKATTEORDNING_FASTLAND,
-            datoForFastetting: String? = DATO_FOR_FASTSETTING,
+            datoForFastsetting: String? = DATO_FOR_FASTSETTING,
             pensjonsgivendeInntektAvLoennsinntekt: Long? = INNTEKT_AV_LOENNSINNTEKT,
             pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel: Long? = INNTEKT_AV_LOENNSINNTEKT_BARE_PENSJONSDEL,
             pensjonsgivendeInntektAvNaeringsinntekt: Long? = INNTEKT_AV_NAERINGSINNTEKT,
             pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage: Long? = INNTEKT_AV_NAERINGSINNTEKT_FRA_FISKE_FANGST_ELLER_FAMILIEBARNEHAGE) = """{
                 "skatteordning": ${if (skatteordning == null) null else """"$skatteordning""""},
-                "datoForFastetting": ${if (datoForFastetting == null) null else """"$datoForFastetting""""},
+                "datoForFastsetting": ${if (datoForFastsetting == null) null else """"$datoForFastsetting""""},
                 "pensjonsgivendeInntektAvLoennsinntekt": $pensjonsgivendeInntektAvLoennsinntekt,
                 "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": $pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel,
                 "pensjonsgivendeInntektAvNaeringsinntekt": $pensjonsgivendeInntektAvNaeringsinntekt,

@@ -4,7 +4,7 @@
   "pensjonsgivendeInntekt": [
     {
       "skatteordning": "FASTLAND",
-      "datoForFastetting": "2020-11-12",
+      "datoForFastsetting": "2020-11-12",
       "pensjonsgivendeInntektAvLoennsinntekt": 3050775,
       "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 2732633,
       "pensjonsgivendeInntektAvNaeringsinntekt": 5879351,
@@ -12,7 +12,7 @@
     },
     {
       "skatteordning": "KILDESKATT_PAA_LOENN",
-      "datoForFastetting": "2020-11-12",
+      "datoForFastsetting": "2020-11-12",
       "pensjonsgivendeInntektAvLoennsinntekt": 2577982,
       "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 6321489,
       "pensjonsgivendeInntektAvNaeringsinntekt": 411507,
@@ -20,7 +20,7 @@
     },
     {
       "skatteordning": "SVALBARD",
-      "datoForFastetting": "2020-11-12",
+      "datoForFastsetting": "2020-11-12",
       "pensjonsgivendeInntektAvLoennsinntekt": 4401364,
       "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 4304,
       "pensjonsgivendeInntektAvNaeringsinntekt": 7820689,
