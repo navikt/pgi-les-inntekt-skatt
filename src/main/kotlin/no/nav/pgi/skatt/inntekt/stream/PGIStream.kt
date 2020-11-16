@@ -58,7 +58,7 @@ internal class PGIStream(streamProperties: Properties, pgiClient: PgiClient = Pg
     internal fun start() = pensjonsgivendeInntektStream.start()
     internal fun close() = pensjonsgivendeInntektStream.close()
 
-    companion object {
+    private companion object {
         private val LOG = LoggerFactory.getLogger(PGIStream::class.java)
     }
 }
