@@ -24,7 +24,7 @@ internal class MapToPgiAvro : ValueMapper<PgiDto, PensjonsgivendeInntekt> {
             pensjonsgivendeInntekt.map {
                 PensjonsgivendeInntektPerOrdning(
                         toSkatteordningEnum(it.skatteordning),
-                        it.datoForFastetting,
+                        it.datoForFastsetting,
                         it.pensjonsgivendeInntektAvLoennsinntekt,
                         it.pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel,
                         it.pensjonsgivendeInntektAvNaeringsinntekt,

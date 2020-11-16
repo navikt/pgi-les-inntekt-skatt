@@ -39,7 +39,7 @@ class PensjonsgivendeInntektMock {
                   "pensjonsgivendeInntekt": [
                     {
                       "skatteordning": "FASTLAND",
-                      "datoForFastetting": "2020-11-02",
+                      "datoForFastsetting": "2020-11-02",
                       "pensjonsgivendeInntektAvLoennsinntekt": 9656805,
                       "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 8124969,
                       "pensjonsgivendeInntektAvNaeringsinntekt": 6171061,
@@ -47,7 +47,7 @@ class PensjonsgivendeInntektMock {
                     },
                     {
                       "skatteordning": "KILDESKATT_PAA_LOENN",
-                      "datoForFastetting": "2020-11-02",
+                      "datoForFastsetting": "2020-11-02",
                       "pensjonsgivendeInntektAvLoennsinntekt": 1981769,
                       "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 2973637,
                       "pensjonsgivendeInntektAvNaeringsinntekt": 8331534,
@@ -55,7 +55,7 @@ class PensjonsgivendeInntektMock {
                     },
                     {
                       "skatteordning": "SVALBARD",
-                      "datoForFastetting": "2020-11-02",
+                      "datoForFastsetting": "2020-11-02",
                       "pensjonsgivendeInntektAvLoennsinntekt": 4889051,
                       "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 2915688,
                       "pensjonsgivendeInntektAvNaeringsinntekt": 6764601,

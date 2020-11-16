@@ -74,13 +74,13 @@ internal class MapToPgiAvroTest {
 
     private fun createPgiPerOrdningDto(
             skatteordning: String = SKATTEORDNING_FASTLAND,
-            datoForFastetting: String = DATO_FOR_FASTSETTING,
+            datoForFastsetting: String = DATO_FOR_FASTSETTING,
             pensjonsgivendeInntektAvLoennsinntekt: Long = INNTEKT_AV_LOENNSINNTEKT,
             pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel: Long = INNTEKT_AV_LOENNSINNTEKT_BARE_PENSJONSDEL,
             pensjonsgivendeInntektAvNaeringsinntekt: Long = INNTEKT_AV_NAERINGSINNTEKT,
             pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage: Long = INNTEKT_AV_NAERINGSINNTEKT_FRA_FISKE_FANGST_ELLER_FAMILIEBARNEHAGE,
     ) = PgiPerOrdningDto(skatteordning,
-            datoForFastetting,
+            datoForFastsetting,
             pensjonsgivendeInntektAvLoennsinntekt,
             pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel,
             pensjonsgivendeInntektAvNaeringsinntekt,

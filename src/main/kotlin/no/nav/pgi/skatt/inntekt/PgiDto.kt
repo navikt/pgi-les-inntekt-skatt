@@ -27,7 +27,7 @@ data class PgiDto(
 
 data class PgiPerOrdningDto(
         val skatteordning: String?,
-        val datoForFastetting: String?,
+        val datoForFastsetting: String?,
         val pensjonsgivendeInntektAvLoennsinntekt: Long?,
         val pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel: Long?,
         val pensjonsgivendeInntektAvNaeringsinntekt: Long?,
@@ -36,7 +36,7 @@ data class PgiPerOrdningDto(
     @JsonIgnore
     internal fun validate() {
         if (skatteordning == null) throw InntektPerOrdningDtoException("skatteordning").also { logger.error(it.message) }
-        if (datoForFastetting == null) throw InntektPerOrdningDtoException("datoForFastetting").also { logger.error(it.message) }
+        if (datoForFastsetting == null) throw InntektPerOrdningDtoException("datoForFastsetting").also { logger.error(it.message) }
     }
 }
 
