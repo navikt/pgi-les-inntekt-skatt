@@ -4,8 +4,8 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 
 private const val PORT = 8097
-private const val PENSJONSGIVENDE_INNTEKT_PATH = "/api/skatteoppgjoer/ekstern/grunnlag-pgi"
-internal const val PENSJONGIVENDE_INNTEKT_MOCK_URL = "http://localhost:$PORT$PENSJONSGIVENDE_INNTEKT_PATH"
+private const val PENSJONSGIVENDE_INNTEKT_PATH = "/formueinntekt/pensjonsgivendeinntektforfolketrygden"
+internal const val PENSJONGIVENDE_INNTEKT_HOST = "http://localhost:$PORT"
 
 class PensjonsgivendeInntektMock {
     private var mock = WireMockServer(PORT).also { it.start() }
