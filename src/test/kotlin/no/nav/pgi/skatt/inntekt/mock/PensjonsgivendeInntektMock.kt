@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 
 private const val PORT = 8097
-private const val PENSJONSGIVENDE_INNTEKT_PATH = "/formueinntekt/pensjonsgivendeinntektforfolketrygden"
+private const val PENSJONSGIVENDE_INNTEKT_PATH = "/api/formueinntekt/pensjonsgivendeinntektforfolketrygden"
 internal const val PENSJONGIVENDE_INNTEKT_HOST = "http://localhost:$PORT"
 
 class PensjonsgivendeInntektMock {
@@ -18,17 +18,12 @@ class PensjonsgivendeInntektMock {
         mock.stop()
     }
 
-    internal fun `stub pensjongivende inntekt`() {
-        mock.stubFor(WireMock.get(WireMock.urlPathEqualTo("""WireMock.urlMatching(PENSJONSGIVENDE_INNTEKT_PATH)"""))
-                .willReturn(WireMock.ok(createResponse("2019", "12345678901"))))
-    }
-
     internal fun `stub pensjongivende inntekt`(inntektsaar: String, norskPersonidentifikator: String) {
         mock.stubFor(WireMock.get(WireMock.urlPathEqualTo("""$PENSJONSGIVENDE_INNTEKT_PATH/$inntektsaar/$norskPersonidentifikator"""))
                 .willReturn(WireMock.ok(createResponse(inntektsaar, norskPersonidentifikator))))
     }
 
-    internal fun `stub 401 fra skatt`() {
+    internal fun `stub 401 fra skatt`(inntektsaar: String, norskPersonidentifikator: String) {
         mock.stubFor(WireMock.get(WireMock.urlMatching(PENSJONSGIVENDE_INNTEKT_PATH)).willReturn(WireMock.unauthorized()))
     }
 

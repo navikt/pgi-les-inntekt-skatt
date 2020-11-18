@@ -7,7 +7,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import javax.ws.rs.core.UriBuilder
 
-internal const val PENSJONSGIVENDE_INNTEKT_PATH = "/formueinntekt/pensjonsgivendeinntektforfolketrygden"
+internal const val PENSJONSGIVENDE_INNTEKT_PATH = "api/formueinntekt/pensjonsgivendeinntektforfolketrygden"
 internal const val PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY = "SKATT_INNTEKT_HOST"
 
 class PgiClient(env: Map<String, String> = System.getenv()) {

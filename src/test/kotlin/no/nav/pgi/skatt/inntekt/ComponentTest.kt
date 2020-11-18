@@ -10,6 +10,9 @@ import no.nav.samordning.pgi.schema.HendelseKey
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 
+private const val INNTEKTSAAR = "2020"
+private const val NORSK_PERSONIDENTIFIKATOR = "12345678901"
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ComponentTest {
     private val kafkaTestEnvironment = KafkaTestEnvironment()
@@ -41,25 +44,25 @@ internal class ComponentTest {
 
     @Test
     fun `reads hendelser from topic, gets pgi based on hendelse, produces inntekt to topic`() {
-        val inntektsaar = "2020"
-        val norskPersonidentifikator = "12345678901"
-        pensjonsgivendeInntektMock.`stub pensjongivende inntekt`(inntektsaar, norskPersonidentifikator)
+        pensjonsgivendeInntektMock.`stub pensjongivende inntekt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
 
-        val hendelseKey = HendelseKey(norskPersonidentifikator, inntektsaar)
-        val hendelse = Hendelse(12345L, norskPersonidentifikator, inntektsaar)
+        val hendelseKey = HendelseKey(NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
+        val hendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
 
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
         assertEquals(hendelseKey, kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
     }
 
+    /*
     @Test
     fun `reads hendelser from topic, gets 401 from skatt`() {
-        val hendelseKey = HendelseKey("12345678901", "2020")
-        val hendelse = Hendelse(12345L, "12345678901", "2020")
+        val hendelseKey = HendelseKey(NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
+        val hendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
 
-        pensjonsgivendeInntektMock.`stub 401 fra skatt`()
+        pensjonsgivendeInntektMock.`stub 401 fra skatt`(INNTEKTSAAR,NORSK_PERSONIDENTIFIKATOR)
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
-        print("")
     }
+
+     */
 
 }
