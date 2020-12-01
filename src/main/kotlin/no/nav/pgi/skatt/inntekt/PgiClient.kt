@@ -15,7 +15,8 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
     private val httpClient: HttpClient = HttpClient.newHttpClient()
     private val skattHost = env.getVal(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY)
 
-    internal fun <T> getPensjonsgivendeInntekter(httpRequest: HttpRequest, responseBodyHandler: HttpResponse.BodyHandler<T>): HttpResponse<T> = httpClient.send(httpRequest, responseBodyHandler)
+    internal fun <T> getPensjonsgivendeInntekter(httpRequest: HttpRequest, responseBodyHandler: HttpResponse.BodyHandler<T>): HttpResponse<T>
+            = httpClient.send(httpRequest, responseBodyHandler)
 
     internal fun createPensjonsgivendeInntekterRequest(inntektsaar: String, norskPersonidentifikator: String) = HttpRequest.newBuilder()
             .uri(UriBuilder.fromPath(skattHost).path(PENSJONSGIVENDE_INNTEKT_PATH).path(inntektsaar).path(norskPersonidentifikator).build())

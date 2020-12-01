@@ -4,6 +4,7 @@ import io.ktor.server.netty.*
 import no.nav.pensjon.samhandling.naisserver.naisServer
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PGIStream
+import no.nav.pgi.skatt.inntekt.stream.PGITopology
 import org.slf4j.LoggerFactory
 
 
@@ -13,7 +14,7 @@ fun main() {
 }
 
 internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: PgiClient = PgiClient()) {
-    private val pensjonsgivendeInntektStream = PGIStream(kafkaConfig.streamConfig(), pgiClient)
+    private val pensjonsgivendeInntektStream = PGIStream(kafkaConfig.streamProperties(), PGITopology(pgiClient))
     private val naisServer = naisServer(readyCheck = { pensjonsgivendeInntektStream.isRunning() })
 
     init {

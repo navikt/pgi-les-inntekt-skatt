@@ -1,46 +1,18 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import no.nav.pensjon.samhandling.maskfnr.maskFnr
-import no.nav.pgi.skatt.inntekt.PgiClient
-import no.nav.pgi.skatt.inntekt.stream.mapping.FetchPgiFromSkatt
-import no.nav.pgi.skatt.inntekt.stream.mapping.HandleErrorCodesFromSkatt
-import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiAvro
-import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiDto
-import no.nav.samordning.pgi.schema.Hendelse
-import no.nav.samordning.pgi.schema.HendelseKey
 import org.apache.kafka.streams.KafkaStreams
-import org.apache.kafka.streams.StreamsBuilder
-import org.apache.kafka.streams.Topology
-import org.apache.kafka.streams.kstream.KStream
 import org.slf4j.LoggerFactory
 import java.util.*
 
 
-internal class PGIStream(streamProperties: Properties, pgiClient: PgiClient = PgiClient()) {
+internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology) {
 
-    private val pensjonsgivendeInntektStream = KafkaStreams(setupStreamTopology(pgiClient), streamProperties)
+    private val pensjonsgivendeInntektStream = KafkaStreams(pgiTopology.createStreamTopology(), streamProperties)
 
     init {
         setStreamStateListener()
         setUncaughtStreamExceptionHandler()
     }
-
-    private fun setupStreamTopology(pgiClient: PgiClient): Topology {
-        val streamBuilder = StreamsBuilder()
-        val stream: KStream<HendelseKey, Hendelse> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
-
-        stream.peek(logHendelseAboutToBeProcessed())
-                .mapValues(FetchPgiFromSkatt(pgiClient))
-                .mapValues(HandleErrorCodesFromSkatt())
-                .mapValues(MapToPgiDto())
-                .mapValues(MapToPgiAvro())
-                .to(PGI_INNTEKT_TOPIC)
-
-        return streamBuilder.build()
-    }
-
-    private fun logHendelseAboutToBeProcessed(): (HendelseKey, Hendelse) -> Unit =
-            { _: HendelseKey, hendelse: Hendelse -> LOG.info("Started processing hendelse ${hendelse.toString().maskFnr()}") }
 
     private fun setUncaughtStreamExceptionHandler() {
         pensjonsgivendeInntektStream.setUncaughtExceptionHandler { thread: Thread?, e: Throwable? ->

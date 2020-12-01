@@ -18,7 +18,7 @@ internal class KafkaConfig(environment: Map<String, String> = System.getenv(), p
     private val schemaRegPassword = environment.getVal(SCHEMA_REGISTRY_PASSWORD)
     private val schemaRegistryUrl = environment.getVal(SCHEMA_REGISTRY)
 
-    internal fun streamConfig(): Properties = Properties().apply {
+    internal fun streamProperties(): Properties = Properties().apply {
         put(BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
         put(DEFAULT_KEY_SERDE_CLASS_CONFIG, SpecificAvroSerde::class.java)
         put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, SpecificAvroSerde::class.java)
