@@ -13,9 +13,6 @@ import com.nimbusds.jwt.SignedJWT
 import no.nav.pensjon.samhandling.maskinporten.*
 import java.util.*
 
-private const val PORT = 8096
-private const val TOKEN_PATH = "/token"
-internal const val MASKINPORTEN_MOCK_HOST = "http://localhost:$PORT"
 
 internal class MaskinportenMock {
     private var mock = WireMockServer(PORT).also { it.start() }
@@ -51,6 +48,10 @@ internal class MaskinportenMock {
     }
 
     companion object {
+        private const val PORT = 8096
+        private const val TOKEN_PATH = "/token"
+        private const val MASKINPORTEN_MOCK_HOST = "http://localhost:$PORT"
+
         val MASKINPORTEN_ENV_VARIABLES: Map<String, String> = mapOf(
                 SCOPE_ENV_KEY to "testScope",
                 CLIENT_ID_ENV_KEY to "testClient",
@@ -58,5 +59,4 @@ internal class MaskinportenMock {
                 PRIVATE_JWK_ENV_KEY to RSAKeyGenerator(2048).keyID("123").generate().toJSONString(),
                 MASKINPORTEN_TOKEN_HOST_ENV_KEY to MASKINPORTEN_MOCK_HOST)
     }
-
 }
