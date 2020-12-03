@@ -12,7 +12,7 @@ class MapToPgiDto : ValueMapper<String, PgiDto> {
     private fun responseDto(responseBody: String): PgiDto {
         try {
             return responseBody.mapToPGIDto()
-        } catch (e: UnrecognizedPropertyException,) {
+        } catch (e: UnrecognizedPropertyException) {
             throw InvalidJsonMappingException(e)
         }
     }
