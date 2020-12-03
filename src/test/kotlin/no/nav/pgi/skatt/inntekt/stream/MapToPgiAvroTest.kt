@@ -1,7 +1,7 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import no.nav.pgi.skatt.inntekt.PgiDto
-import no.nav.pgi.skatt.inntekt.PgiPerOrdningDto
+import no.nav.pgi.skatt.inntekt.skatt.PgiDto
+import no.nav.pgi.skatt.inntekt.skatt.PgiPerOrdningDto
 import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiAvro
 import no.nav.pgi.skatt.inntekt.stream.mapping.MissingSkatteordningException
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt

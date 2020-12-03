@@ -1,4 +1,4 @@
-package no.nav.pgi.skatt.inntekt
+package no.nav.pgi.skatt.inntekt.skatt
 
 import no.nav.pensjon.samhandling.env.getVal
 import no.nav.pensjon.samhandling.maskinporten.Maskinporten

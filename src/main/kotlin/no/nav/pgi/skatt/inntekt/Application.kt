@@ -2,6 +2,7 @@ package no.nav.pgi.skatt.inntekt
 
 import io.ktor.server.netty.*
 import no.nav.pensjon.samhandling.naisserver.naisServer
+import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PGIStream
 import no.nav.pgi.skatt.inntekt.stream.PGITopology

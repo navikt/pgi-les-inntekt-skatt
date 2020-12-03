@@ -1,13 +1,13 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import no.nav.pgi.skatt.inntekt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
-import no.nav.pgi.skatt.inntekt.PgiClient
+import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
+import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA_REGISTRY_URL
-import no.nav.pgi.skatt.inntekt.stream.mapping.PensjonsgivendeInntektClientException
+import no.nav.pgi.skatt.inntekt.stream.mapping.UnhandledStatusCodeException
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
@@ -16,6 +16,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 
 private const val ONE_HUNDRED = 100
 private const val TEN = 10
+
+private const val INNTEKTSAAR = "2019"
+private const val IDENTIFIKATOR = "12345678901"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PGITopologyTest {
@@ -41,6 +44,7 @@ internal class PGITopologyTest {
     fun tearDown() {
         maskinportenMock.stop()
         pensjonsgivendeInntektMock.stop()
+        topologyDriver.close()
     }
 
     @Test
@@ -56,17 +60,15 @@ internal class PGITopologyTest {
     }
 
     @Test
-    internal fun `should fail with PensjonsgivendeInntektClientException if unhandled statuscode is returned from skatt`() {
-        val innteksAar = "2019"
-        val identifikator = "12345678901"
-        val failingHendelse = Hendelse(1L, identifikator, innteksAar)
+    internal fun `should fail with Exception if exception iss thrown in stream`() {
+        val failingHendelse = Hendelse(1L, IDENTIFIKATOR, INNTEKTSAAR)
 
         pensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`()
-        pensjonsgivendeInntektMock.`stub 401 fra skatt`(innteksAar, identifikator)
+        pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR, IDENTIFIKATOR)
 
         addToHendelseTopic(TEN)
 
-        assertThrows<PensjonsgivendeInntektClientException> { addToTopic(failingHendelse) }
+        assertThrows<UnhandledStatusCodeException> { addToTopic(failingHendelse) }
         assertEquals(TEN, testOutputTopic.readKeyValuesToList().size)
     }
 

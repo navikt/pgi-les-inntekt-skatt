@@ -3,6 +3,8 @@ package no.nav.pgi.skatt.inntekt
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock.Companion.MASKINPORTEN_ENV_VARIABLES
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
+import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
+import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import java.net.http.HttpResponse

@@ -1,8 +1,8 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import no.nav.pgi.skatt.inntekt.InntektDtoException
-import no.nav.pgi.skatt.inntekt.InntektPerOrdningDtoException
-import no.nav.pgi.skatt.inntekt.PgiDto
+import no.nav.pgi.skatt.inntekt.skatt.InntektDtoException
+import no.nav.pgi.skatt.inntekt.skatt.InntektPerOrdningDtoException
+import no.nav.pgi.skatt.inntekt.skatt.PgiDto
 import no.nav.pgi.skatt.inntekt.stream.mapping.InvalidJsonMappingException
 import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiDto
 import org.apache.kafka.streams.kstream.ValueMapper

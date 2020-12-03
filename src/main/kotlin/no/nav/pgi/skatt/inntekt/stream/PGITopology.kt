@@ -1,7 +1,7 @@
 package no.nav.pgi.skatt.inntekt.stream
 
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
-import no.nav.pgi.skatt.inntekt.PgiClient
+import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.FetchPgiFromSkatt
 import no.nav.pgi.skatt.inntekt.stream.mapping.HandleErrorCodeFromSkatt
 import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiAvro

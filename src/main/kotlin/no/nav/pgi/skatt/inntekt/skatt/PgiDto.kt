@@ -1,4 +1,4 @@
-package no.nav.pgi.skatt.inntekt
+package no.nav.pgi.skatt.inntekt.skatt
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.DeserializationFeature

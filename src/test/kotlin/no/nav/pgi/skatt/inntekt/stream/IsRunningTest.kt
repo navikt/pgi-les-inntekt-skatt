@@ -1,8 +1,8 @@
 package no.nav.pgi.skatt.inntekt.stream
 
 import no.nav.pgi.skatt.inntekt.KafkaTestEnvironment
-import no.nav.pgi.skatt.inntekt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
-import no.nav.pgi.skatt.inntekt.PgiClient
+import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
+import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock

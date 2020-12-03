@@ -40,7 +40,7 @@ class PensjonsgivendeInntektMock {
                         .willReturn(ok(createResponse(inntektsaar, norskPersonidentifikator))))
     }
 
-    internal fun `stub 401 fra skatt`(inntektsaar: String, norskPersonidentifikator: String) {
+    internal fun `stub 401 from skatt`(inntektsaar: String, norskPersonidentifikator: String) {
         mock.stubFor(
                 get(urlPathMatching("$PENSJONSGIVENDE_INNTEKT_PATH/$inntektsaar/$norskPersonidentifikator"))
                         .atPriority(1)

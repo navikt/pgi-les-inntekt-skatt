@@ -1,7 +1,7 @@
 package no.nav.pgi.skatt.inntekt.stream.mapping
 
-import no.nav.pgi.skatt.inntekt.PgiDto
-import no.nav.pgi.skatt.inntekt.PgiPerOrdningDto
+import no.nav.pgi.skatt.inntekt.skatt.PgiDto
+import no.nav.pgi.skatt.inntekt.skatt.PgiPerOrdningDto
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntektPerOrdning
 import no.nav.samordning.pgi.schema.Skatteordning
@@ -41,5 +41,4 @@ internal class MapToPgiAvro : ValueMapper<PgiDto, PensjonsgivendeInntekt> {
             }
 }
 
-internal class MissingSkatteordningException(missingSkatteordning: String?) :
-        Exception("""Cant find $missingSkatteordning in ${Skatteordning::class.simpleName} enum when converting from DTO to avro. """)
+internal class MissingSkatteordningException(missingSkatteordning: String?) : Exception("""Cant find $missingSkatteordning in ${Skatteordning::class.simpleName} enum when converting from DTO to avro. """)

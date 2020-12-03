@@ -11,7 +11,7 @@ import org.apache.kafka.streams.TopologyTestDriver
 import java.util.*
 
 internal class PgiTopologyTestDriver(topology: Topology, properties: Properties) {
-    private val testDriver: TopologyTestDriver = TopologyTestDriver(topology, properties)
+    internal val testDriver: TopologyTestDriver = TopologyTestDriver(topology, properties)
 
     internal fun <Key : SpecificRecord, Value : SpecificRecord> createInputTopic(topic: String, schemaUrl: String): TestInputTopic<Key, Value> {
         return testDriver.createInputTopic(topic, createSerde<Key>(schemaUrl).serializer(), createSerde<Value>(schemaUrl).serializer())
