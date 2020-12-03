@@ -1,14 +1,18 @@
 package no.nav.pgi.skatt.inntekt.mock
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer
 
 private const val PORT = 8097
 private const val PENSJONSGIVENDE_INNTEKT_PATH = "/api/formueinntekt/pensjonsgivendeinntektforfolketrygden"
-internal const val PENSJONGIVENDE_INNTEKT_HOST = "http://localhost:$PORT"
+internal const val PENSJONGIVENDE_INNTEKT_MOCK_HOST = "http://localhost:$PORT"
 
 class PensjonsgivendeInntektMock {
-    private var mock = WireMockServer(PORT).also { it.start() }
+    private var config = wireMockConfig().port(PORT)
+            .extensions(ResponseTemplateTransformer(false))
+    private var mock = WireMockServer(config).also { it.start() }
 
     internal fun reset() {
         mock.resetAll()
@@ -18,19 +22,38 @@ class PensjonsgivendeInntektMock {
         mock.stop()
     }
 
+    internal fun callsToMock() = mock.serveEvents.requests.size
+
+    internal fun `stub pensjongivende inntekt endpoint`() {
+        mock.stubFor(
+                get(urlPathMatching("$PENSJONSGIVENDE_INNTEKT_PATH$YEAR_FNR"))
+                        .atPriority(10)
+                        .withName("ape")
+                        .withHeader("Authorization", matching(TOKEN))
+                        .willReturn(aResponse()
+                                .withBody(createResponse("{{request.path.[3]}}", "{{request.path.[4]}}"))
+                                .withTransformer("response-template", "mock", "mock")
+                                .withStatus(200)))
+    }
+
     internal fun `stub pensjongivende inntekt`(inntektsaar: String, norskPersonidentifikator: String) {
-        mock.stubFor(WireMock.get(WireMock.urlPathEqualTo("""$PENSJONSGIVENDE_INNTEKT_PATH/$inntektsaar/$norskPersonidentifikator"""))
-                .willReturn(WireMock.ok(createResponse(inntektsaar, norskPersonidentifikator))))
+        mock.stubFor(
+                get(urlPathEqualTo("""$PENSJONSGIVENDE_INNTEKT_PATH/$inntektsaar/$norskPersonidentifikator"""))
+                        .atPriority(9)
+                        .willReturn(ok(createResponse(inntektsaar, norskPersonidentifikator))))
     }
 
     internal fun `stub 401 fra skatt`(inntektsaar: String, norskPersonidentifikator: String) {
-        mock.stubFor(WireMock.get(WireMock.urlMatching(PENSJONSGIVENDE_INNTEKT_PATH)).willReturn(WireMock.unauthorized()))
+        mock.stubFor(
+                get(urlPathMatching("$PENSJONSGIVENDE_INNTEKT_PATH/$inntektsaar/$norskPersonidentifikator"))
+                        .atPriority(1)
+                        .willReturn(unauthorized()))
     }
 
     private fun createResponse(inntektsaar: String, norskPersonidentifikator: String) =
             """{
                   "norskPersonidentifikator": "$norskPersonidentifikator",
-                  "inntektsaar": ${inntektsaar.toInt()},
+                  "inntektsaar": ${inntektsaar},
                   "pensjonsgivendeInntekt": [
                     {
                       "skatteordning": "FASTLAND",
@@ -60,4 +83,8 @@ class PensjonsgivendeInntektMock {
                 }"""
 
 
+    companion object {
+        private const val YEAR_FNR = """/[0-9]{4}/[0-9]{11}"""
+        private const val TOKEN = """.*\..*\..*"""
+    }
 }

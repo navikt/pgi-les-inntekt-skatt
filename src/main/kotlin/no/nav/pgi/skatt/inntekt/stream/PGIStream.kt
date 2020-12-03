@@ -7,7 +7,7 @@ import java.util.*
 
 internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology) {
 
-    private val pensjonsgivendeInntektStream = KafkaStreams(pgiTopology.createStreamTopology(), streamProperties)
+    private val pensjonsgivendeInntektStream = KafkaStreams(pgiTopology.topology(), streamProperties)
 
     init {
         setStreamStateListener()

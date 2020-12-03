@@ -2,7 +2,7 @@ package no.nav.pgi.skatt.inntekt
 
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock.Companion.MASKINPORTEN_ENV_VARIABLES
-import no.nav.pgi.skatt.inntekt.mock.PENSJONGIVENDE_INNTEKT_HOST
+import no.nav.pgi.skatt.inntekt.mock.PENSJONGIVENDE_INNTEKT_MOCK_HOST
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
@@ -19,7 +19,7 @@ internal class ComponentTest {
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
-    private val skattClient = PgiClient(mapOf(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to PENSJONGIVENDE_INNTEKT_HOST) + MASKINPORTEN_ENV_VARIABLES)
+    private val skattClient = PgiClient(mapOf(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to PENSJONGIVENDE_INNTEKT_MOCK_HOST) + MASKINPORTEN_ENV_VARIABLES)
     private val application = Application(kafkaConfig, skattClient)
 
     @BeforeAll

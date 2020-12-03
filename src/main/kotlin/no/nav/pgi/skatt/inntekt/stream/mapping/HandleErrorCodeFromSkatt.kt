@@ -3,7 +3,7 @@ package no.nav.pgi.skatt.inntekt.stream.mapping
 import org.apache.kafka.streams.kstream.ValueMapper
 import java.net.http.HttpResponse
 
-internal class HandleErrorCodesFromSkatt : ValueMapper<HttpResponse<String>, String> {
+internal class HandleErrorCodeFromSkatt : ValueMapper<HttpResponse<String>, String> {
     override fun apply(httpResponse: HttpResponse<String>): String {
         return when {
             httpResponse.statusCode() == 200 -> httpResponse.body()

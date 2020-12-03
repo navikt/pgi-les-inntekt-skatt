@@ -3,7 +3,7 @@ package no.nav.pgi.skatt.inntekt.stream
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
 import no.nav.pgi.skatt.inntekt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.FetchPgiFromSkatt
-import no.nav.pgi.skatt.inntekt.stream.mapping.HandleErrorCodesFromSkatt
+import no.nav.pgi.skatt.inntekt.stream.mapping.HandleErrorCodeFromSkatt
 import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiAvro
 import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiDto
 import no.nav.samordning.pgi.schema.Hendelse
@@ -15,13 +15,13 @@ import org.slf4j.LoggerFactory
 
 internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
 
-    internal fun createStreamTopology(): Topology {
+    internal fun topology(): Topology {
         val streamBuilder = StreamsBuilder()
         val stream: KStream<HendelseKey, Hendelse> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
 
         stream.peek(logHendelseAboutToBeProcessed())
                 .mapValues(FetchPgiFromSkatt(pgiClient))
-                .mapValues(HandleErrorCodesFromSkatt())
+                .mapValues(HandleErrorCodeFromSkatt())
                 .mapValues(MapToPgiDto())
                 .mapValues(MapToPgiAvro())
                 .to(PGI_INNTEKT_TOPIC)
