@@ -54,16 +54,14 @@ internal class ComponentTest {
         assertEquals(hendelseKey, kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
     }
 
-    /*
+
     @Test
     fun `reads hendelser from topic, gets 401 from skatt`() {
         val hendelseKey = HendelseKey(NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
         val hendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
 
-        pensjonsgivendeInntektMock.`stub 401 fra skatt`(INNTEKTSAAR,NORSK_PERSONIDENTIFIKATOR)
+        pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR,NORSK_PERSONIDENTIFIKATOR)
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
     }
-
-     */
 
 }

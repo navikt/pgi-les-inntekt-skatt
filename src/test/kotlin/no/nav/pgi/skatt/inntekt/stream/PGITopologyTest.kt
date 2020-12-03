@@ -89,11 +89,6 @@ internal class PGITopologyTest {
 private fun Hendelse.key() = HendelseKey(getIdentifikator(), getGjelderPeriode())
 
 
-//TODO test hvor noen meldinger går først så exception for deretter se om ting går igjennom
-
-//TODO verifisering av 1000 kall mot skatt mock
-
-
 
 
 

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 
-internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology) {
+internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology, private val onClose: () -> Unit = {}) {
 
     private val pensjonsgivendeInntektStream = KafkaStreams(pgiTopology.topology(), streamProperties)
 
@@ -27,8 +27,16 @@ internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology)
         }
     }
 
-    internal fun start() = pensjonsgivendeInntektStream.start()
-    internal fun close() = pensjonsgivendeInntektStream.close()
+    internal fun start() {
+        LOG.info("Starting PgiStream")
+        pensjonsgivendeInntektStream.start()
+    }
+
+    internal fun close() {
+        LOG.info("Stopping PgiStream")
+        pensjonsgivendeInntektStream.close()
+    }
+
     internal fun isRunning() = pensjonsgivendeInntektStream.state().isRunningOrRebalancing
 
     private companion object {

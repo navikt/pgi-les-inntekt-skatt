@@ -1,6 +1,5 @@
 package no.nav.pgi.skatt.inntekt
 
-import io.ktor.server.netty.*
 import no.nav.pensjon.samhandling.naisserver.naisServer
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
@@ -19,40 +18,27 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
     private val naisServer = naisServer(readyCheck = { pensjonsgivendeInntektStream.isRunning() })
 
     init {
+        addShutdownHook()
         naisServer.start()
-        addShutdownHook(naisServer)
     }
 
     internal fun startPensjonsgivendeInntektStream() {
         pensjonsgivendeInntektStream.start()
-        addShutdownHook(pensjonsgivendeInntektStream)
+    }
+
+    private fun addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(Thread {
+            try {
+                stop()
+            } catch (e: Exception) {
+                LOGGER.error("Error while shutting down", e)
+            }
+        })
     }
 
     internal fun stop() {
         pensjonsgivendeInntektStream.close()
         naisServer.stop(500, 500)
-    }
-
-    private fun addShutdownHook(naisServer: NettyApplicationEngine) {
-        Runtime.getRuntime().addShutdownHook(Thread {
-            try {
-                LOGGER.info("stopping naisServer in shutdownHook")
-                naisServer.stop(400, 400)
-            } catch (e: Exception) {
-                LOGGER.error("Error while shutting down naisServer", e)
-            }
-        })
-    }
-
-    private fun addShutdownHook(stream: PGIStream) {
-        Runtime.getRuntime().addShutdownHook(Thread {
-            try {
-                LOGGER.info("stopping pgiStream in shutdownHook")
-                stream.close()
-            } catch (e: Exception) {
-                LOGGER.error("Error while shutting down PgiStream", e)
-            }
-        })
     }
 
     companion object {
