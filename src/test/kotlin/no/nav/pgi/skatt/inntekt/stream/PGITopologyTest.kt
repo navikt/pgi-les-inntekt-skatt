@@ -4,7 +4,6 @@ import no.nav.pgi.skatt.inntekt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
 import no.nav.pgi.skatt.inntekt.PgiClient
 import no.nav.pgi.skatt.inntekt.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
-import no.nav.pgi.skatt.inntekt.mock.PENSJONGIVENDE_INNTEKT_MOCK_HOST
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA_REGISTRY_URL
@@ -72,7 +71,7 @@ internal class PGITopologyTest {
     }
 
     private fun getPgiClientEnv() =
-            MaskinportenMock.MASKINPORTEN_ENV_VARIABLES + mapOf(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to PENSJONGIVENDE_INNTEKT_MOCK_HOST)
+            MaskinportenMock.MASKINPORTEN_ENV_VARIABLES + mapOf(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to PensjonsgivendeInntektMock.HOST)
 
     private fun getKafkaTestEnv() =
             mapOf(KafkaConfig.BOOTSTRAP_SERVERS to "test",

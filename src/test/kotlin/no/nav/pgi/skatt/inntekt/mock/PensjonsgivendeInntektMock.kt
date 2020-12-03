@@ -5,9 +5,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer
 
-private const val PORT = 8097
-private const val PENSJONSGIVENDE_INNTEKT_PATH = "/api/formueinntekt/pensjonsgivendeinntektforfolketrygden"
-internal const val PENSJONGIVENDE_INNTEKT_MOCK_HOST = "http://localhost:$PORT"
 
 class PensjonsgivendeInntektMock {
     private var config = wireMockConfig().port(PORT)
@@ -84,7 +81,11 @@ class PensjonsgivendeInntektMock {
 
 
     companion object {
+        private const val PORT = 8097
+        private const val PENSJONSGIVENDE_INNTEKT_PATH = "/api/formueinntekt/pensjonsgivendeinntektforfolketrygden"
         private const val YEAR_FNR = """/[0-9]{4}/[0-9]{11}"""
         private const val TOKEN = """.*\..*\..*"""
+
+        internal const val HOST = "http://localhost:$PORT"
     }
 }
