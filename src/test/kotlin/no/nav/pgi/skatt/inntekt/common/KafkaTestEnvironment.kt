@@ -1,4 +1,4 @@
-package no.nav.pgi.skatt.inntekt
+package no.nav.pgi.skatt.inntekt.common
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig

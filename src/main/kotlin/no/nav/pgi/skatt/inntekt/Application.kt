@@ -1,5 +1,6 @@
 package no.nav.pgi.skatt.inntekt
 
+import io.ktor.server.netty.*
 import no.nav.pensjon.samhandling.naisserver.naisServer
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
@@ -9,13 +10,17 @@ import org.slf4j.LoggerFactory
 
 
 fun main() {
-    val application = Application()
-    application.startPensjonsgivendeInntektStream()
+    try {
+        val application = Application()
+        application.startPensjonsgivendeInntektStream()
+    } catch (e: java.lang.Exception) {
+        System.exit(1)
+    }
 }
 
 internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: PgiClient = PgiClient()) {
-    private val pensjonsgivendeInntektStream = PGIStream(kafkaConfig.streamProperties(), PGITopology(pgiClient))
-    private val naisServer = naisServer(readyCheck = { pensjonsgivendeInntektStream.isRunning() })
+    private val pgiStream = PGIStream(kafkaConfig.streamProperties(), PGITopology(pgiClient))
+    private val naisServer: NettyApplicationEngine = naisServer(readyCheck = { pgiStream.isRunning() })
 
     init {
         addShutdownHook()
@@ -23,27 +28,31 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
     }
 
     internal fun startPensjonsgivendeInntektStream() {
-        pensjonsgivendeInntektStream.start()
+        pgiStream.start()
+    }
+
+    internal fun close() {
+        pgiStream.close()
+        naisServer.stop(500, 500)
     }
 
     private fun addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(Thread {
             try {
-                stop()
+                close()
             } catch (e: Exception) {
                 LOGGER.error("Error while shutting down", e)
             }
         })
     }
 
-    internal fun stop() {
-        pensjonsgivendeInntektStream.close()
-        naisServer.stop(500, 500)
-    }
-
     companion object {
         private val LOGGER = LoggerFactory.getLogger(Application::class.java)
     }
 }
+
+//TODO Sjekk om stream kaster exception. Eventuelt få den til å gjøre det.
+//TODO Lag flere tester for DTO mapping og avromapping
+//TODO dobbelsjekk DTO mapping og avromapping logikk.
 
 

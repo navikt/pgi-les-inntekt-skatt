@@ -52,7 +52,7 @@ internal class MaskinportenMock {
         private const val TOKEN_PATH = "/token"
         private const val MASKINPORTEN_MOCK_HOST = "http://localhost:$PORT"
 
-        val MASKINPORTEN_ENV_VARIABLES: Map<String, String> = mapOf(
+        val MASKINPORTEN_CLIENT_ENV_VARIABLES: Map<String, String> = mapOf(
                 SCOPE_ENV_KEY to "testScope",
                 CLIENT_ID_ENV_KEY to "testClient",
                 VALID_IN_SECONDS_ENV_KEY to "120",

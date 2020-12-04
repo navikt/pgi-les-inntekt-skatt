@@ -1,12 +1,11 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
-import no.nav.pgi.skatt.inntekt.skatt.PgiClient
-import no.nav.pgi.skatt.inntekt.PlaintextStrategy
+import no.nav.pgi.skatt.inntekt.common.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA_REGISTRY_URL
+import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.UnhandledStatusCodeException
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
@@ -25,8 +24,10 @@ internal class PGITopologyTest {
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
 
+    private val pgiClient = PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MaskinportenMock.MASKINPORTEN_CLIENT_ENV_VARIABLES)
     private val kafkaConfig = KafkaConfig(getKafkaTestEnv(), PlaintextStrategy())
-    private val topologyDriver = PgiTopologyTestDriver(PGITopology(PgiClient(getPgiClientEnv())).topology(), kafkaConfig.streamProperties())
+    private val topologyDriver = PgiTopologyTestDriver(PGITopology(pgiClient).topology(), kafkaConfig.streamProperties())
+
     val testInputTopic = topologyDriver.createInputTopic<HendelseKey, Hendelse>(PGI_HENDELSE_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
     val testOutputTopic = topologyDriver.createOutputTopic<HendelseKey, PensjonsgivendeInntekt>(PGI_INNTEKT_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
 
@@ -60,7 +61,7 @@ internal class PGITopologyTest {
     }
 
     @Test
-    internal fun `should fail with Exception if exception iss thrown in stream`() {
+    internal fun `should fail with Exception if exception is thrown in stream`() {
         val failingHendelse = Hendelse(1L, IDENTIFIKATOR, INNTEKTSAAR)
 
         pensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`()
@@ -71,9 +72,6 @@ internal class PGITopologyTest {
         assertThrows<UnhandledStatusCodeException> { addToTopic(failingHendelse) }
         assertEquals(TEN, testOutputTopic.readKeyValuesToList().size)
     }
-
-    private fun getPgiClientEnv() =
-            MaskinportenMock.MASKINPORTEN_ENV_VARIABLES + mapOf(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to PensjonsgivendeInntektMock.HOST)
 
     private fun getKafkaTestEnv() =
             mapOf(KafkaConfig.BOOTSTRAP_SERVERS to "test",

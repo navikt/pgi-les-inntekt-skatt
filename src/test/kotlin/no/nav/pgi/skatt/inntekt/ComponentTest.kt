@@ -1,9 +1,10 @@
 package no.nav.pgi.skatt.inntekt
 
+import no.nav.pgi.skatt.inntekt.common.KafkaTestEnvironment
+import no.nav.pgi.skatt.inntekt.common.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
-import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock.Companion.MASKINPORTEN_ENV_VARIABLES
+import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock.Companion.MASKINPORTEN_CLIENT_ENV_VARIABLES
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
-import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
@@ -20,7 +21,7 @@ internal class ComponentTest {
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
-    private val skattClient = PgiClient(mapOf(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to PensjonsgivendeInntektMock.HOST) + MASKINPORTEN_ENV_VARIABLES)
+    private val skattClient = PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MASKINPORTEN_CLIENT_ENV_VARIABLES)
     private val application = Application(kafkaConfig, skattClient)
 
     @BeforeAll
@@ -36,7 +37,7 @@ internal class ComponentTest {
 
     @AfterAll
     fun tearDown() {
-        application.stop()
+        application.close()
         pensjonsgivendeInntektMock.stop()
         maskinportenMock.stop()
         kafkaTestEnvironment.tearDown()
@@ -54,14 +55,12 @@ internal class ComponentTest {
         assertEquals(hendelseKey, kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
     }
 
-
     @Test
     fun `reads hendelser from topic, gets 401 from skatt`() {
         val hendelseKey = HendelseKey(NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
         val hendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
 
-        pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR,NORSK_PERSONIDENTIFIKATOR)
+        pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
     }
-
 }

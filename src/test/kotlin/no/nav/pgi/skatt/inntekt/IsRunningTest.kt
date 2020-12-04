@@ -1,11 +1,13 @@
-package no.nav.pgi.skatt.inntekt.stream
+package no.nav.pgi.skatt.inntekt
 
-import no.nav.pgi.skatt.inntekt.KafkaTestEnvironment
-import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
-import no.nav.pgi.skatt.inntekt.skatt.PgiClient
-import no.nav.pgi.skatt.inntekt.PlaintextStrategy
+import no.nav.pgi.skatt.inntekt.common.KafkaTestEnvironment
+import no.nav.pgi.skatt.inntekt.common.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
+import no.nav.pgi.skatt.inntekt.skatt.PgiClient
+import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
+import no.nav.pgi.skatt.inntekt.stream.PGIStream
+import no.nav.pgi.skatt.inntekt.stream.PGITopology
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -16,7 +18,7 @@ import org.junit.jupiter.api.TestInstance
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class IsRunningTest {
     private val kafkaTestEnvironment = KafkaTestEnvironment()
-    private val pgiClient = PgiClient(mapOf(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to PensjonsgivendeInntektMock.HOST) + MaskinportenMock.MASKINPORTEN_ENV_VARIABLES)
+    private val pgiClient = PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MaskinportenMock.MASKINPORTEN_CLIENT_ENV_VARIABLES)
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
     private val pgiStream: PGIStream = PGIStream(kafkaConfig.streamProperties(), PGITopology(pgiClient))
 

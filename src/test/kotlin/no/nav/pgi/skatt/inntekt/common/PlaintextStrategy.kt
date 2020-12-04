@@ -1,4 +1,4 @@
-package no.nav.pgi.skatt.inntekt
+package no.nav.pgi.skatt.inntekt.common
 
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import org.apache.kafka.clients.CommonClientConfigs

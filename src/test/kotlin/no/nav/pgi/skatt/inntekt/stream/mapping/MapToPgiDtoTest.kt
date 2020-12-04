@@ -1,10 +1,8 @@
-package no.nav.pgi.skatt.inntekt.stream
+package no.nav.pgi.skatt.inntekt.stream.mapping
 
 import no.nav.pgi.skatt.inntekt.skatt.InntektDtoException
 import no.nav.pgi.skatt.inntekt.skatt.InntektPerOrdningDtoException
 import no.nav.pgi.skatt.inntekt.skatt.PgiDto
-import no.nav.pgi.skatt.inntekt.stream.mapping.InvalidJsonMappingException
-import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiDto
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -130,7 +128,8 @@ internal class MapToPgiDtoTest {
             pensjonsgivendeInntektAvLoennsinntekt: Long? = INNTEKT_AV_LOENNSINNTEKT,
             pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel: Long? = INNTEKT_AV_LOENNSINNTEKT_BARE_PENSJONSDEL,
             pensjonsgivendeInntektAvNaeringsinntekt: Long? = INNTEKT_AV_NAERINGSINNTEKT,
-            pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage: Long? = INNTEKT_AV_NAERINGSINNTEKT_FRA_FISKE_FANGST_ELLER_FAMILIEBARNEHAGE) = """{
+            pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage: Long? = INNTEKT_AV_NAERINGSINNTEKT_FRA_FISKE_FANGST_ELLER_FAMILIEBARNEHAGE
+    ) = """{
                 "skatteordning": ${if (skatteordning == null) null else """"$skatteordning""""},
                 "datoForFastsetting": ${if (datoForFastsetting == null) null else """"$datoForFastsetting""""},
                 "pensjonsgivendeInntektAvLoennsinntekt": $pensjonsgivendeInntektAvLoennsinntekt,

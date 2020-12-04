@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 
-internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology, private val onClose: () -> Unit = {}) {
+internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology) {
 
     private val pensjonsgivendeInntektStream = KafkaStreams(pgiTopology.topology(), streamProperties)
 
