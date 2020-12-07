@@ -34,7 +34,7 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
 
 
     private companion object {
-        private val LOG = LoggerFactory.getLogger(PGIStream::class.java)
+        private val LOG = LoggerFactory.getLogger(PGITopology::class.java)
     }
 }
 

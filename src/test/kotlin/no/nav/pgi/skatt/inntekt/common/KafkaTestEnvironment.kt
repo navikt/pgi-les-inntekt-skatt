@@ -75,14 +75,19 @@ internal class KafkaTestEnvironment {
     )
 
     //Duration 4 seconds to allow for hendelse to be added to topic
-    private fun consumeInntektTopic(): List<ConsumerRecord<HendelseKey, PensjonsgivendeInntekt>> = inntektTestConsumer.poll(ofSeconds(4L)).records(PGI_INNTEKT_TOPIC).toList()
+    fun consumeInntektTopic(): List<ConsumerRecord<HendelseKey, PensjonsgivendeInntekt>> = inntektTestConsumer.poll(ofSeconds(4L)).records(PGI_INNTEKT_TOPIC).toList()
 
     internal fun writeHendelse(hendelseKey: HendelseKey, hendelse: Hendelse) {
         val record = ProducerRecord(PGI_HENDELSE_TOPIC, hendelseKey, hendelse)
         hendelseTestProducer.send(record).get()
     }
 
+    fun pgiHendelseTopicOffsett(){
+        kafkaTestEnvironment
+    }
+
     fun getFirstRecordOnInntektTopic() = consumeInntektTopic()[0]
+
 
     fun closeTestConsumer() = inntektTestConsumer.close()
 }

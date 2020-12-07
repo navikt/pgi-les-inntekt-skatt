@@ -7,37 +7,36 @@ import java.util.*
 
 internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology) {
 
-    private val pensjonsgivendeInntektStream = KafkaStreams(pgiTopology.topology(), streamProperties)
+    private val pgiStream = KafkaStreams(pgiTopology.topology(), streamProperties)
 
-    init {
+    init{
         setStreamStateListener()
-        setUncaughtStreamExceptionHandler()
     }
 
-    private fun setUncaughtStreamExceptionHandler() {
-        pensjonsgivendeInntektStream.setUncaughtExceptionHandler { thread: Thread?, e: Throwable? ->
-            LOG.error("Uncaught exception in thread $thread, closing beregnetSkattStream", e)
-            pensjonsgivendeInntektStream.close()
+    internal fun setUncaughtStreamExceptionHandler(handleException: (e: Throwable?) -> Unit) {
+        pgiStream.setUncaughtExceptionHandler { thread: Thread?, e: Throwable? ->
+            LOG.error("Uncaught exception in thread $thread", e)
+            handleException(e)
         }
     }
 
     private fun setStreamStateListener() {
-        pensjonsgivendeInntektStream.setStateListener { newState: KafkaStreams.State?, oldState: KafkaStreams.State? ->
+        pgiStream.setStateListener { newState: KafkaStreams.State?, oldState: KafkaStreams.State? ->
             LOG.info("State change from $oldState to $newState")
         }
     }
 
     internal fun start() {
         LOG.info("Starting PgiStream")
-        pensjonsgivendeInntektStream.start()
+        pgiStream.start()
     }
 
     internal fun close() {
-        LOG.info("Stopping PgiStream")
-        pensjonsgivendeInntektStream.close()
+        LOG.info("Closing PgiStream")
+        pgiStream.close()
     }
 
-    internal fun isRunning() = pensjonsgivendeInntektStream.state().isRunningOrRebalancing
+    internal fun isRunning() = pgiStream.state().isRunningOrRebalancing
 
     private companion object {
         private val LOG = LoggerFactory.getLogger(PGIStream::class.java)

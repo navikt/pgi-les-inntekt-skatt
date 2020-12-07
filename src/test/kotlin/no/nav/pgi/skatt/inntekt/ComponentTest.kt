@@ -21,23 +21,18 @@ internal class ComponentTest {
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
-    private val skattClient = PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MASKINPORTEN_CLIENT_ENV_VARIABLES)
-    private val application = Application(kafkaConfig, skattClient)
+    private val pgiClient = PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MASKINPORTEN_CLIENT_ENV_VARIABLES)
+    private val application = Application(kafkaConfig, pgiClient)
 
     @BeforeAll
     fun init() {
-        application.startPensjonsgivendeInntektStream()
+        application.start()
         maskinportenMock.`stub maskinporten token endpoint`()
-    }
-
-    @BeforeEach
-    fun beforeEach() {
-        pensjonsgivendeInntektMock.reset()
     }
 
     @AfterAll
     fun tearDown() {
-        application.close()
+        application.stop()
         pensjonsgivendeInntektMock.stop()
         maskinportenMock.stop()
         kafkaTestEnvironment.tearDown()
@@ -53,14 +48,5 @@ internal class ComponentTest {
 
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
         assertEquals(hendelseKey, kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
-    }
-
-    @Test
-    fun `reads hendelser from topic, gets 401 from skatt`() {
-        val hendelseKey = HendelseKey(NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
-        val hendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
-
-        pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
-        kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
     }
 }

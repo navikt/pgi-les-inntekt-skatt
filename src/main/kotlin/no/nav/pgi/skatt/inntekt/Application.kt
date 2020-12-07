@@ -1,5 +1,6 @@
 package no.nav.pgi.skatt.inntekt
 
+import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import no.nav.pensjon.samhandling.naisserver.naisServer
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
@@ -7,14 +8,16 @@ import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PGIStream
 import no.nav.pgi.skatt.inntekt.stream.PGITopology
 import org.slf4j.LoggerFactory
+import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 
 fun main() {
     try {
         val application = Application()
-        application.startPensjonsgivendeInntektStream()
-    } catch (e: java.lang.Exception) {
-        System.exit(1)
+        application.start()
+    } catch (e: Throwable) {
+        exitProcess(1)
     }
 }
 
@@ -22,32 +25,41 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
     private val pgiStream = PGIStream(kafkaConfig.streamProperties(), PGITopology(pgiClient))
     private val naisServer: NettyApplicationEngine = naisServer(readyCheck = { pgiStream.isRunning() })
 
-    init {
+    internal fun start() {
         addShutdownHook()
-        naisServer.start()
-    }
+        addCloseOnExceptionInStream()
 
-    internal fun startPensjonsgivendeInntektStream() {
+        naisServer.start(wait = false)
         pgiStream.start()
     }
 
-    internal fun close() {
-        pgiStream.close()
-        naisServer.stop(500, 500)
+    internal fun stop() {
+        LOG.info("Stop is called closing pgiStream and naisServer")
+        Thread{
+            pgiStream.close()
+        }.start()
+        naisServer.stop(5, 10, TimeUnit.SECONDS)
     }
 
     private fun addShutdownHook() {
+        LOG.info("Adding shutdown hook")
         Runtime.getRuntime().addShutdownHook(Thread {
             try {
-                close()
+                LOG.info("Shutdown hook triggered closing pgiStream and naisServer")
+                pgiStream.close()
+                naisServer.stop(5, 10, TimeUnit.SECONDS)
             } catch (e: Exception) {
-                LOGGER.error("Error while shutting down", e)
+                LOG.error("Error while shutting down", e)
             }
         })
     }
 
+    private fun addCloseOnExceptionInStream() = pgiStream.setUncaughtStreamExceptionHandler {
+        stop()
+    }
+
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(Application::class.java)
+        private val LOG = LoggerFactory.getLogger(Application::class.java)
     }
 }
 
