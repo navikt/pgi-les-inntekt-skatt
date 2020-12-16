@@ -11,6 +11,9 @@ spec:
   port: 8080
   envFrom:
     - secret: pgi-les-inntekt-skatt-secrets
+  prometheus:
+    enabled: true
+    path: /metrics
   kafka:
     pool: nav-dev
   liveness:
