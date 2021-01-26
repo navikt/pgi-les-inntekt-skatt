@@ -12,9 +12,15 @@ internal class HandleErrorCodeFromSkatt : ValueMapper<HttpResponse<String>, Stri
         }
     }
 
-    private fun handleError(httpResponse: HttpResponse<String>): String {
-        throw UnhandledStatusCodeException("Call to pgi failed with code: ${httpResponse.statusCode()} and body: ${httpResponse.body()}")
+    private fun handleError(httpResponse: HttpResponse<String>): Nothing = when {
+        httpResponse.statusCode() == 400 && httpResponse.body().contains("PGIF-005") -> throw UnsupportedInntektsAarException("LOL")
+        httpResponse.statusCode() == 400 && httpResponse.body().contains("PGIF-007") -> throw InvalidInntektsAarFormatException("LOL")
+        httpResponse.statusCode() == 404 && httpResponse.body().contains("PGIF-006") -> throw PgiForYearAndIdentifierNotFoundException("LOL")
+        else -> throw UnhandledStatusCodeException("Call to pgi failed with code: ${httpResponse.statusCode()} and body: ${httpResponse.body()}")
     }
 }
 
+class UnsupportedInntektsAarException(message: String) :  RuntimeException(message.maskFnr())
+class PgiForYearAndIdentifierNotFoundException(message: String) :  RuntimeException(message.maskFnr())
+class InvalidInntektsAarFormatException(message: String) :  RuntimeException(message.maskFnr())
 class UnhandledStatusCodeException(message: String) : RuntimeException(message.maskFnr())
