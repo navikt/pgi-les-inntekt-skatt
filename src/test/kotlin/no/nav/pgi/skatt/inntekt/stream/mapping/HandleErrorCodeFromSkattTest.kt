@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito
 import java.net.http.HttpResponse
 
 private const val DUMMY_BODY = "test body"
@@ -17,71 +16,55 @@ private const val DUMMY_BODY = "test body"
 internal class HandleErrorCodeFromSkattTest {
     private val handleErrorCodesMapper: ValueMapper<HttpResponse<String>, String> = HandleErrorCodeFromSkatt()
 
+
     @Test
     internal fun `should return body when status 200`() {
-        val httpResponse = mockk<HttpResponse<String>>() 
-        every { httpResponse.body() } returns DUMMY_BODY
-        every { httpResponse.statusCode() } returns (200)
-
-        assertEquals(DUMMY_BODY, handleErrorCodesMapper.apply(httpResponse))
+        assertEquals(DUMMY_BODY, handleErrorCodesMapper.apply(mockkHttpResponse(DUMMY_BODY, 200)))
     }
 
     @Test
     internal fun `should throw UnhandledStatusCodeException when status is not handled`() {
-        val httpResponse = createMockHttpResponse()
-        Mockito.`when`(httpResponse.body()).thenReturn(DUMMY_BODY)
-        Mockito.`when`(httpResponse.statusCode()).thenReturn(404)
-
-        assertThrows<UnhandledStatusCodeException> { handleErrorCodesMapper.apply(httpResponse) }
+        assertThrows<UnhandledStatusCodeException> { handleErrorCodesMapper.apply(mockkHttpResponse(DUMMY_BODY, 404)) }
     }
-
-
     @Test
     internal fun `should throw UnsupportedInntektsAarException when status is not handled`() {
-        val httpResponse = createMockHttpResponse()
-        Mockito.`when`(httpResponse.body()).thenReturn("PGIF-005")
-        Mockito.`when`(httpResponse.statusCode()).thenReturn(400)
-
-        assertThrows<UnsupportedInntektsAarException> { handleErrorCodesMapper.apply(httpResponse) }
+        assertThrows<UnsupportedInntektsAarException> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-005", 400))
+        }
     }
-
     @Test
     internal fun `should throw PgiForYearAndIdentifierNotFoundException when status is not handled`() {
-        val httpResponse = createMockHttpResponse()
-        Mockito.`when`(httpResponse.body()).thenReturn("PGIF-006")
-        Mockito.`when`(httpResponse.statusCode()).thenReturn(404)
-
-        assertThrows<PgiForYearAndIdentifierNotFoundException> { handleErrorCodesMapper.apply(httpResponse) }
+        assertThrows<PgiForYearAndIdentifierNotFoundException> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-006", 404))
+        }
     }
 
     @Test
     internal fun `should throw InvalidInntektsAarFormatException when status is not handled`() {
-        val httpResponse = createMockHttpResponse()
-        Mockito.`when`(httpResponse.body()).thenReturn("PGIF-007")
-        Mockito.`when`(httpResponse.statusCode()).thenReturn(400)
-
-        assertThrows<InvalidInntektsAarFormatException> { handleErrorCodesMapper.apply(httpResponse) }
+         assertThrows<InvalidInntektsAarFormatException> {
+             handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-007", 400))
+         }
     }
 
     @Test
     internal fun `should throw InvalidPersonidentifikatorFormatException when status is not handled`() {
-        val httpResponse = createMockHttpResponse()
-        Mockito.`when`(httpResponse.body()).thenReturn("PGIF-008")
-        Mockito.`when`(httpResponse.statusCode()).thenReturn(400)
-
-        assertThrows<InvalidPersonidentifikatorFormatException> { handleErrorCodesMapper.apply(httpResponse) }
+        assertThrows<InvalidPersonidentifikatorFormatException> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-008", 400))
+        }
     }
 
     @Test
     internal fun `should throw NoPersonWithGivenIdentifikatorException when status is not handled`() {
-        val httpResponse = createMockHttpResponse()
-        Mockito.`when`(httpResponse.body()).thenReturn("PGIF-009")
-        Mockito.`when`(httpResponse.statusCode()).thenReturn(404)
-
-        assertThrows<NoPersonWithGivenIdentifikatorException> { handleErrorCodesMapper.apply(httpResponse) }
+        assertThrows<NoPersonWithGivenIdentifikatorException> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-009", 404))
+        }
     }
 
-    private fun createMockHttpResponse(): HttpResponse<String> = Mockito.mock(HttpResponse::class.java) as HttpResponse<String>
+    fun mockkHttpResponse(body: String, statusCode: Int) =
+        mockk<HttpResponse<String>>().apply {
+            every { body() } returns body
+            every { statusCode() } returns (statusCode)
+        }
 }
 
 /*

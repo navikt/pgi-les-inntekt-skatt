@@ -24,7 +24,6 @@ class UnsupportedInntektsAarException(message: String) : RuntimeException(messag
 class PgiForYearAndIdentifierNotFoundException(message: String) : RuntimeException(message.maskFnr())
 class InvalidInntektsAarFormatException(message: String) : RuntimeException(message.maskFnr())
 class UnhandledStatusCodeException(message: String) : RuntimeException(message.maskFnr())
-
 class InvalidPersonidentifikatorFormatException(message: String) : RuntimeException(message.maskFnr())
 class NoPersonWithGivenIdentifikatorException(message: String) : RuntimeException(message.maskFnr())
 
