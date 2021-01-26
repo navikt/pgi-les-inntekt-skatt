@@ -8,7 +8,6 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito
 import java.net.http.HttpResponse
 
-
 private const val DUMMY_BODY = "test body"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -62,11 +61,28 @@ internal class HandleErrorCodeFromSkattTest {
         assertThrows<InvalidInntektsAarFormatException> { handleErrorCodesMapper.apply(httpResponse) }
     }
 
+    @Test
+    internal fun `should throw InvalidPersonidentifikatorFormatException when status is not handled`() {
+        val httpResponse = createMockHttpResponse()
+        Mockito.`when`(httpResponse.body()).thenReturn("PGIF-008")
+        Mockito.`when`(httpResponse.statusCode()).thenReturn(400)
+
+        assertThrows<InvalidPersonidentifikatorFormatException> { handleErrorCodesMapper.apply(httpResponse) }
+    }
+
+    @Test
+    internal fun `should throw NoPersonWithGivenIdentifikatorException when status is not handled`() {
+        val httpResponse = createMockHttpResponse()
+        Mockito.`when`(httpResponse.body()).thenReturn("PGIF-009")
+        Mockito.`when`(httpResponse.statusCode()).thenReturn(404)
+
+        assertThrows<NoPersonWithGivenIdentifikatorException> { handleErrorCodesMapper.apply(httpResponse) }
+    }
+
     private fun createMockHttpResponse(): HttpResponse<String> = Mockito.mock(HttpResponse::class.java) as HttpResponse<String>
 }
 
 /*
-*
 Når det gjelder feilmeldinger som er spesielle i kallet for å hente ut grunnlaget så har vi til nå:
 HTTP kode	Feilkode	Tekst
 400	PGIF-005	Det forespurte inntektsåret er ikke støttet
