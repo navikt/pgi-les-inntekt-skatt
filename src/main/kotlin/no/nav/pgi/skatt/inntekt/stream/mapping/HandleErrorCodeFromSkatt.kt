@@ -5,20 +5,16 @@ import org.apache.kafka.streams.kstream.ValueMapper
 import java.net.http.HttpResponse
 
 internal class HandleErrorCodeFromSkatt : ValueMapper<HttpResponse<String>, String> {
-    override fun apply(httpResponse: HttpResponse<String>): String {
+    override fun apply(response: HttpResponse<String>): String {
         return when {
-            httpResponse.statusCode() == 200 -> httpResponse.body()
-            else -> handleError(httpResponse)
+            response.statusCode() == 200 -> response.body()
+            response.statusCode() == 400 && response hasErrorMessage "PGIF-005" -> throw UnsupportedInntektsAarException("PGIF-005\tDet forespurte inntektsåret er ikke støttet")
+            response.statusCode() == 400 && response hasErrorMessage "PGIF-007" -> throw InvalidInntektsAarFormatException("PGIF-007\tInntektsår har ikke gyldig format")
+            response.statusCode() == 400 && response hasErrorMessage "PGIF-008" -> throw InvalidPersonidentifikatorFormatException("PGIF-008\tPersonidentifikator har ikke gyldig format")
+            response.statusCode() == 404 && response hasErrorMessage "PGIF-006" -> throw PgiForYearAndIdentifierNotFoundException("PGIF-006\tFant ikke PGI for angitt inntektsår og identifikator")
+            response.statusCode() == 404 && response hasErrorMessage "PGIF-009" -> throw NoPersonWithGivenIdentifikatorException("PGIF-009\tFant ingen person for gitt identifikator")
+            else -> throw UnhandledStatusCodeException("Call to pgi failed with code: ${response.statusCode()} and body: ${response.body()}")
         }
-    }
-
-    private fun handleError(response: HttpResponse<String>): Nothing = when {
-        response.statusCode() == 400 && response hasErrorMessage "PGIF-005" -> throw UnsupportedInntektsAarException("PGIF-005\tDet forespurte inntektsåret er ikke støttet")
-        response.statusCode() == 400 && response hasErrorMessage "PGIF-007" -> throw InvalidInntektsAarFormatException("PGIF-007\tInntektsår har ikke gyldig format")
-        response.statusCode() == 400 && response hasErrorMessage "PGIF-008" -> throw InvalidPersonidentifikatorFormatException("PGIF-008\tPersonidentifikator har ikke gyldig format")
-        response.statusCode() == 404 && response hasErrorMessage "PGIF-006" -> throw PgiForYearAndIdentifierNotFoundException("PGIF-006\tFant ikke PGI for angitt inntektsår og identifikator")
-        response.statusCode() == 404 && response hasErrorMessage "PGIF-009" -> throw NoPersonWithGivenIdentifikatorException("PGIF-009\tFant ingen person for gitt identifikator")
-        else -> throw UnhandledStatusCodeException("Call to pgi failed with code: ${response.statusCode()} and body: ${response.body()}")
     }
 }
 
