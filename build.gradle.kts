@@ -17,6 +17,7 @@ val junitJupiterVersion = "5.6.0"
 val wiremockVersion = "2.27.1"
 val kafkaEmbeddedEnvVersion = "2.5.0"
 val mockitoVersion = "3.6.0"
+val mockkVerion = "1.10.5"
 
 group = "no.nav.pgi"
 
@@ -72,6 +73,7 @@ dependencies {
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
     testImplementation("org.mockito:mockito-core:$mockitoVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+    testImplementation("io.mockk:mockk:$mockkVerion")
 }
 
 

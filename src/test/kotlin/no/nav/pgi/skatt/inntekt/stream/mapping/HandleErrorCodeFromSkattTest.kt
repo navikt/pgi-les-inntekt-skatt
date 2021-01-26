@@ -1,5 +1,7 @@
 package no.nav.pgi.skatt.inntekt.stream.mapping
 
+import io.mockk.every
+import io.mockk.mockk
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -17,9 +19,9 @@ internal class HandleErrorCodeFromSkattTest {
 
     @Test
     internal fun `should return body when status 200`() {
-        val httpResponse = createMockHttpResponse()
-        Mockito.`when`(httpResponse.body()).thenReturn(DUMMY_BODY)
-        Mockito.`when`(httpResponse.statusCode()).thenReturn(200)
+        val httpResponse = mockk<HttpResponse<String>>() 
+        every { httpResponse.body() } returns DUMMY_BODY
+        every { httpResponse.statusCode() } returns (200)
 
         assertEquals(DUMMY_BODY, handleErrorCodesMapper.apply(httpResponse))
     }
