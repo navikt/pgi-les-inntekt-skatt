@@ -12,7 +12,6 @@ import java.net.http.HttpResponse
 private const val DUMMY_BODY = "test body"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Suppress("UNCHECKED_CAST")
 internal class HandleErrorCodeFromSkattTest {
     private val handleErrorCodesMapper: ValueMapper<HttpResponse<String>, String> = HandleErrorCodeFromSkatt()
 
@@ -68,11 +67,10 @@ internal class HandleErrorCodeFromSkattTest {
 }
 
 /*
-Når det gjelder feilmeldinger som er spesielle i kallet for å hente ut grunnlaget så har vi til nå:
-HTTP kode	Feilkode	Tekst
-400	PGIF-005	Det forespurte inntektsåret er ikke støttet
-404	PGIF-006	Fant ikke PGI for angitt inntektsår og identifikator
-400	PGIF-007	Inntektsår har ikke gyldig format
-400	PGIF-008	Personidentifikator har ikke gyldig format
-404	PGIF-009	Fant ingen person for gitt identifikator
+Feilkoder:
+    400	PGIF-005	Det forespurte inntektsåret er ikke støttet
+    404	PGIF-006	Fant ikke PGI for angitt inntektsår og identifikator
+    400	PGIF-007	Inntektsår har ikke gyldig format
+    400	PGIF-008	Personidentifikator har ikke gyldig format
+    404	PGIF-009	Fant ingen person for gitt identifikator
 */
