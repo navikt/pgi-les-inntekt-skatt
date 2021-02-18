@@ -26,14 +26,3 @@ class InvalidInntektsAarFormatException(message: String) : RuntimeException(mess
 class UnhandledStatusCodeException(message: String) : RuntimeException(message.maskFnr())
 class InvalidPersonidentifikatorFormatException(message: String) : RuntimeException(message.maskFnr())
 class NoPersonWithGivenIdentifikatorException(message: String) : RuntimeException(message.maskFnr())
-
-
-/*
-Når det gjelder feilmeldinger som er spesielle i kallet for å hente ut grunnlaget så har vi til nå:
-HTTP kode	Feilkode	Tekst
-400	PGIF-005	Det forespurte inntektsåret er ikke støttet
-404	PGIF-006	Fant ikke PGI for angitt inntektsår og identifikator
-400	PGIF-007	Inntektsår har ikke gyldig format
-400	PGIF-008	Personidentifikator har ikke gyldig format
-404	PGIF-009	Fant ingen person for gitt identifikator
-*/
