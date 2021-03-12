@@ -9,7 +9,7 @@ data class PgiResponse(val httpResponse: HttpResponse<String>, val metadata: Pen
     internal fun metadata() = metadata
 
     internal infix fun hasErrorMessage(errorMessage: String) = body().contains(errorMessage)
-    internal fun sekvensnummerString() = createTraceableSekvensnummerString(metadata.getSekvensnummer())
+    internal fun traceString() = createTraceableSekvensnummerString(metadata.getSekvensnummer())
 }
 
 internal fun createTraceableSekvensnummerString(sekvensnummer: Long?) = """ ("sekvensnummer": $sekvensnummer)"""
