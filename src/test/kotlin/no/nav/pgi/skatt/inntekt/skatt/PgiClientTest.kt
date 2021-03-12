@@ -26,7 +26,7 @@ class PgiClientTest {
     }
 
     @BeforeEach
-    internal fun beforeEach(){
+    internal fun beforeEach() {
         pensjonsgivendeInntektMock.reset()
     }
 
@@ -38,13 +38,13 @@ class PgiClientTest {
 
     @Test
     fun `createGetRequest should add inntektsaar and norskPersonidentifikator to path`() {
-        val request = pgiClient.createPensjonsgivendeInntekterRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
+        val request = pgiClient.createPgiRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
         assertEquals("""$PENSJONSGIVENDE_INNTEKT_PATH/$INNTEKTSAAR/$NORSK_PERSONIDENTIFIKATOR""", request.uri().path)
     }
 
     @Test
     fun `createGetRequest should add authorization header with bearer token`() {
-        val request = pgiClient.createPensjonsgivendeInntekterRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
+        val request = pgiClient.createPgiRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
         val authorizationHeader = request.headers().firstValue("Authorization").get()
 
         assertTrue(authorizationHeader containsRegex """Bearer\s.*""")
@@ -55,7 +55,10 @@ class PgiClientTest {
     fun `should return response for pensjonsgivende inntekt endpoint when status 200`() {
         pensjonsgivendeInntektMock.`stub pensjongivende inntekt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
 
-        val response = pgiClient.getPensjonsgivendeInntekter(pgiClient.createPensjonsgivendeInntekterRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR), HttpResponse.BodyHandlers.discarding())
+        val response = pgiClient.getPgi(
+            pgiClient.createPgiRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR),
+            HttpResponse.BodyHandlers.discarding()
+        )
 
         assertEquals(200, response.statusCode())
     }
@@ -64,7 +67,10 @@ class PgiClientTest {
     fun `should return response for pensjonsgivende inntekt endpoint when status is not 200`() {
         pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
 
-        val response = pgiClient.getPensjonsgivendeInntekter(pgiClient.createPensjonsgivendeInntekterRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR), HttpResponse.BodyHandlers.discarding())
+        val response = pgiClient.getPgi(
+            pgiClient.createPgiRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR),
+            HttpResponse.BodyHandlers.discarding()
+        )
 
         assertEquals(401, response.statusCode())
     }

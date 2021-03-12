@@ -6,16 +6,16 @@ import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.Companion.PGI_CLIENT_ENV_VARIABLES
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.samordning.pgi.schema.Hendelse
+import no.nav.samordning.pgi.schema.HendelseMetadata
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import java.net.http.HttpResponse
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class FetchPgiFromSkattTest {
     private val pgiClient: PgiClient = PgiClient(PGI_CLIENT_ENV_VARIABLES + MASKINPORTEN_CLIENT_ENV_VARIABLES)
-    private val mapper: ValueMapper<Hendelse, HttpResponse<String>> = FetchPgiFromSkatt(pgiClient)
+    private val mapper: ValueMapper<Hendelse, PgiResponse> = FetchPgiFromSkatt(pgiClient)
 
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
@@ -59,6 +59,6 @@ internal class FetchPgiFromSkattTest {
         private const val IDENTIFIKATOR = "12345678901"
         private const val GJELDER_PERIODE = "2019"
 
-        private val HENDELSE = Hendelse(SEKVENSNUMMER, IDENTIFIKATOR, GJELDER_PERIODE)
+        private val HENDELSE = Hendelse(SEKVENSNUMMER, IDENTIFIKATOR, GJELDER_PERIODE, HendelseMetadata(0))
     }
 }

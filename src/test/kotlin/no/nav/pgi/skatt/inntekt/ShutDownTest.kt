@@ -12,6 +12,7 @@ import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
+import no.nav.samordning.pgi.schema.HendelseMetadata
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
@@ -51,7 +52,7 @@ internal class ShutDownTest {
 
     @Test
     fun `Stream should shut down when 401 is returned from skatt`() {
-        val failingHendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
+        val failingHendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR, HendelseMetadata(0))
 
         pensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`()
         pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
@@ -72,9 +73,8 @@ internal class ShutDownTest {
     }
 
     private fun writeToTopic(hendelse: Hendelse) = kafkaTestEnvironment.writeHendelse(hendelse.key(), hendelse)
-    private fun createHendelseList(count: Int) = (1..count).map { Hendelse(it.toLong(), (10000000000 + it).toString(), "2018") }
-    private fun callIsReady() =
-            newHttpClient().send(newBuilder(URI("http://localhost:8080$IS_READY_PATH")).build(), ofString())
+    private fun createHendelseList(count: Int) = (1..count).map { Hendelse(it.toLong(), (10000000000 + it).toString(), "2018", HendelseMetadata(0)) }
+    private fun callIsReady() = newHttpClient().send(newBuilder(URI("http://localhost:8080$IS_READY_PATH")).build(), ofString())
 
 }
 

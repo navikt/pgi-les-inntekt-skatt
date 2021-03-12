@@ -11,12 +11,12 @@ val logbackVersion = "1.2.3"
 val logstashVersion = "5.2"
 val slf4jVersion = "1.7.30"
 val log4jVersion = "2.13.3"
-val avroSchemaVersion = "0.0.4"
+val avroSchemaVersion = "0.0.7"
 val joseJwtVersion = "9.0.1"
 val junitJupiterVersion = "5.6.0"
 val wiremockVersion = "2.27.1"
 val kafkaEmbeddedEnvVersion = "2.5.0"
-val mockkVerion = "1.10.5"
+val mockkVerion = "1.10.6"
 
 group = "no.nav.pgi"
 
@@ -54,7 +54,7 @@ dependencies {
     implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
     implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
-    implementation("no.nav.pensjonsamhandling:pgi-schema:$avroSchemaVersion")
+    implementation("no.nav.pgi:pgi-schema:$avroSchemaVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")

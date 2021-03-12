@@ -9,6 +9,7 @@ import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.UnhandledStatusCodeException
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
+import no.nav.samordning.pgi.schema.HendelseMetadata
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -62,7 +63,7 @@ internal class PGITopologyTest {
 
     @Test
     internal fun `should fail with Exception if exception is thrown in stream`() {
-        val failingHendelse = Hendelse(1L, IDENTIFIKATOR, INNTEKTSAAR)
+        val failingHendelse = Hendelse(1L, IDENTIFIKATOR, INNTEKTSAAR, HendelseMetadata(0))
 
         pensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`()
         pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR, IDENTIFIKATOR)
@@ -74,14 +75,17 @@ internal class PGITopologyTest {
     }
 
     private fun getKafkaTestEnv() =
-            mapOf(KafkaConfig.BOOTSTRAP_SERVERS to "test",
-                    KafkaConfig.SCHEMA_REGISTRY_USERNAME to "test",
-                    KafkaConfig.SCHEMA_REGISTRY_PASSWORD to "test",
-                    KafkaConfig.SCHEMA_REGISTRY to MOCK_SCHEMA_REGISTRY_URL)
+        mapOf(
+            KafkaConfig.BOOTSTRAP_SERVERS to "test",
+            KafkaConfig.SCHEMA_REGISTRY_USERNAME to "test",
+            KafkaConfig.SCHEMA_REGISTRY_PASSWORD to "test",
+            KafkaConfig.SCHEMA_REGISTRY to MOCK_SCHEMA_REGISTRY_URL
+        )
 
     private fun addToHendelseTopic(amount: Int) = createHendelseList(amount).forEach { addToTopic(it) }
     private fun addToTopic(hendelse: Hendelse) = testInputTopic.pipeInput(hendelse.key(), hendelse)
-    private fun createHendelseList(count: Int) = (1..count).map { Hendelse(it.toLong(), (10000000000 + it).toString(), "2018") }
+    private fun createHendelseList(count: Int) =
+        (1..count).map { Hendelse(it.toLong(), (10000000000 + it).toString(), "2018", HendelseMetadata(0)) }
 }
 
 private fun Hendelse.key() = HendelseKey(getIdentifikator(), getGjelderPeriode())

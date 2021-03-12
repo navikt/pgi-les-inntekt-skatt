@@ -9,6 +9,7 @@ import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
+import no.nav.samordning.pgi.schema.HendelseMetadata
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 
@@ -44,7 +45,7 @@ internal class ComponentTest {
         pensjonsgivendeInntektMock.`stub pensjongivende inntekt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
 
         val hendelseKey = HendelseKey(NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
-        val hendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
+        val hendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR, HendelseMetadata(0))
 
         kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
         assertEquals(hendelseKey, kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
