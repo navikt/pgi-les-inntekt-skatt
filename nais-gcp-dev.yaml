@@ -9,6 +9,10 @@ spec:
   image: {{ image }}
   team: pensjonopptjening
   port: 8080
+  maskinporten:
+    enabled: true
+    scopes:
+      - name: "skatteetaten:pensjonsgivendeinntektforfolketrygden"
   envFrom:
     - secret: pgi-les-inntekt-skatt-secrets
   prometheus:
