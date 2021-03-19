@@ -1,7 +1,8 @@
 package no.nav.pgi.skatt.inntekt.skatt
 
+import no.nav.pensjon.opptjening.gcp.maskinporten.client.MaskinportenClient
+import no.nav.pensjon.opptjening.gcp.maskinporten.client.config.MaskinportenEnvVariableConfigCreator.Companion.createMaskinportenConfig
 import no.nav.pensjon.samhandling.env.getVal
-import no.nav.pensjon.samhandling.maskinporten.Maskinporten
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
@@ -11,7 +12,7 @@ internal const val PENSJONSGIVENDE_INNTEKT_PATH = "/api/formueinntekt/pensjonsgi
 internal const val PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY = "SKATT_INNTEKT_HOST"
 
 class PgiClient(env: Map<String, String> = System.getenv()) {
-    private val maskinporten: Maskinporten = Maskinporten(env)
+    private val maskinporten: MaskinportenClient = MaskinportenClient(createMaskinportenConfig(env))
     private val httpClient: HttpClient = HttpClient.newHttpClient()
     private val skattHost = env.getVal(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY)
 
@@ -26,5 +27,5 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
                 .path(norskPersonidentifikator)
                 .build()
         )
-            .GET().setHeader("Authorization", "Bearer ${maskinporten.token}").build()
+            .GET().setHeader("Authorization", "Bearer ${maskinporten.tokenString}").build()
 }
