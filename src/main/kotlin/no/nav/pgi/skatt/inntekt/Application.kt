@@ -35,9 +35,7 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
 
     internal fun stop() {
         LOG.info("Stop is called closing pgiStream and naisServer")
-        Thread{
-            pgiStream.close()
-        }.start()
+        Thread { pgiStream.close() }.start()
         naisServer.stop(5, 10, TimeUnit.SECONDS)
     }
 
@@ -54,17 +52,11 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
         })
     }
 
-    private fun addCloseOnExceptionInStream() = pgiStream.setUncaughtStreamExceptionHandler {
-        stop()
-    }
+    private fun addCloseOnExceptionInStream() = pgiStream.setUncaughtStreamExceptionHandler { stop() }
 
     companion object {
         private val LOG = LoggerFactory.getLogger(Application::class.java)
     }
 }
-
-//TODO Sjekk om stream kaster exception. Eventuelt få den til å gjøre det.
-//TODO Lag flere tester for DTO mapping og avromapping
-//TODO dobbelsjekk DTO mapping og avromapping logikk.
 
 

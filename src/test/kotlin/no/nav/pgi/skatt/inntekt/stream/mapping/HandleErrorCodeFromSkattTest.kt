@@ -62,6 +62,69 @@ internal class HandleErrorCodeFromSkattTest {
         }
     }
 
+    @Test
+    internal fun `should throw SkattCommonError when 500 error contains message DAS-001`() {
+        assertThrows<SkattCommonError> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("DAS-001", 500))
+        }
+    }
+
+    @Test
+    internal fun `should throw SkattCommonError when 404 error contains message DAS-002`() {
+        assertThrows<SkattCommonError> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("DAS-002", 404))
+        }
+    }
+
+    @Test
+    internal fun `should throw SkattCommonError when 500 error contains message DAS-003`() {
+        assertThrows<SkattCommonError> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("DAS-004", 500))
+        }
+    }
+
+    @Test
+    internal fun `should throw SkattCommonError when 500 error contains message DAS-004`() {
+        assertThrows<SkattCommonError> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("DAS-004", 500))
+        }
+    }
+
+    @Test
+    internal fun `should throw SkattCommonError when 500 error contains message DAS-005`() {
+        assertThrows<SkattCommonError> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("DAS-005", 500))
+        }
+    }
+
+    @Test
+    internal fun `should throw SkattCommonError when 500 error contains message DAS-006`() {
+        assertThrows<SkattCommonError> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("DAS-006", 500))
+        }
+    }
+
+    @Test
+    internal fun `should throw SkattCommonError when 500 error contains message DAS-007`() {
+        assertThrows<SkattCommonError> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("DAS-007", 500))
+        }
+    }
+
+    @Test
+    internal fun `should throw SkattCommonError when 403 error contains message DAS-008`() {
+        assertThrows<SkattCommonError> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("DAS-008", 403))
+        }
+    }
+
+    @Test
+    internal fun `should throw UnhandledStatusCodeException when unknown DAS-error`() {
+        assertThrows<UnhandledStatusCodeException> {
+            handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-009", 500))
+        }
+    }
+
     private fun mockkHttpResponse(body: String, statusCode: Int): PgiResponse {
         val mockHttpResponse = mockk<HttpResponse<String>>()
         every { mockHttpResponse.hint(String::class).body() } returns body
