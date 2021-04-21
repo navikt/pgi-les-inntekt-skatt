@@ -8,7 +8,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
 import org.apache.kafka.streams.StreamsConfig.*
 import java.util.*
 
-internal const val STREAM_APPLICATION_ID = "pgi-les-inntekt-skatt-12341234"
+internal const val STREAM_APPLICATION_ID = "pgi-les-inntekt-skatt-asfas2131d"
 internal const val PGI_INNTEKT_TOPIC = "pensjonopptjening.privat-pgi-inntekt"
 internal const val PGI_HENDELSE_TOPIC = "pensjonopptjening.privat-pgi-hendelse"
 
