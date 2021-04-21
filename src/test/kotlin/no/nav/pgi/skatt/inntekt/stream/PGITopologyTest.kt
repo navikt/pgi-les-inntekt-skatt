@@ -6,7 +6,7 @@ import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA_REGISTRY_URL
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
-import no.nav.pgi.skatt.inntekt.stream.mapping.UnhandledStatusCodeException
+import no.nav.pgi.skatt.inntekt.stream.mapping.FeilmedlingFraSkattException
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import no.nav.samordning.pgi.schema.HendelseMetadata
@@ -70,7 +70,7 @@ internal class PGITopologyTest {
 
         addToHendelseTopic(TEN)
 
-        assertThrows<UnhandledStatusCodeException> { addToTopic(failingHendelse) }
+        assertThrows<FeilmedlingFraSkattException> { addToTopic(failingHendelse) }
         assertEquals(TEN, testOutputTopic.readKeyValuesToList().size)
     }
 
