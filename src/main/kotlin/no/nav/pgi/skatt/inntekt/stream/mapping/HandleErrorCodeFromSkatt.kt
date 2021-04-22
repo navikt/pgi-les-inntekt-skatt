@@ -2,7 +2,12 @@ package no.nav.pgi.skatt.inntekt.stream.mapping
 
 import io.prometheus.client.Counter
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
+import no.nav.pgi.skatt.inntekt.skatt.ErrorCodesSkatt.Companion.skattAllErrorCodes
+import no.nav.pgi.skatt.inntekt.skatt.ErrorCodesSkatt.Companion.skattDiscardErrorCodes
+import no.nav.pgi.skatt.inntekt.skatt.containOneOf
+import no.nav.pgi.skatt.inntekt.skatt.getFirstMatch
 import org.apache.kafka.streams.kstream.ValueMapper
+import org.slf4j.LoggerFactory
 
 private val pgiLesInntektSkattResponseCounter = Counter.build()
     .name("pgi_les_inntekt_skatt_response_counter")
@@ -10,15 +15,19 @@ private val pgiLesInntektSkattResponseCounter = Counter.build()
     .help("Count response status codes from popp")
     .register()
 
-private val handledErrorCodes =
-    listOf("PGIF-005", "PGIF-006", "PGIF-007", "PGIF-008", "PGIF-009", "DAS-001", "DAS-002", "DAS-003", "DAS-004", "DAS-005", "DAS-006", "DAS-007", "DAS-008")
+private val LOG = LoggerFactory.getLogger(HandleErrorCodeFromSkatt::class.java)
 
 internal class HandleErrorCodeFromSkatt : ValueMapper<PgiResponse, PgiResponse> {
-    override fun apply(response: PgiResponse): PgiResponse {
+    override fun apply(response: PgiResponse): PgiResponse? {
         return when {
             response.statusCode() == 200 -> {
                 pgiLesInntektSkattResponseCounter.labels("${response.statusCode()}").inc()
                 response
+            }
+            response.body() containOneOf skattDiscardErrorCodes -> {
+                pgiLesInntektSkattResponseCounter.labels(createErrorLabel(response)).inc()
+                LOG.error("Feil på api Pgi Folketrygd, kontakt skatt! Call to pgi failed with code: ${response.statusCode()} and body: ${response.body()}. ${response.traceString()}")
+                null
             }
             else -> {
                 pgiLesInntektSkattResponseCounter.labels(createErrorLabel(response)).inc()
@@ -27,7 +36,7 @@ internal class HandleErrorCodeFromSkatt : ValueMapper<PgiResponse, PgiResponse> 
         }
     }
 
-    private fun createErrorLabel(response: PgiResponse) = "${response.statusCode()}${response.getErrorMessage(handledErrorCodes)?.let { "_$it" } ?: ""}"
+    private fun createErrorLabel(response: PgiResponse) = "${response.statusCode()}${(response.body() getFirstMatch skattAllErrorCodes)?.let { "_$it" } ?: ""}"
 }
 
 class FeilmedlingFraSkattException(message: String) : RuntimeException(message.maskFnr())

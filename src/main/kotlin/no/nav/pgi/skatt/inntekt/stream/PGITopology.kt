@@ -6,6 +6,7 @@ import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.FetchPgiFromSkatt
 import no.nav.pgi.skatt.inntekt.stream.mapping.HandleErrorCodeFromSkatt
 import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiAvro
+import no.nav.pgi.skatt.inntekt.stream.mapping.PgiResponse
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
@@ -31,6 +32,7 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
         stream.peek(logHendelseAboutToBeProcessed())
             .mapValues(FetchPgiFromSkatt(pgiClient))
             .mapValues(HandleErrorCodeFromSkatt())
+            .filter(pgiResponseNotNull())
             .mapValues(MapToPgiAvro())
             .peek(countInntektProcessed())
             .to(PGI_INNTEKT_TOPIC)
@@ -42,6 +44,8 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
         { _: HendelseKey, hendelse: Hendelse ->
             LOG.info("""Started processing hendelse ${hendelse.toString().maskFnr()}""")
         }
+
+    private fun pgiResponseNotNull(): (HendelseKey, PgiResponse?) -> Boolean = { _, pgiResponse -> pgiResponse != null }
 
     private fun countInntektProcessed(): (HendelseKey, PensjonsgivendeInntekt) -> Unit =
         { key: HendelseKey, _: PensjonsgivendeInntekt ->

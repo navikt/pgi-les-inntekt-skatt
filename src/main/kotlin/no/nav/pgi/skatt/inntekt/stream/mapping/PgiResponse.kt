@@ -7,10 +7,6 @@ data class PgiResponse(val httpResponse: HttpResponse<String>, val metadata: Pen
     internal fun statusCode() = httpResponse.statusCode()
     internal fun body() = httpResponse.body()
     internal fun metadata() = metadata
-
-    internal infix fun hasErrorMessage(errorMessage: String) = body().contains(errorMessage)
-    internal fun containErrorMessage(errorMessages: List<String>) = getErrorMessage(errorMessages) != null
-    internal fun getErrorMessage(errorMessages: List<String>) = errorMessages.find { body().contains(it) }
     internal fun traceString() = createTraceableSekvensnummerString(metadata.getSekvensnummer())
 }
 

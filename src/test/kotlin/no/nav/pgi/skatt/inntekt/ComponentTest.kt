@@ -5,6 +5,7 @@ import no.nav.pgi.skatt.inntekt.common.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock.Companion.MASKINPORTEN_CLIENT_ENV_VARIABLES
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
+import no.nav.pgi.skatt.inntekt.skatt.ErrorCodesSkatt
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
@@ -42,12 +43,17 @@ internal class ComponentTest {
 
     @Test
     fun `reads hendelser from topic, gets pgi based on hendelse, produces inntekt to topic`() {
-        pensjonsgivendeInntektMock.`stub pensjongivende inntekt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
-
-        val hendelseKey = HendelseKey(NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR)
+        val discardedHendelse = Hendelse(12346L, "11111111111", INNTEKTSAAR, HendelseMetadata(0))
         val hendelse = Hendelse(12345L, NORSK_PERSONIDENTIFIKATOR, INNTEKTSAAR, HendelseMetadata(0))
 
-        kafkaTestEnvironment.writeHendelse(hendelseKey, hendelse)
-        assertEquals(hendelseKey, kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
+        pensjonsgivendeInntektMock.`stub pensjongivende inntekt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
+        pensjonsgivendeInntektMock.`stub error code from skatt`(discardedHendelse, ErrorCodesSkatt.skattDiscardErrorCodes.first())
+
+        kafkaTestEnvironment.writeHendelse(discardedHendelse.key(), discardedHendelse)
+        kafkaTestEnvironment.writeHendelse(hendelse.key(), hendelse)
+
+        assertEquals(hendelse.key(), kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
     }
 }
+
+private fun Hendelse.key() = HendelseKey(getIdentifikator(), getGjelderPeriode())

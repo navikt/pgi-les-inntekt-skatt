@@ -5,6 +5,7 @@ import io.mockk.mockk
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntektMetadata
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.net.http.HttpResponse
@@ -28,53 +29,41 @@ internal class HandleErrorCodeFromSkattTest {
 
     @Test
     internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-005`() {
-        assertThrows<FeilmedlingFraSkattException> {
-            handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-005", 400))
-        }
+        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-005", 400)))
     }
 
     @Test
     internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-006`() {
-        assertThrows<FeilmedlingFraSkattException> {
-            handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-006", 404))
-        }
+        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-006", 404)))
     }
 
     @Test
     internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-007`() {
-        assertThrows<FeilmedlingFraSkattException> {
-            handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-007", 400))
-        }
+        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-007", 400)))
     }
 
     @Test
-    internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-008`() {
-        assertThrows<FeilmedlingFraSkattException> {
-            handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-008", 400))
-        }
+    internal fun `should return null when error message contains PGIF-008`() {
+        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-008", 400)))
     }
 
 
     @Test
     internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-009`() {
-        assertThrows<FeilmedlingFraSkattException> {
-            handleErrorCodesMapper.apply(
-                mockkHttpResponse(
-                    """{"kode":"PGIF-009","melding":"Fant ingen person for gitt identifikator","korrelasjonsid":"e81bef15-b211-43d7-9c03-8d1d33205a5a"}""",
-                    404
-                )
-            )
-        }
+        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-009", 404)))
     }
-
 
     @Test
     internal fun `should throw FeilmedlingFraSkattException when 500 error contains message DAS-001`() {
         assertThrows<FeilmedlingFraSkattException> {
-            handleErrorCodesMapper.apply(mockkHttpResponse("DAS-001", 500))
+            handleErrorCodesMapper.apply(
+                mockkHttpResponse(
+                    """{"kode":"DAS-001","melding":"Fant ingen person for gitt identifikator","korrelasjonsid":"e81bef15-b211-43d7-9c03-8d1d33205a5a"}""",
+                    500
+                )
+            )
         }
     }
-
 
     @Test
     internal fun `should throw FeilmedlingFraSkattException when 404 error contains message DAS-002`() {

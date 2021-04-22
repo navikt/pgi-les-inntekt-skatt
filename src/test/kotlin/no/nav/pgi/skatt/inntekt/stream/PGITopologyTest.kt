@@ -5,6 +5,7 @@ import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA_REGISTRY_URL
+import no.nav.pgi.skatt.inntekt.skatt.ErrorCodesSkatt
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.FeilmedlingFraSkattException
 import no.nav.samordning.pgi.schema.Hendelse
@@ -62,6 +63,27 @@ internal class PGITopologyTest {
     }
 
     @Test
+    internal fun `should not process skattDiscardErrorCodes`() {
+        pensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`()
+        val discardHendelseList = mutableListOf<Hendelse>()
+
+        for (i in ErrorCodesSkatt.skattDiscardErrorCodes.indices) {
+            val hendelse = Hendelse(i + 5000L, "1111111111$i", "2019", HendelseMetadata(0))
+            pensjonsgivendeInntektMock.`stub error code from skatt`(hendelse, ErrorCodesSkatt.skattDiscardErrorCodes[i])
+            discardHendelseList.add(hendelse)
+        }
+
+        addToHendelseTopic(TEN)
+        addToHendelseTopic(discardHendelseList)
+        addToHendelseTopic(TEN)
+
+        val output = testOutputTopic.readKeyValuesToList()
+
+        assertEquals(TEN + discardHendelseList.size + TEN, pensjonsgivendeInntektMock.callsToMock())
+        assertEquals(TEN + TEN, output.size)
+    }
+
+    @Test
     internal fun `should fail with Exception if exception is thrown in stream`() {
         val failingHendelse = Hendelse(1L, IDENTIFIKATOR, INNTEKTSAAR, HendelseMetadata(0))
 
@@ -83,6 +105,7 @@ internal class PGITopologyTest {
         )
 
     private fun addToHendelseTopic(amount: Int) = createHendelseList(amount).forEach { addToTopic(it) }
+    private fun addToHendelseTopic(hendelser: List<Hendelse>) = hendelser.forEach { addToTopic(it) }
     private fun addToTopic(hendelse: Hendelse) = testInputTopic.pipeInput(hendelse.key(), hendelse)
     private fun createHendelseList(count: Int) =
         (1..count).map { Hendelse(it.toLong(), (10000000000 + it).toString(), "2018", HendelseMetadata(0)) }
