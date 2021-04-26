@@ -119,4 +119,3 @@ tasks.withType<Test> {
 tasks.withType<Wrapper> {
     gradleVersion = "6.8.3"
 }
-
