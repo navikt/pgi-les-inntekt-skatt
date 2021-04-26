@@ -42,8 +42,8 @@ jobs:
       - name: Push Docker image
         run: "docker push $(cat .docker_image):$(cat .docker_tag)"
 
-      # Deploy to GCP dev
-      - name: Deploy pgi-les-inntekt-skatt (dev-gcp)
+      # Deploy to GCP Prod
+      - name: Deploy pgi-les-inntekt-skatt (prod-gcp)
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
