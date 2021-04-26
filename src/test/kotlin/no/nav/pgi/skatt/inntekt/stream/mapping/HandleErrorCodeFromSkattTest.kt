@@ -7,15 +7,15 @@ import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import java.net.http.HttpResponse
 
 private const val DUMMY_BODY = "test body"
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class HandleErrorCodeFromSkattTest {
-    private val handleErrorCodesMapper: ValueMapper<PgiResponse, PgiResponse> =
-        HandleErrorCodeFromSkatt()
-
+    private val handleErrorCodesMapper: ValueMapper<PgiResponse, PgiResponse> = HandleErrorCodeFromSkatt()
 
     @Test
     internal fun `should return body when status 200`() {
