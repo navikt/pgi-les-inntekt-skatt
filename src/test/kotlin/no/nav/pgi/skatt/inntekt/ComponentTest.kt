@@ -35,10 +35,10 @@ internal class ComponentTest {
     @AfterAll
     fun tearDown() {
         application.stop()
+        kafkaTestEnvironment.closeTestConsumer()
+        kafkaTestEnvironment.tearDown()
         pensjonsgivendeInntektMock.stop()
         maskinportenMock.stop()
-        kafkaTestEnvironment.tearDown()
-        kafkaTestEnvironment.closeTestConsumer()
     }
 
     @Test
