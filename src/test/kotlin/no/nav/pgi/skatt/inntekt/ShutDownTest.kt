@@ -75,7 +75,6 @@ internal class ShutDownTest {
     private fun writeToTopic(hendelse: Hendelse) = kafkaTestEnvironment.writeHendelse(hendelse.key(), hendelse)
     private fun createHendelseList(count: Int) = (1..count).map { Hendelse(it.toLong(), (10000000000 + it).toString(), "2018", HendelseMetadata(0)) }
     private fun callIsReady() = newHttpClient().send(newBuilder(URI("http://localhost:8080$IS_READY_PATH")).build(), ofString())
-
 }
 
 private fun Hendelse.key() = HendelseKey(getIdentifikator(), getGjelderPeriode())
