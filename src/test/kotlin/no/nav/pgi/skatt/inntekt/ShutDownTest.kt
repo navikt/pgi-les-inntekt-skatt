@@ -28,6 +28,7 @@ private const val NORSK_PERSONIDENTIFIKATOR = "12345678901"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ShutDownTest {
+    /*
     private val kafkaTestEnvironment = KafkaTestEnvironment()
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
@@ -35,7 +36,7 @@ internal class ShutDownTest {
     private val pgiClient = PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MaskinportenMock.MASKINPORTEN_CLIENT_ENV_VARIABLES)
     private val application = Application(kafkaConfig, pgiClient)
 
-    /*
+
     @BeforeAll
     fun init() {
         application.start()
@@ -73,11 +74,13 @@ internal class ShutDownTest {
         kafkaTestEnvironment.pgiHendelseTopicOffsett()
     }
 
-     */
+
 
     private fun writeToTopic(hendelse: Hendelse) = kafkaTestEnvironment.writeHendelse(hendelse.key(), hendelse)
     private fun createHendelseList(count: Int) = (1..count).map { Hendelse(it.toLong(), (10000000000 + it).toString(), "2018", HendelseMetadata(0)) }
     private fun callIsReady() = newHttpClient().send(newBuilder(URI("http://localhost:8080$IS_READY_PATH")).build(), ofString())
+
+     */
 }
 
 private fun Hendelse.key() = HendelseKey(getIdentifikator(), getGjelderPeriode())

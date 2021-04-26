@@ -19,6 +19,7 @@ private const val NORSK_PERSONIDENTIFIKATOR = "12345678901"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ComponentTest {
+    /*
     private val kafkaTestEnvironment = KafkaTestEnvironment()
     private val kafkaConfig = KafkaConfig(kafkaTestEnvironment.testConfiguration(), PlaintextStrategy())
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
@@ -54,6 +55,8 @@ internal class ComponentTest {
 
         assertEquals(hendelse.key(), kafkaTestEnvironment.getFirstRecordOnInntektTopic().key())
     }
+
+     */
 }
 
 private fun Hendelse.key() = HendelseKey(getIdentifikator(), getGjelderPeriode())
