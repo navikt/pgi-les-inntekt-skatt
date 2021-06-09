@@ -30,7 +30,7 @@ export GITHUB_ACTOR="username"
 # Read only token for downloading github packages
 export GITHUB_TOKEN="token"
 ```
-
+ 
 ## Metrikker
 Grafana dashboards brukes for å f.eks. monitorere minne, cpu-bruk og andre metrikker.
 Se [pgi-les-inntekt-skatt grafana dasboard](https://grafana.adeo.no/) TODO: Fiks link
