@@ -12,7 +12,8 @@ spec:
   maskinporten:
     enabled: true
     scopes:
-      - name: "skatteetaten:pensjonsgivendeinntektforfolketrygden"
+      consumes:
+        - name: "skatteetaten:pensjonsgivendeinntektforfolketrygden"
   envFrom:
     - secret: pgi-les-inntekt-skatt-secrets
   prometheus:
