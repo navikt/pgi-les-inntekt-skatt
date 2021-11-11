@@ -34,7 +34,7 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
             .mapValues(HandleErrorCodeFromSkatt())
             .filter(pgiResponseNotNull())
             .mapValues(MapToPgiAvro())
-            .peek(countInntektProcessed())
+            .peek(logAndCountInntektProcessed())
             .to(PGI_INNTEKT_TOPIC)
 
         return streamBuilder.build()
@@ -47,10 +47,11 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
 
     private fun pgiResponseNotNull(): (HendelseKey, PgiResponse?) -> Boolean = { _, pgiResponse -> pgiResponse != null }
 
-    private fun countInntektProcessed(): (HendelseKey, PensjonsgivendeInntekt) -> Unit =
-        { key: HendelseKey, _: PensjonsgivendeInntekt ->
+    private fun logAndCountInntektProcessed(): (HendelseKey, PensjonsgivendeInntekt) -> Unit =
+        { key: HendelseKey, pgi: PensjonsgivendeInntekt ->
             hendelserToinntektProcessedTotal.inc()
             hendelserToinntektProcessedByYear.labels(key.getGjelderPeriode()).inc()
+            LOG.info("Hentet: ${pgi.toString().maskFnr()}")
         }
 
     private companion object {
