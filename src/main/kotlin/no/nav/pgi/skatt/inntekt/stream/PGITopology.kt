@@ -51,7 +51,7 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
         { key: HendelseKey, pgi: PensjonsgivendeInntekt ->
             hendelserToinntektProcessedTotal.inc()
             hendelserToinntektProcessedByYear.labels(key.getGjelderPeriode()).inc()
-            LOG.info("Hentet: ${pgi.toString().maskFnr()}")
+            LOG.info("Lest inntekt Skatt: ${pgi.toString().maskFnr()}")
         }
 
     private companion object {
