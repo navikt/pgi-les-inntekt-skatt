@@ -7,6 +7,7 @@ import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PGIStream
 import no.nav.pgi.skatt.inntekt.stream.PGITopology
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
@@ -26,6 +27,7 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
     private val naisServer: NettyApplicationEngine = naisServer(readyCheck = { pgiStream.isRunning() })
 
     internal fun start() {
+        SECURE_LOG.warn("Test Secure log")
         addShutdownHook()
         addCloseOnExceptionInStream()
 
@@ -55,6 +57,7 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
     private fun addCloseOnExceptionInStream() = pgiStream.setUncaughtStreamExceptionHandler { stop() }
 
     companion object {
+        private val SECURE_LOG: Logger = LoggerFactory.getLogger("tjenestekall")
         private val LOG = LoggerFactory.getLogger(Application::class.java)
     }
 }
