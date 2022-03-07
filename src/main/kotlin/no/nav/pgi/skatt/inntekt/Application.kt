@@ -27,7 +27,6 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
     private val naisServer: NettyApplicationEngine = naisServer(readyCheck = { pgiStream.isRunning() })
 
     internal fun start() {
-        SECURE_LOG.warn("Test Secure log")
         addShutdownHook()
         addCloseOnExceptionInStream()
 
@@ -57,7 +56,6 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
     private fun addCloseOnExceptionInStream() = pgiStream.setUncaughtStreamExceptionHandler { stop() }
 
     companion object {
-        private val SECURE_LOG: Logger = LoggerFactory.getLogger("tjenestekall")
         private val LOG = LoggerFactory.getLogger(Application::class.java)
     }
 }

@@ -15,7 +15,8 @@ internal class FetchPgiFromSkatt(private val pgiClient: PgiClient) :
             val request = pgiClient.createPgiRequest(hendelse.getGjelderPeriode(), hendelse.getIdentifikator())
             return PgiResponse(
                 pgiClient.getPgi(request, HttpResponse.BodyHandlers.ofString()),
-                createPgiMetadata(hendelse)
+                createPgiMetadata(hendelse),
+                hendelse.getIdentifikator()
             )
         } catch (e: Exception) {
             throw PensjonsgivendeInntektClientException("Call to pgi failed with exception: ${e.javaClass.simpleName}. Message: ${e.message}. ${createTraceableSekvensnummerString(hendelse.getSekvensnummer())}")
