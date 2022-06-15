@@ -5,7 +5,7 @@ og publiserer deretter inntektene til kafka topicen ```privat-pgi-inntekt```.
 
 For å se hvordan hendelsene publiseres til ```privat-pgi-hendelse```, se følgende github repo: [pgi-les-hendelse-skatt](https://github.com/navikt/pgi-les-hendelse-skatt/)
 
-Dokumentasjon REST tjeneste vi bruker fra SKE: [pensjonsgivende inntekt API](https://skatteetaten.github.io/datasamarbeid-api-dokumentasjon/reference_pgi.html)
+Dokumentasjon REST tjeneste vi bruker fra SKE: [Pensjonsgivende inntekt for folketrygden API](https://skatteetaten.github.io/datasamarbeid-api-dokumentasjon/reference_pgi_folketrygden.html)
 
 ## Bygge lokalt
 
