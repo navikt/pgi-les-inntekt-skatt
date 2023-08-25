@@ -39,3 +39,7 @@ spec:
   env:
     - name: APP_TEAM
       value: pensjonopptjening
+  accessPolicy:
+    outbound:
+      external:
+        - host: api-test.sits.no
