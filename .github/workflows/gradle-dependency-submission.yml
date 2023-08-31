@@ -20,5 +20,6 @@ jobs:
         with:
           fail-on-error: true
           gradle-dependency-path: "build.gradle.kts"
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          java-version: '14.x'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
