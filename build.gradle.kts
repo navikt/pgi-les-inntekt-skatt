@@ -31,6 +31,12 @@ java {
     }
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(14))
+    }
+}
+
 repositories {
     jcenter()
     mavenCentral()
