@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorSupportVersion = "0.0.20"
-val ktorVersion = "1.3.2-1.4.0-rc"
+val ktorVersion = "1.5.4"
 val maskinportenClientVersion = "0.0.4"
 val joseJwtVersion = "9.0.1"
 val kafkaVersion = "2.5.0"
@@ -21,13 +21,13 @@ val mockkVerion = "1.10.6"
 group = "no.nav.pgi"
 
 plugins {
-    kotlin("jvm") version "1.4.10"
-    kotlin("plugin.serialization") version "1.4.0"
+    kotlin("jvm") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(14))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -88,11 +88,12 @@ dependencies {
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVerion")
+    implementation(kotlin("stdlib"))
 }
 
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "14"
+    kotlinOptions.jvmTarget = "17"
 }
 
 tasks.named<Jar>("jar") {
@@ -123,5 +124,5 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "6.8.3"
+    gradleVersion = "7.5"
 }
