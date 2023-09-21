@@ -27,5 +27,8 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
                 .path(norskPersonidentifikator)
                 .build()
         )
-            .GET().setHeader("Authorization", "Bearer ${maskinporten.tokenString}").build()
+            .GET()
+            .setHeader("Authorization", "Bearer ${maskinporten.tokenString}")
+            .setHeader("Accept", "application/json")
+            .build()
 }
