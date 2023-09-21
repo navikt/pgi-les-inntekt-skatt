@@ -3,6 +3,7 @@ package no.nav.pgi.skatt.inntekt.skatt
 import no.nav.pensjon.opptjening.gcp.maskinporten.client.MaskinportenClient
 import no.nav.pensjon.opptjening.gcp.maskinporten.client.config.MaskinportenEnvVariableConfigCreator.Companion.createMaskinportenConfig
 import no.nav.pensjon.samhandling.env.getVal
+import org.slf4j.LoggerFactory
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
@@ -26,6 +27,7 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
                 .path(inntektsaar)
                 .path(norskPersonidentifikator)
                 .build()
+                .also { LoggerFactory.getLogger(this::class.java).info(it.toString()) }
         )
             .GET()
             .setHeader("Authorization", "Bearer ${maskinporten.tokenString}")
