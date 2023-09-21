@@ -10,7 +10,7 @@ Dokumentasjon REST tjeneste vi bruker fra SKE: [Pensjonsgivende inntekt for folk
 ## Bygge lokalt
 
 ### Java
-Java 14 hs
+Java 17 temurin
 ### gradle
 Prosjektet bruker gradle og har en egen gradlew fil. Vi anbefaler å bruke gradlew filen ved bygging lokalt.
 ```
