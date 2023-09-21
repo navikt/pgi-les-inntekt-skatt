@@ -27,7 +27,6 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
                 .path(inntektsaar)
                 .path(norskPersonidentifikator)
                 .build()
-                .also { LoggerFactory.getLogger(this::class.java).info(it.toString()) }
         )
             .GET()
             .setHeader("Authorization", "Bearer ${maskinporten.tokenString}")
