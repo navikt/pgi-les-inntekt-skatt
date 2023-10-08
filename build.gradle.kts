@@ -124,5 +124,5 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "8.3"
+    gradleVersion = "8.4"
 }
