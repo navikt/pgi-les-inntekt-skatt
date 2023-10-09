@@ -12,6 +12,7 @@ import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import no.nav.samordning.pgi.schema.HendelseMetadata
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 
@@ -92,7 +93,8 @@ internal class PGITopologyTest {
 
         addToHendelseTopic(TEN)
 
-        assertThrows<FeilmedlingFraSkattException> { addToTopic(failingHendelse) }
+        assertThatThrownBy {addToTopic(failingHendelse) }
+            .hasCauseInstanceOf(FeilmedlingFraSkattException::class.java)
         assertEquals(TEN, testOutputTopic.readKeyValuesToList().size)
     }
 

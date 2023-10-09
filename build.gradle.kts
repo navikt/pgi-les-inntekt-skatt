@@ -2,11 +2,11 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorSupportVersion = "0.0.25"
-val ktorVersion = "1.5.4"
-val maskinportenClientVersion = "0.0.7"
+val ktorVersion = "2.3.5"
+val maskinportenClientVersion = "0.0.10"
 val joseJwtVersion = "9.36"
-val kafkaVersion = "2.5.0"
-val confluentVersion = "5.5.1"
+val kafkaVersion = "3.6.0"
+val confluentVersion = "7.5.1"
 val avroSchemaVersion = "0.0.7"
 val micrometerVersion = "1.11.4"
 val logbackVersion = "1.4.11"
@@ -14,8 +14,9 @@ val logstashVersion = "5.2"
 val slf4jVersion = "2.0.9"
 val log4jVersion = "2.20.0"
 val junitJupiterVersion = "5.10.0"
+val assertJVersion = "3.24.2"
 val wiremockVersion = "2.27.2"
-val kafkaEmbeddedEnvVersion = "2.5.0"
+val kafkaEmbeddedEnvVersion = "3.2.3"
 val mockkVerion = "1.13.8"
 
 // overstyrte transitive avhengigheter
@@ -23,6 +24,8 @@ val guavaVersion = "32.1.2-jre"
 val snappyJavaVersion = "1.1.10.5"
 val snakeYamlVersion = "2.2"
 val commonsCompressVersion = "1.24.0"
+
+val jacksonVersion = "2.15.2"
 
 group = "no.nav.pgi"
 
@@ -64,10 +67,11 @@ repositories {
 
 dependencies {
     implementation("no.nav.pensjonsamhandling:pensjon-samhandling-ktor-support:$ktorSupportVersion")
-    implementation("io.ktor:ktor-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-metrics-micrometer:$ktorVersion")
+    implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
 
     implementation("no.nav.pensjonopptjening:pensjon-opptjening-gcp-maskinporten-client:$maskinportenClientVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:$joseJwtVersion")
@@ -75,6 +79,7 @@ dependencies {
     implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
     implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
+    implementation("io.confluent:kafka-schema-registry:$confluentVersion")
     implementation("no.nav.pgi:pgi-schema:$avroSchemaVersion")
 
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
@@ -91,9 +96,17 @@ dependencies {
     implementation("org.yaml:snakeyaml:$snakeYamlVersion")
     implementation("org.apache.commons:commons-compress:$commonsCompressVersion")
 
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+
+    // diverse:
+    implementation("javax.xml.bind:jaxb-api:2.3.0")
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
+    testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("com.github.tomakehurst:wiremock:$wiremockVersion")
+    testImplementation("javax.servlet:javax.servlet-api:4.0.1")
     testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion") {
         exclude(group = "org.slf4j", module = "slf4j-log4j12")
     }
@@ -120,7 +133,10 @@ tasks.named<Jar>("jar") {
 
     doLast {
         configurations.runtimeClasspath.get().forEach {
-            val file = File("$buildDir/libs/${it.name}")
+//            val bd = layout.buildDirectory.get()
+//            var bd2 = buildDir
+//            println("####### BUILDDIR $bd != $bd2")
+            val file = File("${layout.buildDirectory.get()}/libs/${it.name}")
             if (!file.exists())
                 it.copyTo(file)
         }

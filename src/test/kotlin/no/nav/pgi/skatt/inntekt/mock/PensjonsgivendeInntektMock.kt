@@ -11,6 +11,8 @@ import no.nav.samordning.pgi.schema.Hendelse
 class PensjonsgivendeInntektMock {
     private var config = wireMockConfig().port(PORT)
         .extensions(ResponseTemplateTransformer(false))
+    // For wiremock 3.x når tiden kommer
+    // private var config = wireMockConfig().port(PORT).globalTemplating(false)
     private var mock = WireMockServer(config).also { it.start() }
 
     internal fun reset() {
