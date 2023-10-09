@@ -23,6 +23,7 @@ group = "no.nav.pgi"
 plugins {
     kotlin("jvm") version "1.8.0"
     kotlin("plugin.serialization") version "1.8.0"
+    id("com.github.ben-manes.versions") version "0.49.0"
 }
 
 java {
@@ -32,7 +33,6 @@ java {
 }
 
 repositories {
-    jcenter()
     mavenCentral()
     maven("https://packages.confluent.io/maven/")
     maven("https://jitpack.io")
