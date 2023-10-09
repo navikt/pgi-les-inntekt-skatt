@@ -17,9 +17,12 @@ val junitJupiterVersion = "5.10.0"
 val wiremockVersion = "2.27.2"
 val kafkaEmbeddedEnvVersion = "2.5.0"
 val mockkVerion = "1.13.8"
+
+// overstyrte transitive avhengigheter
 val guavaVersion = "32.1.2-jre"
 val snappyJavaVersion = "1.1.10.5"
 val snakeYamlVersion = "2.2"
+val commonsCompressVersion = "1.24.0"
 
 group = "no.nav.pgi"
 
@@ -86,6 +89,7 @@ dependencies {
     implementation("com.google.guava:guava:$guavaVersion")
     implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion")
     implementation("org.yaml:snakeyaml:$snakeYamlVersion")
+    implementation("org.apache.commons:commons-compress:$commonsCompressVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
