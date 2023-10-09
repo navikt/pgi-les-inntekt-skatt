@@ -17,6 +17,9 @@ val junitJupiterVersion = "5.10.0"
 val wiremockVersion = "2.27.2"
 val kafkaEmbeddedEnvVersion = "2.5.0"
 val mockkVerion = "1.13.8"
+val guavaVersion = "32.1.2-jre"
+val snappyJavaVersion = "1.1.10.5"
+val snakeYamlVersion = "2.2"
 
 group = "no.nav.pgi"
 
@@ -78,6 +81,11 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion")
+
+    // Overstyrer noen transitive avhengigheter (pga sikkerhet m.m.)
+    implementation("com.google.guava:guava:$guavaVersion")
+    implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion")
+    implementation("org.yaml:snakeyaml:$snakeYamlVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
