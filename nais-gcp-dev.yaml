@@ -41,4 +41,4 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: https://pgiforfolketrygden.api.skatteetaten-test.no
+        - host: pgiforfolketrygden.api.skatteetaten-test.no
