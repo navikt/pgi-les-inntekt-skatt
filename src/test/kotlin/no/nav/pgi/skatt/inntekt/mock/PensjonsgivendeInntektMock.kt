@@ -1,10 +1,19 @@
 package no.nav.pgi.skatt.inntekt.mock
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.matching
+import com.github.tomakehurst.wiremock.client.WireMock.ok
+import com.github.tomakehurst.wiremock.client.WireMock.serverError
+import com.github.tomakehurst.wiremock.client.WireMock.unauthorized
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer
 import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
+import no.nav.pgi.skatt.inntekt.skatt.RETTIGHETSPAKKE
+import no.nav.pgi.skatt.inntekt.skatt.VERSJON
 import no.nav.samordning.pgi.schema.Hendelse
 
 
@@ -25,7 +34,7 @@ class PensjonsgivendeInntektMock {
 
     internal fun `stub pensjongivende inntekt endpoint`() {
         mock.stubFor(
-            get(urlPathMatching("$PENSJONSGIVENDE_INNTEKT_PATH$YEAR_FNR"))
+            get(urlPathMatching("/$VERSJON/$RETTIGHETSPAKKE$YEAR_FNR"))
                 .atPriority(10)
                 .withName("ape")
                 .withHeader("Authorization", matching(TOKEN))
@@ -40,7 +49,7 @@ class PensjonsgivendeInntektMock {
 
     internal fun `stub pensjongivende inntekt`(inntektsaar: String, norskPersonidentifikator: String) {
         mock.stubFor(
-            get(urlPathEqualTo("""$PENSJONSGIVENDE_INNTEKT_PATH/$inntektsaar/$norskPersonidentifikator"""))
+            get(urlPathEqualTo("""/$VERSJON/$RETTIGHETSPAKKE/$inntektsaar/$norskPersonidentifikator"""))
                 .atPriority(9)
                 .willReturn(ok(createResponse(inntektsaar, norskPersonidentifikator)))
         )
@@ -48,7 +57,7 @@ class PensjonsgivendeInntektMock {
 
     internal fun `stub error code from skatt`(hendelse: Hendelse, errorCode: String) {
         mock.stubFor(
-            get(urlPathMatching("$PENSJONSGIVENDE_INNTEKT_PATH/${hendelse.getGjelderPeriode()}/${hendelse.getIdentifikator()}"))
+            get(urlPathMatching("/$VERSJON/$RETTIGHETSPAKKE/${hendelse.getGjelderPeriode()}/${hendelse.getIdentifikator()}"))
                 .atPriority(1)
                 .willReturn(serverError().withBody(errorCode))
         )
@@ -56,7 +65,7 @@ class PensjonsgivendeInntektMock {
 
     internal fun `stub 401 from skatt`(inntektsaar: String, norskPersonidentifikator: String) {
         mock.stubFor(
-            get(urlPathMatching("$PENSJONSGIVENDE_INNTEKT_PATH/$inntektsaar/$norskPersonidentifikator"))
+            get(urlPathMatching("/$VERSJON/$RETTIGHETSPAKKE/$inntektsaar/$norskPersonidentifikator"))
                 .atPriority(1)
                 .willReturn(unauthorized())
         )
@@ -97,7 +106,6 @@ class PensjonsgivendeInntektMock {
 
     companion object {
         private const val PORT = 8097
-        private const val PENSJONSGIVENDE_INNTEKT_PATH = "/api/formueinntekt/pensjonsgivendeinntektforfolketrygden"
         private const val YEAR_FNR = """/[0-9]{4}/[0-9]{11}"""
         private const val TOKEN = """.*\..*\..*"""
 

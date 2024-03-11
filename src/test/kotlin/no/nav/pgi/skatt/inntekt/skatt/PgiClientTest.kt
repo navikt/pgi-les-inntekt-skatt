@@ -5,9 +5,14 @@ import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock.Companion.MASKINPORTEN_CLIENT_ENV_VARIABLES
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.Companion.PGI_CLIENT_ENV_VARIABLES
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.net.http.HttpResponse
 
 private const val INNTEKTSAAR = "2018"
@@ -37,9 +42,9 @@ class PgiClientTest {
     }
 
     @Test
-    fun `createGetRequest should add inntektsaar and norskPersonidentifikator to path`() {
+    fun `createGetRequest should add versjon, rettighetpakke, inntektsaar and norskPersonidentifikator to path`() {
         val request = pgiClient.createPgiRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
-        assertEquals("""$PENSJONSGIVENDE_INNTEKT_PATH/$INNTEKTSAAR/$NORSK_PERSONIDENTIFIKATOR""", request.uri().path)
+        assertEquals("""/$VERSJON/$RETTIGHETSPAKKE/$INNTEKTSAAR/$NORSK_PERSONIDENTIFIKATOR""", request.uri().path)
     }
 
     @Test

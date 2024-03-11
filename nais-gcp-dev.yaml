@@ -13,8 +13,6 @@ spec:
     scopes:
       consumes:
         - name: "skatteetaten:pensjonsgivendeinntektforfolketrygden"
-  envFrom:
-    - secret: pgi-les-inntekt-skatt-secrets
   prometheus:
     enabled: true
     path: /metrics
@@ -38,7 +36,9 @@ spec:
   env:
     - name: APP_TEAM
       value: pensjonopptjening
+    - name: SKATT_INNTEKT_HOST
+      value: https://pgiforfolketrygden.api.skatteetaten-test.no
   accessPolicy:
     outbound:
       external:
-        - host: api-test.sits.no
+        - host: https://pgiforfolketrygden.api.skatteetaten-test.no
