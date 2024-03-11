@@ -13,6 +13,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer
 import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
 import no.nav.pgi.skatt.inntekt.skatt.RETTIGHETSPAKKE
+import no.nav.pgi.skatt.inntekt.skatt.SKATT_INNTEKT_PATH_ENV_KEY
 import no.nav.pgi.skatt.inntekt.skatt.VERSJON
 import no.nav.samordning.pgi.schema.Hendelse
 
@@ -109,6 +110,9 @@ class PensjonsgivendeInntektMock {
         private const val YEAR_FNR = """/[0-9]{4}/[0-9]{11}"""
         private const val TOKEN = """.*\..*\..*"""
 
-        internal val PGI_CLIENT_ENV_VARIABLES = mapOf(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to "http://localhost:$PORT")
+        internal val PGI_CLIENT_ENV_VARIABLES = mapOf(
+            PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to "http://localhost:$PORT",
+            SKATT_INNTEKT_PATH_ENV_KEY to "/v1/navPensjonopptjening",
+        )
     }
 }
