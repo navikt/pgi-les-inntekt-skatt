@@ -2,6 +2,7 @@ package no.nav.pgi.skatt.inntekt.stream.mapping
 
 import io.mockk.every
 import io.mockk.mockk
+import net.logstash.logback.argument.StructuredArguments.r
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntektMetadata
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -28,29 +29,19 @@ internal class HandleErrorCodeFromSkattTest {
     }
 
     @Test
-    internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-005`() {
-        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-005", 400)))
-    }
+    internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-whatever`() {
+        val httpStatus = 500 //ikke representativ for det man får for hver kode, men vi sjekker bare på !200.. tilstrekkelig for test.
 
-    @Test
-    internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-006`() {
-        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-006", 404)))
-    }
-
-    @Test
-    internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-007`() {
-        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-007", 400)))
-    }
-
-    @Test
-    internal fun `should return null when error message contains PGIF-008`() {
-        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-008", 400)))
-    }
-
-
-    @Test
-    internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-009`() {
-        assertNull(handleErrorCodesMapper.apply(mockkHttpResponse("PGIF-009", 404)))
+        (1..9).map { "PGIF-00$it" }.forEach {
+            assertThrows<FeilmedlingFraSkattException> {
+                handleErrorCodesMapper.apply(
+                    mockkHttpResponse(
+                        """{"kode":"$it","melding":"whatever","korrelasjonsid":"e81bef15-b211-43d7-9c03-8d1d33205a5a"}""",
+                        httpStatus
+                    )
+                )
+            }
+        }
     }
 
     @Test

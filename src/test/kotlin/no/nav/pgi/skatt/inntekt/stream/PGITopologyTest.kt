@@ -5,7 +5,7 @@ import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA_REGISTRY_URL
-import no.nav.pgi.skatt.inntekt.skatt.ErrorCodesSkatt
+import no.nav.pgi.skatt.inntekt.skatt.PgiFolketrygdenErrorCodes
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.FeilmedlingFraSkattException
 import no.nav.samordning.pgi.schema.Hendelse
@@ -26,12 +26,18 @@ internal class PGITopologyTest {
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
 
-    private val pgiClient = PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MaskinportenMock.MASKINPORTEN_CLIENT_ENV_VARIABLES)
+    private val pgiClient =
+        PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MaskinportenMock.MASKINPORTEN_CLIENT_ENV_VARIABLES)
     private val kafkaConfig = KafkaConfig(getKafkaTestEnv(), PlaintextStrategy())
-    private val topologyDriver = PgiTopologyTestDriver(PGITopology(pgiClient).topology(), kafkaConfig.streamProperties())
+    private val topologyDriver =
+        PgiTopologyTestDriver(PGITopology(pgiClient).topology(), kafkaConfig.streamProperties())
 
-    val testInputTopic = topologyDriver.createInputTopic<HendelseKey, Hendelse>(PGI_HENDELSE_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
-    val testOutputTopic = topologyDriver.createOutputTopic<HendelseKey, PensjonsgivendeInntekt>(PGI_INNTEKT_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
+    val testInputTopic =
+        topologyDriver.createInputTopic<HendelseKey, Hendelse>(PGI_HENDELSE_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
+    val testOutputTopic = topologyDriver.createOutputTopic<HendelseKey, PensjonsgivendeInntekt>(
+        PGI_INNTEKT_TOPIC,
+        MOCK_SCHEMA_REGISTRY_URL
+    )
 
     @BeforeAll
     fun init() {
@@ -62,26 +68,26 @@ internal class PGITopologyTest {
         assertEquals(ONE_HUNDRED, output.size)
     }
 
-    @Test
-    internal fun `should not process skattDiscardErrorCodes`() {
-        pensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`()
-        val discardHendelseList = mutableListOf<Hendelse>()
-
-        for (i in ErrorCodesSkatt.skattDiscardErrorCodes.indices) {
-            val hendelse = Hendelse(i + 5000L, "1111111111$i", "2019", HendelseMetadata(0))
-            pensjonsgivendeInntektMock.`stub error code from skatt`(hendelse, ErrorCodesSkatt.skattDiscardErrorCodes[i])
-            discardHendelseList.add(hendelse)
-        }
-
-        addToHendelseTopic(TEN)
-        addToHendelseTopic(discardHendelseList)
-        addToHendelseTopic(TEN)
-
-        val output = testOutputTopic.readKeyValuesToList()
-
-        assertEquals(TEN + discardHendelseList.size + TEN, pensjonsgivendeInntektMock.callsToMock())
-        assertEquals(TEN + TEN, output.size)
-    }
+//    @Test //TODO vurder å legg denne tilbake etterhvert som vi får oversikt over eventuelle feil vi kan/bør hoppe over/discarde
+//    internal fun `should not process skattDiscardErrorCodes`() {
+//        pensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`()
+//        val discardHendelseList = mutableListOf<Hendelse>()
+//
+//        for (i in PgiFolketrygdenErrorCodes.pgiFolketrygdenDiscardErrorCodes.indices) {
+//            val hendelse = Hendelse(i + 5000L, "1111111111$i", "2019", HendelseMetadata(0))
+//            pensjonsgivendeInntektMock.`stub error code from skatt`(hendelse, PgiFolketrygdenErrorCodes.pgiFolketrygdenDiscardErrorCodes[i])
+//            discardHendelseList.add(hendelse)
+//        }
+//
+//        addToHendelseTopic(TEN)
+//        addToHendelseTopic(discardHendelseList)
+//        addToHendelseTopic(TEN)
+//
+//        val output = testOutputTopic.readKeyValuesToList()
+//
+//        assertEquals(TEN + discardHendelseList.size + TEN, pensjonsgivendeInntektMock.callsToMock())
+//        assertEquals(TEN + TEN, output.size)
+//    }
 
     @Test
     internal fun `should fail with Exception if exception is thrown in stream`() {

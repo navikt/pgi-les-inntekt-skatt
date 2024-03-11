@@ -1,18 +1,8 @@
 package no.nav.pgi.skatt.inntekt
 
-import no.nav.pgi.skatt.inntekt.common.KafkaTestEnvironment
-import no.nav.pgi.skatt.inntekt.common.PlaintextStrategy
-import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
-import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock.Companion.MASKINPORTEN_CLIENT_ENV_VARIABLES
-import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
-import no.nav.pgi.skatt.inntekt.skatt.ErrorCodesSkatt
-import no.nav.pgi.skatt.inntekt.skatt.PgiClient
-import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
-import no.nav.samordning.pgi.schema.HendelseMetadata
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.TestInstance
 
 private const val INNTEKTSAAR = "2020"
 private const val NORSK_PERSONIDENTIFIKATOR = "12345678901"
