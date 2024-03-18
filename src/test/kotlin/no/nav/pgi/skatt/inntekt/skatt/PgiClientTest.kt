@@ -44,7 +44,7 @@ class PgiClientTest {
     @Test
     fun `createGetRequest should add versjon, rettighetpakke, inntektsaar and norskPersonidentifikator to path`() {
         val request = pgiClient.createPgiRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
-        assertEquals("""/$VERSJON/$RETTIGHETSPAKKE/$INNTEKTSAAR/$NORSK_PERSONIDENTIFIKATOR""", request.uri().path)
+        assertEquals("""/v1/navPensjonOpptjening/2018/12345678901""", request.uri().path)
     }
 
     @Test

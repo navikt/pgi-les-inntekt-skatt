@@ -37,10 +37,10 @@ spec:
     - name: APP_TEAM
       value: pensjonopptjening
     - name: SKATT_INNTEKT_HOST
-      value: https://api.skatteetaten.no
+      value: https://pgiforfolketrygden.api.skatteetaten.no
     - name: SKATT_INNTEKT_PATH
-      value: /api/formueinntekt/pensjonsgivendeinntektforfolketrygden
+      value: /v1/navPensjonOpptjening
   accessPolicy:
     outbound:
       external:
-        - host: api.skatteetaten.no
+        - host: pgiforfolketrygden.api.skatteetaten.no

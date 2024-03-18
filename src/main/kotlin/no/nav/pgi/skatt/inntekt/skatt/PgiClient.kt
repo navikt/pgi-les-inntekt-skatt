@@ -9,8 +9,6 @@ import java.net.http.HttpResponse
 import javax.ws.rs.core.UriBuilder
 
 internal const val PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY = "SKATT_INNTEKT_HOST"
-internal const val VERSJON = "v1"
-internal const val RETTIGHETSPAKKE = "navPensjonopptjening"
 internal const val SKATT_INNTEKT_PATH_ENV_KEY = "SKATT_INNTEKT_PATH"
 
 class PgiClient(env: Map<String, String> = System.getenv()) {

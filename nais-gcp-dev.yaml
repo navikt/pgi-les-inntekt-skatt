@@ -39,7 +39,7 @@ spec:
     - name: SKATT_INNTEKT_HOST
       value: https://pgiforfolketrygden.api.skatteetaten-test.no
     - name: SKATT_INNTEKT_PATH
-      value: /v1/navPensjonopptjening
+      value: /v1/navPensjonOpptjening
   accessPolicy:
     outbound:
       external:
