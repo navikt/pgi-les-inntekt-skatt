@@ -7,6 +7,8 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import javax.ws.rs.core.UriBuilder
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 internal const val PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY = "SKATT_INNTEKT_HOST"
 internal const val SKATT_INNTEKT_PATH_ENV_KEY = "SKATT_INNTEKT_PATH"
@@ -17,8 +19,12 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
     private val skattHost = env.getVal(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY)
     private val skattPath = env.getVal(SKATT_INNTEKT_PATH_ENV_KEY)
 
-    internal fun <T> getPgi(httpRequest: HttpRequest, responseBodyHandler: HttpResponse.BodyHandler<T>):
-            HttpResponse<T> = httpClient.send(httpRequest, responseBodyHandler)
+    internal fun <T> getPgi(
+        httpRequest: HttpRequest,
+        responseBodyHandler: HttpResponse.BodyHandler<T>
+    ): HttpResponse<T> =
+        RateLimit(rate = 1000, timeInterval = 5.minutes).limit { httpClient.send(httpRequest, responseBodyHandler) }
+
 
     internal fun createPgiRequest(inntektsaar: String, norskPersonidentifikator: String) =
         HttpRequest.newBuilder().uri(
@@ -32,4 +38,27 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
             .setHeader("Authorization", "Bearer ${maskinporten.tokenString}")
             .setHeader("Accept", "application/json")
             .build()
+}
+
+class RateLimit(
+    rate: Int,
+    timeInterval: Duration,
+) {
+    val timeslot = timeInterval.inWholeMilliseconds / rate
+
+    inline fun <reified T> limit(action: () -> T): T {
+        val startTime = System.currentTimeMillis()
+
+        val res = action()
+
+        val endTime = System.currentTimeMillis()
+        val elapsed = endTime - startTime
+
+        return if (elapsed >= timeslot) {
+            res
+        } else {
+            Thread.sleep(timeslot - elapsed)
+            res
+        }
+    }
 }
