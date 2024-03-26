@@ -5,15 +5,21 @@ import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA_REGISTRY_URL
-import no.nav.pgi.skatt.inntekt.skatt.PgiFolketrygdenErrorCodes
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
+import no.nav.pgi.skatt.inntekt.skatt.RateLimit
 import no.nav.pgi.skatt.inntekt.stream.mapping.FeilmedlingFraSkattException
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
 import no.nav.samordning.pgi.schema.HendelseMetadata
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
+import kotlin.time.Duration.Companion.seconds
 
 private const val ONE_HUNDRED = 100
 private const val TEN = 10
@@ -26,8 +32,10 @@ internal class PGITopologyTest {
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
 
-    private val pgiClient =
-        PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MaskinportenMock.MASKINPORTEN_CLIENT_ENV_VARIABLES)
+    private val pgiClient = PgiClient(
+        env = PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MaskinportenMock.MASKINPORTEN_CLIENT_ENV_VARIABLES,
+        rateLimit = RateLimit(rate = 1000, timeInterval = 1.seconds)
+    )
     private val kafkaConfig = KafkaConfig(getKafkaTestEnv(), PlaintextStrategy())
     private val topologyDriver =
         PgiTopologyTestDriver(PGITopology(pgiClient).topology(), kafkaConfig.streamProperties())
