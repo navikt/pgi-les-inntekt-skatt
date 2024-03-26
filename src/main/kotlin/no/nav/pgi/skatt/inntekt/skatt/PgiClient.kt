@@ -23,7 +23,7 @@ class PgiClient(env: Map<String, String> = System.getenv()) {
         httpRequest: HttpRequest,
         responseBodyHandler: HttpResponse.BodyHandler<T>
     ): HttpResponse<T> =
-        RateLimit(rate = 1000, timeInterval = 5.minutes).limit { httpClient.send(httpRequest, responseBodyHandler) }
+        RateLimit(rate = 500, timeInterval = 5.minutes).limit { httpClient.send(httpRequest, responseBodyHandler) }
 
 
     internal fun createPgiRequest(inntektsaar: String, norskPersonidentifikator: String) =
