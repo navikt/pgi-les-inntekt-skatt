@@ -13,9 +13,14 @@ import kotlin.time.Duration.Companion.minutes
 internal const val PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY = "SKATT_INNTEKT_HOST"
 internal const val SKATT_INNTEKT_PATH_ENV_KEY = "SKATT_INNTEKT_PATH"
 
-class PgiClient(env: Map<String, String> = System.getenv(), val rateLimit: RateLimit = RateLimit(rate = 250, timeInterval = 5.minutes)) {
+class PgiClient(
+    env: Map<String, String> = System.getenv(),
+    val rateLimit: RateLimit = RateLimit(rate = 10000, timeInterval = 1.minutes)
+) {
     private val maskinporten: MaskinportenClient = MaskinportenClient(createMaskinportenConfig(env))
-    private val httpClient: HttpClient = HttpClient.newHttpClient()
+    private val httpClient: HttpClient = HttpClient.newBuilder()
+        .version(HttpClient.Version.HTTP_1_1)
+        .build()
     private val skattHost = env.getVal(PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY)
     private val skattPath = env.getVal(SKATT_INNTEKT_PATH_ENV_KEY)
 
