@@ -19,7 +19,7 @@ internal class FetchPgiFromSkatt(private val pgiClient: PgiClient) :
                 hendelse.getIdentifikator()
             )
         } catch (e: Exception) {
-            throw PensjonsgivendeInntektClientException("Call to pgi failed with exception: ${e.javaClass.simpleName}. Message: ${e.message}. ${createTraceableSekvensnummerString(hendelse.getSekvensnummer())}")
+            throw PensjonsgivendeInntektClientException("Call to pgi failed with exception: ${e.javaClass.simpleName}. Message: ${e.message} ")
         }
     }
 

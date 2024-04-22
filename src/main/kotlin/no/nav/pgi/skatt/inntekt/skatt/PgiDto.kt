@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
+import net.logstash.logback.marker.Markers
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
 import no.nav.pgi.skatt.inntekt.stream.mapping.PgiResponse
 import org.slf4j.LoggerFactory
@@ -15,9 +16,10 @@ private val objectMapper = ObjectMapper().registerModule(KotlinModule()).configu
 
 internal fun PgiResponse.mapToPGIDto(): PgiDto = try {
     objectMapper.readValue<PgiDto>(this.body())
-        .also { it.validate(traceString()) }
+        .also { it.validate(sekvensnummer()) }
 } catch (e: UnrecognizedPropertyException) {
-    throw InvalidJsonMappingException(e, traceString())
+    throw InvalidJsonMappingException(e)
+        .also { LOG.error(Markers.append("sekvensnummer", sekvensnummer()), it.message) }
 }
 
 data class PgiDto(
@@ -26,12 +28,12 @@ data class PgiDto(
     val pensjonsgivendeInntekt: List<PgiPerOrdningDto> = emptyList()
 ) {
     @JsonIgnore
-    internal fun validate(traceString: String) {
-        if (norskPersonidentifikator == null) throw InntektDtoException("norskPersonidentifikator", traceString)
-            .also { LOG.error(it.message) }
-        if (inntektsaar == null) throw InntektDtoException("inntektsaar", traceString)
-            .also { LOG.error(it.message) }
-        pensjonsgivendeInntekt.forEach { it.validate(traceString) }
+    internal fun validate(sekvensnummer: Long) {
+        if (norskPersonidentifikator == null) throw InntektDtoException("norskPersonidentifikator")
+            .also { LOG.error(Markers.append("sekvensnummer", sekvensnummer), it.message) }
+        if (inntektsaar == null) throw InntektDtoException("inntektsaar")
+            .also { LOG.error(Markers.append("sekvensnummer", sekvensnummer), it.message) }
+        pensjonsgivendeInntekt.forEach { it.validate(sekvensnummer) }
     }
 }
 
@@ -44,19 +46,19 @@ data class PgiPerOrdningDto(
     val pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage: Long?
 ) {
     @JsonIgnore
-    internal fun validate(traceString: String) {
-        if (skatteordning == null) throw InntektPerOrdningDtoException("skatteordning", traceString)
-            .also { LOG.error(it.message) }
-        if (datoForFastsetting == null) throw InntektPerOrdningDtoException("datoForFastsetting", traceString)
-            .also { LOG.error(it.message) }
+    internal fun validate(sekvensnummer: Long) {
+        if (skatteordning == null) throw InntektPerOrdningDtoException("skatteordning")
+            .also { LOG.error(Markers.append("sekvensnummer", sekvensnummer), it.message) }
+        if (datoForFastsetting == null) throw InntektPerOrdningDtoException("datoForFastsetting")
+            .also { LOG.error(Markers.append("sekvensnummer", sekvensnummer), it.message) }
     }
 }
 
-internal class InntektDtoException(missingVariableName: String, traceString: String) :
-    Exception("""$missingVariableName is missing in ${PgiDto::class.simpleName}. $traceString""")
+internal class InntektDtoException(missingVariableName: String) :
+    Exception("""$missingVariableName is missing in ${PgiDto::class.simpleName} """)
 
-internal class InntektPerOrdningDtoException(missingVariableName: String, traceString: String) :
-    Exception("""$missingVariableName is missing in ${PgiPerOrdningDto::class.simpleName}. $traceString""")
+internal class InntektPerOrdningDtoException(missingVariableName: String) :
+    Exception("""$missingVariableName is missing in ${PgiPerOrdningDto::class.simpleName} """)
 
-internal class InvalidJsonMappingException(exception: Exception, traceString: String) :
-    RuntimeException("""${exception.message!!.maskFnr()}. $traceString""")
+internal class InvalidJsonMappingException(exception: Exception) :
+    RuntimeException(exception.message!!.maskFnr())

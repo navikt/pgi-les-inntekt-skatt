@@ -1,6 +1,7 @@
 package no.nav.pgi.skatt.inntekt.stream.mapping
 
 import io.prometheus.client.Counter
+import net.logstash.logback.marker.Markers
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
 import no.nav.pgi.skatt.inntekt.skatt.PgiFolketrygdenErrorCodes.Companion.pgiFolketrygdenErrorCodes
 import no.nav.pgi.skatt.inntekt.skatt.getFirstMatch
@@ -15,7 +16,7 @@ private val pgiLesInntektSkattResponseCounter = Counter.build()
     .register()
 
 internal class HandleErrorCodeFromSkatt : ValueMapper<PgiResponse, PgiResponse> {
-    override fun apply(response: PgiResponse): PgiResponse? {
+    override fun apply(response: PgiResponse): PgiResponse {
         return when {
             response.statusCode() == 200 -> {
                 pgiLesInntektSkattResponseCounter.labels("${response.statusCode()}").inc()
@@ -24,8 +25,9 @@ internal class HandleErrorCodeFromSkatt : ValueMapper<PgiResponse, PgiResponse> 
 
             else -> {
                 pgiLesInntektSkattResponseCounter.labels(createErrorLabel(response)).inc()
-                SECURE_LOG.error("Call to pgi failed with code: ${response.statusCode()}, body: ${response.body()} and fnr ${response.identifikator()}. ${response.traceString()}")
-                throw FeilmedlingFraSkattException("Call to pgi failed with code: ${response.statusCode()} and body: ${response.body()}. ${response.traceString()}")
+                LOG.error(Markers.append("sekvensnummer",response.sekvensnummer().toString()), "Call to pgi failed with code: ${response.statusCode()}, body: ${response.body()} and fnr ${response.identifikator().maskFnr()} ")
+                SECURE_LOG.error(Markers.append("sekvensnummer",response.sekvensnummer().toString()), "Call to pgi failed with code: ${response.statusCode()}, body: ${response.body()} and fnr ${response.identifikator()} ")
+                throw FeilmedlingFraSkattException("Call to pgi failed with code: ${response.statusCode()} and body: ${response.body()} ")
             }
         }
     }
