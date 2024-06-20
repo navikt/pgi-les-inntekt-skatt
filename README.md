@@ -5,7 +5,7 @@ og publiserer deretter inntektene til kafka topicen ```privat-pgi-inntekt```.
 
 For å se hvordan hendelsene publiseres til ```privat-pgi-hendelse```, se følgende github repo: [pgi-les-hendelse-skatt](https://github.com/navikt/pgi-les-hendelse-skatt/)
 
-Dokumentasjon REST tjeneste vi bruker fra SKE: [Pensjonsgivende inntekt for folketrygden API](https://skatteetaten.github.io/datasamarbeid-api-dokumentasjon/reference_pgi_folketrygden.html)
+Dokumentasjon REST tjeneste vi bruker fra Skatteetaten: [Pensjonsgivende inntekt for folketrygden API](https://skatteetaten.github.io/api-dokumentasjon/api/pgi_folketrygden) 
 
 ## Bygge lokalt
 
@@ -33,7 +33,7 @@ export GITHUB_TOKEN="token"
  
 ## Metrikker
 Grafana dashboards brukes for å f.eks. monitorere minne, cpu-bruk og andre metrikker.
-Se [pgi-les-inntekt-skatt grafana dasboard](https://grafana.adeo.no/) TODO: Fiks link
+Se [Grafana - Pensjon Opptjening](https://grafana.nav.cloud.nais.io/dashboards/f/TCcNd81Gz/pensjons-opptjening) TODO: Fiks link
 
 ## Logging
 [Kibana](https://logs.adeo.no/app/kibana) benyttes til logging. Søk på f.eks. ```application:pgi-les-inntekt-skatt AND envclass:q``` for logginnslag fra preprod.
