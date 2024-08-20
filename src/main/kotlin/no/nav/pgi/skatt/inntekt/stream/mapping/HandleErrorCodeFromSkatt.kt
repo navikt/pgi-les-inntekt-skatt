@@ -25,8 +25,9 @@ internal class HandleErrorCodeFromSkatt : ValueMapper<PgiResponse, PgiResponse> 
 
             else -> {
                 pgiLesInntektSkattResponseCounter.labels(createErrorLabel(response)).inc()
-                LOG.error(Markers.append("sekvensnummer",response.sekvensnummer().toString()), "Call to pgi failed with code: ${response.statusCode()}, body: ${response.body()} and fnr ${response.identifikator().maskFnr()} ")
-                SECURE_LOG.error(Markers.append("sekvensnummer",response.sekvensnummer().toString()), "Call to pgi failed with code: ${response.statusCode()}, body: ${response.body()} and fnr ${response.identifikator()} ")
+                val marker = Markers.append("sekvensnummer", response.sekvensnummer().toString())
+                LOG.error(marker, "Call to pgi failed with code: ${response.statusCode()}, body: ${response.body()} and fnr ${response.identifikator().maskFnr()} ")
+                SECURE_LOG.error(marker, "Call to pgi failed with code: ${response.statusCode()}, body: ${response.body()} and fnr ${response.identifikator()} ")
                 throw FeilmedlingFraSkattException("Call to pgi failed with code: ${response.statusCode()} and body: ${response.body()} ")
             }
         }

@@ -108,8 +108,8 @@ class PensjonsgivendeInntektMock {
         private const val YEAR_FNR = """/[0-9]{4}/[0-9]{11}"""
         private const val TOKEN = """.*\..*\..*"""
 
-        internal val HOST = "http://localhost:$PORT"
-        internal val VERSJON_RETTIGHETSPAKKE = "/v1/navPensjonOpptjening"
+        internal const val HOST = "http://localhost:$PORT"
+        internal const val VERSJON_RETTIGHETSPAKKE = "/v1/navPensjonOpptjening"
 
         internal val PGI_CLIENT_ENV_VARIABLES = mapOf(
             PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to HOST,

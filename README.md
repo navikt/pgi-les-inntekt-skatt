@@ -40,4 +40,3 @@ Se [Grafana - Pensjon Opptjening](https://grafana.nav.cloud.nais.io/dashboards/f
 
 ## Kontakt
 Kontakt Team Samhandling dersom du har noen spørsmål. Vi finnes blant annet på Slack, i kanalen [#samhandling_pensjonsområdet](https://nav-it.slack.com/archives/CQ08JC3UG)
-

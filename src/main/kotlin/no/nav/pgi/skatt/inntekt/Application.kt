@@ -7,7 +7,6 @@ import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PGIStream
 import no.nav.pgi.skatt.inntekt.stream.PGITopology
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess

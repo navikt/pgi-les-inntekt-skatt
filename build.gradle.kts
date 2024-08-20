@@ -13,10 +13,10 @@ val logbackVersion = "1.4.11"
 val logstashVersion = "5.2"
 val slf4jVersion = "2.0.9"
 val log4jVersion = "2.20.0"
-val junitJupiterVersion = "5.10.0"
+val junitJupiterVersion = "5.11.0"
 val wiremockVersion = "2.27.2"
 val kafkaEmbeddedEnvVersion = "2.5.0"
-val mockkVerion = "1.13.8"
+val mockkVerion = "1.13.12"
 
 // overstyrte transitive avhengigheter
 val guavaVersion = "32.1.2-jre"

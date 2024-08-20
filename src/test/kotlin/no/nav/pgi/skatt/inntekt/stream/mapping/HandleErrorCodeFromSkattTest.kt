@@ -2,11 +2,9 @@ package no.nav.pgi.skatt.inntekt.stream.mapping
 
 import io.mockk.every
 import io.mockk.mockk
-import net.logstash.logback.argument.StructuredArguments.r
 import no.nav.samordning.pgi.schema.PensjonsgivendeInntektMetadata
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows

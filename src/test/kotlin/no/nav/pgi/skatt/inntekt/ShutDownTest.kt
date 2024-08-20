@@ -1,27 +1,8 @@
 package no.nav.pgi.skatt.inntekt
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import no.nav.pensjon.samhandling.liveness.IS_READY_PATH
-import no.nav.pgi.skatt.inntekt.common.KafkaTestEnvironment
-import no.nav.pgi.skatt.inntekt.common.PlaintextStrategy
-import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
-import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
-import no.nav.pgi.skatt.inntekt.skatt.PgiClient
-import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.samordning.pgi.schema.Hendelse
 import no.nav.samordning.pgi.schema.HendelseKey
-import no.nav.samordning.pgi.schema.HendelseMetadata
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import java.net.URI
-import java.net.http.HttpClient.newHttpClient
-import java.net.http.HttpRequest.newBuilder
-import java.net.http.HttpResponse.BodyHandlers.ofString
 
 private const val INNTEKTSAAR = "2020"
 private const val NORSK_PERSONIDENTIFIKATOR = "12345678901"
