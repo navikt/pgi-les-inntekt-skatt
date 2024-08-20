@@ -29,7 +29,7 @@ group = "no.nav.pgi"
 plugins {
     kotlin("jvm") version "1.9.10"
     kotlin("plugin.serialization") version "1.9.10"
-    id("com.github.ben-manes.versions") version "0.49.0"
+    id("com.github.ben-manes.versions") version "0.51.0"
 }
 
 java {
@@ -136,5 +136,5 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "8.4"
+    gradleVersion = "8.10"
 }
