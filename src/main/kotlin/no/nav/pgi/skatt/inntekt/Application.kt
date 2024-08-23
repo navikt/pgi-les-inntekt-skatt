@@ -58,5 +58,3 @@ internal class Application(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: 
         private val LOG = LoggerFactory.getLogger(Application::class.java)
     }
 }
-
-

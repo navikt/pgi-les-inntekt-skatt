@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorSupportVersion = "0.0.22"
@@ -8,12 +9,14 @@ val joseJwtVersion = "9.36"
 val kafkaVersion = "2.5.0"
 val confluentVersion = "5.5.1"
 val avroSchemaVersion = "0.0.7"
+val pgiDomainVersion = "0.0.5"
 val micrometerVersion = "1.11.4"
 val logbackVersion = "1.4.11"
 val logstashVersion = "5.2"
 val slf4jVersion = "2.0.9"
 val log4jVersion = "2.20.0"
 val junitJupiterVersion = "5.11.0"
+val assertJVersion = "3.26.3"
 val wiremockVersion = "2.27.2"
 val kafkaEmbeddedEnvVersion = "2.5.0"
 val mockkVerion = "1.13.12"
@@ -27,14 +30,14 @@ val commonsCompressVersion = "1.24.0"
 group = "no.nav.pgi"
 
 plugins {
-    kotlin("jvm") version "1.9.10"
-    kotlin("plugin.serialization") version "1.9.10"
+    kotlin("jvm") version "2.0.20"
+    kotlin("plugin.serialization") version "2.0.20"
     id("com.github.ben-manes.versions") version "0.51.0"
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -49,6 +52,12 @@ repositories {
         }
     }
     maven("https://maven.pkg.github.com/navikt/pgi-schema") {
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
+    maven("https://maven.pkg.github.com/navikt/pgi-domain") {
         credentials {
             username = System.getenv("GITHUB_ACTOR")
             password = System.getenv("GITHUB_TOKEN")
@@ -75,7 +84,8 @@ dependencies {
     implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
     implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
-    implementation("no.nav.pgi:pgi-schema:$avroSchemaVersion")
+//    implementation("no.nav.pgi:pgi-schema:$avroSchemaVersion")
+    implementation("no.nav.pgi:pgi-domain:$pgiDomainVersion")
 
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
@@ -93,6 +103,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
+    testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("com.github.tomakehurst:wiremock:$wiremockVersion")
     testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion") {
         exclude(group = "org.slf4j", module = "slf4j-log4j12")
@@ -105,7 +116,9 @@ dependencies {
 
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
 }
 
 tasks.named<Jar>("jar") {

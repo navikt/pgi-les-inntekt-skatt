@@ -1,7 +1,7 @@
 package no.nav.pgi.skatt.inntekt
 
-import no.nav.samordning.pgi.schema.Hendelse
-import no.nav.samordning.pgi.schema.HendelseKey
+import no.nav.pgi.domain.Hendelse
+import no.nav.pgi.domain.HendelseKey
 import org.junit.jupiter.api.TestInstance
 
 private const val INNTEKTSAAR = "2020"
@@ -64,5 +64,5 @@ internal class ShutDownTest {
      */
 }
 
-private fun Hendelse.key() = HendelseKey(getIdentifikator(), getGjelderPeriode())
+private fun Hendelse.key() = HendelseKey(identifikator!!, gjelderPeriode!!)
 

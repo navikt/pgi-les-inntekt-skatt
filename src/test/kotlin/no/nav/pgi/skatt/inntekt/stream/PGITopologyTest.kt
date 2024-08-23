@@ -1,5 +1,9 @@
 package no.nav.pgi.skatt.inntekt.stream
 
+import no.nav.pgi.domain.Hendelse
+import no.nav.pgi.domain.HendelseKey
+import no.nav.pgi.domain.HendelseMetadata
+import no.nav.pgi.domain.serialization.PgiDomainSerializer
 import no.nav.pgi.skatt.inntekt.common.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
@@ -8,10 +12,6 @@ import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.skatt.RateLimit
 import no.nav.pgi.skatt.inntekt.stream.mapping.FeilmedlingFraSkattException
-import no.nav.samordning.pgi.schema.Hendelse
-import no.nav.samordning.pgi.schema.HendelseKey
-import no.nav.samordning.pgi.schema.HendelseMetadata
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -28,9 +28,10 @@ private const val INNTEKTSAAR = "2019"
 private const val IDENTIFIKATOR = "12345678901"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class PGITopologyTest {
+internal class PGITopologyTest<PensjonsgivendeInntekt> {
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
+    private val pgiDomainSerializer = PgiDomainSerializer()
 
     private val pgiClient = PgiClient(
         env = PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MaskinportenMock.MASKINPORTEN_CLIENT_ENV_VARIABLES,
@@ -40,12 +41,8 @@ internal class PGITopologyTest {
     private val topologyDriver =
         PgiTopologyTestDriver(PGITopology(pgiClient).topology(), kafkaConfig.streamProperties())
 
-    val testInputTopic =
-        topologyDriver.createInputTopic<HendelseKey, Hendelse>(PGI_HENDELSE_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
-    val testOutputTopic = topologyDriver.createOutputTopic<HendelseKey, PensjonsgivendeInntekt>(
-        PGI_INNTEKT_TOPIC,
-        MOCK_SCHEMA_REGISTRY_URL
-    )
+    private val testInputTopic = topologyDriver.createInputTopic(PGI_HENDELSE_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
+    private val testOutputTopic = topologyDriver.createOutputTopic(PGI_INNTEKT_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
 
     @BeforeAll
     fun init() {
@@ -120,12 +117,18 @@ internal class PGITopologyTest {
 
     private fun addToHendelseTopic(amount: Int) = createHendelseList(amount).forEach { addToTopic(it) }
     private fun addToHendelseTopic(hendelser: List<Hendelse>) = hendelser.forEach { addToTopic(it) }
-    private fun addToTopic(hendelse: Hendelse) = testInputTopic.pipeInput(hendelse.key(), hendelse)
+
+    private fun addToTopic(hendelse: Hendelse) {
+        val key = pgiDomainSerializer.toJson(hendelse.key())
+        val value = pgiDomainSerializer.toJson(hendelse)
+        testInputTopic.pipeInput(key, value)
+    }
+
     private fun createHendelseList(count: Int) =
         (1..count).map { Hendelse(it.toLong(), (10000000000 + it).toString(), "2018", HendelseMetadata(0)) }
 }
 
-private fun Hendelse.key() = HendelseKey(getIdentifikator(), getGjelderPeriode())
+private fun Hendelse.key() = HendelseKey(identifikator, gjelderPeriode)
 
 
 

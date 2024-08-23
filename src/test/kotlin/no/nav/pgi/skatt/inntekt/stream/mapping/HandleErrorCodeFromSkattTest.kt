@@ -2,7 +2,7 @@ package no.nav.pgi.skatt.inntekt.stream.mapping
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntektMetadata
+import no.nav.pgi.domain.PensjonsgivendeInntektMetadata
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -114,6 +114,6 @@ internal class HandleErrorCodeFromSkattTest {
         val mockHttpResponse = mockk<HttpResponse<String>>()
         every { mockHttpResponse.hint(String::class).body() } returns body
         every { mockHttpResponse.statusCode() } returns (statusCode)
-        return PgiResponse(mockHttpResponse, PensjonsgivendeInntektMetadata())
+        return PgiResponse(mockHttpResponse, PensjonsgivendeInntektMetadata(0,0))
     }
 }

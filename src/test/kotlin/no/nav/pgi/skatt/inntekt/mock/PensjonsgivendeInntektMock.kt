@@ -11,9 +11,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer
+import no.nav.pgi.domain.Hendelse
 import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
 import no.nav.pgi.skatt.inntekt.skatt.SKATT_INNTEKT_PATH_ENV_KEY
-import no.nav.samordning.pgi.schema.Hendelse
 
 
 class PensjonsgivendeInntektMock {
@@ -56,7 +56,7 @@ class PensjonsgivendeInntektMock {
 
     internal fun `stub error code from skatt`(hendelse: Hendelse, errorCode: String) {
         mock.stubFor(
-            get(urlPathMatching("$VERSJON_RETTIGHETSPAKKE/${hendelse.getGjelderPeriode()}/${hendelse.getIdentifikator()}"))
+            get(urlPathMatching("$VERSJON_RETTIGHETSPAKKE/${hendelse.gjelderPeriode}/${hendelse.identifikator}"))
                 .atPriority(1)
                 .willReturn(serverError().withBody(errorCode))
         )

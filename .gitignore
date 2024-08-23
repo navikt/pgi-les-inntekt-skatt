@@ -4,4 +4,3 @@ build
 out
 gradle.properties.kts
 createSecrets.sh
-**/RemoveThis*

@@ -1,15 +1,12 @@
 package no.nav.pgi.skatt.inntekt.common
 
-import io.confluent.kafka.serializers.KafkaAvroDeserializer
-import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
-import io.confluent.kafka.serializers.KafkaAvroSerializer
 import no.nav.common.KafkaEnvironment
+import no.nav.pgi.domain.Hendelse
+import no.nav.pgi.domain.HendelseKey
+import no.nav.pgi.domain.PensjonsgivendeInntekt
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PGI_HENDELSE_TOPIC
 import no.nav.pgi.skatt.inntekt.stream.PGI_INNTEKT_TOPIC
-import no.nav.samordning.pgi.schema.Hendelse
-import no.nav.samordning.pgi.schema.HendelseKey
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig.*
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -17,6 +14,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.serialization.StringSerializer
 import java.time.Duration.ofSeconds
 
 
@@ -54,9 +52,8 @@ internal class KafkaTestEnvironment {
             mapOf(
                     CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to kafkaTestEnvironment.brokersURL,
                     "schema.registry.url" to schemaRegistryUrl,
-                    KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to true,
-                    KEY_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
-                    VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
+                    KEY_DESERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
+                    VALUE_DESERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
                     GROUP_ID_CONFIG to "LOL",
                     AUTO_OFFSET_RESET_CONFIG to "earliest",
                     ENABLE_AUTO_COMMIT_CONFIG to false
@@ -67,8 +64,8 @@ internal class KafkaTestEnvironment {
             mapOf(
                     CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to kafkaTestEnvironment.brokersURL,
                     "schema.registry.url" to schemaRegistryUrl,
-                    ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
-                    ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
+                    ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
+                    ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
                     ProducerConfig.ACKS_CONFIG to "all",
                     ProducerConfig.RETRIES_CONFIG to Integer.MAX_VALUE
             )
