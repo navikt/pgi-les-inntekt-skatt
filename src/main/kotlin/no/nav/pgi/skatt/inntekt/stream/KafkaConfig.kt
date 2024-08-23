@@ -1,7 +1,5 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.*
-import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import no.nav.pensjon.samhandling.env.getVal
 import org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
@@ -15,9 +13,6 @@ internal const val PGI_HENDELSE_TOPIC = "pensjonopptjening.privat-pgi-hendelse"
 
 internal class KafkaConfig(environment: Map<String, String> = System.getenv(), private val securityStrategy: SecurityStrategy = SslStrategy()) {
     private val bootstrapServers = environment.getVal(BOOTSTRAP_SERVERS)
-    private val schemaRegUsername = environment.getVal(SCHEMA_REGISTRY_USERNAME)
-    private val schemaRegPassword = environment.getVal(SCHEMA_REGISTRY_PASSWORD)
-    private val schemaRegistryUrl = environment.getVal(SCHEMA_REGISTRY)
 
     internal fun streamProperties(): Properties = Properties().apply {
         put(BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
@@ -26,14 +21,7 @@ internal class KafkaConfig(environment: Map<String, String> = System.getenv(), p
         put(APPLICATION_ID_CONFIG, STREAM_APPLICATION_ID)
         put(AUTO_OFFSET_RESET_CONFIG, "earliest")
         putAll(securityStrategy.securityConfig())
-        putAll(schemaRegistryConfig())
     }
-
-    private fun schemaRegistryConfig() = mapOf(
-            BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO",
-            USER_INFO_CONFIG to "$schemaRegUsername:$schemaRegPassword",
-            SCHEMA_REGISTRY_URL_CONFIG to schemaRegistryUrl
-    )
 
     internal companion object EnvironmentKeys {
         const val BOOTSTRAP_SERVERS = "KAFKA_BROKERS"

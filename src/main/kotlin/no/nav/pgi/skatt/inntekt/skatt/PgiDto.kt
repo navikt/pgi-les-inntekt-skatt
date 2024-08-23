@@ -12,7 +12,7 @@ import no.nav.pgi.skatt.inntekt.stream.mapping.PgiResponse
 import org.slf4j.LoggerFactory
 
 private val LOG = LoggerFactory.getLogger(PgiDto::class.java)
-private val objectMapper = ObjectMapper().registerModule(KotlinModule()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
 
 internal fun PgiResponse.mapToPGIDto(): PgiDto = try {
     objectMapper.readValue<PgiDto>(this.body())

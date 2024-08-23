@@ -2,30 +2,34 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorSupportVersion = "0.0.22"
-val ktorVersion = "1.5.4"
+val ktorSupportVersion = "0.0.30"
+val ktorVersion = "1.6.8"
 val maskinportenClientVersion = "0.0.4"
-val joseJwtVersion = "9.36"
-val kafkaVersion = "2.5.0"
+val joseJwtVersion = "9.40"
+val kafkaVersion = "3.8.0"
 val confluentVersion = "5.5.1"
 val avroSchemaVersion = "0.0.7"
 val pgiDomainVersion = "0.0.5"
 val micrometerVersion = "1.11.4"
-val logbackVersion = "1.4.11"
+val logbackVersion = "1.5.7"
 val logstashVersion = "5.2"
 val slf4jVersion = "2.0.9"
 val log4jVersion = "2.20.0"
 val junitJupiterVersion = "5.11.0"
 val assertJVersion = "3.26.3"
 val wiremockVersion = "2.27.2"
-val kafkaEmbeddedEnvVersion = "2.5.0"
+val kafkaEmbeddedEnvVersion = "3.2.8"
 val mockkVerion = "1.13.12"
 
 // overstyrte transitive avhengigheter
-val guavaVersion = "32.1.2-jre"
-val snappyJavaVersion = "1.1.10.5"
+val guavaVersion = "33.3.0-jre"
+val snappyJavaVersion = "1.1.10.6"
 val snakeYamlVersion = "2.2"
-val commonsCompressVersion = "1.24.0"
+val commonsCompressVersion = "1.27.1"
+
+// påkrevd av pgi-domain
+val jacksonVersion = "2.17.2"
+
 
 group = "no.nav.pgi"
 
@@ -72,8 +76,17 @@ repositories {
 }
 
 dependencies {
+// påkrevd av pgi-domain
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+
+
+    // TODO: Disse var avhengigheter fra confluent-avro
+    implementation("org.glassfish.jersey.core:jersey-common:2.30")
+//    implementation("javax.ws.rs.javax.ws.rs-api:2.1.1")
+
     implementation("no.nav.pensjonsamhandling:pensjon-samhandling-ktor-support:$ktorSupportVersion")
-    implementation("io.ktor:ktor-jackson:$ktorVersion")
+//    implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-metrics-micrometer:$ktorVersion")
@@ -83,8 +96,11 @@ dependencies {
 
     implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
-    implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
-//    implementation("no.nav.pgi:pgi-schema:$avroSchemaVersion")
+
+    // TODO: foreløpig for å få inn kafka
+    testImplementation("org.springframework.kafka:spring-kafka-test:3.2.2")
+//    implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
+    implementation("no.nav.pgi:pgi-schema:$avroSchemaVersion")
     implementation("no.nav.pgi:pgi-domain:$pgiDomainVersion")
 
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")

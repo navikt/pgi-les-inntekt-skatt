@@ -14,6 +14,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import java.time.Duration.ofSeconds
 
@@ -52,8 +53,8 @@ internal class KafkaTestEnvironment {
             mapOf(
                     CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to kafkaTestEnvironment.brokersURL,
                     "schema.registry.url" to schemaRegistryUrl,
-                    KEY_DESERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-                    VALUE_DESERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
+                    KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                    VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
                     GROUP_ID_CONFIG to "LOL",
                     AUTO_OFFSET_RESET_CONFIG to "earliest",
                     ENABLE_AUTO_COMMIT_CONFIG to false
