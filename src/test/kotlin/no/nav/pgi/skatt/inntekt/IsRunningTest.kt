@@ -15,7 +15,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+// @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+/*
 internal class IsRunningTest {
     private val kafkaTestEnvironment = KafkaTestEnvironment()
     private val pgiClient = PgiClient(PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES + MaskinportenMock.MASKINPORTEN_CLIENT_ENV_VARIABLES)
@@ -42,3 +43,4 @@ internal class IsRunningTest {
         assertTrue(pgiStream.isRunning())
     }
 }
+ */

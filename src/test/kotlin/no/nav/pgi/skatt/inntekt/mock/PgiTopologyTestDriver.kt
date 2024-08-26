@@ -11,11 +11,11 @@ import java.util.*
 internal class PgiTopologyTestDriver(topology: Topology, properties: Properties) {
     internal val testDriver: TopologyTestDriver = TopologyTestDriver(topology, properties)
 
-    internal fun createInputTopic(topic: String, schemaUrl: String): TestInputTopic<String, String> {
+    internal fun createInputTopic(topic: String): TestInputTopic<String, String> {
         return testDriver.createInputTopic(topic, StringSerializer(), StringSerializer())
     }
 
-    internal fun createOutputTopic(topic: String, schemaUrl: String): TestOutputTopic<String, String> {
+    internal fun createOutputTopic(topic: String): TestOutputTopic<String, String> {
         return testDriver.createOutputTopic(topic, StringDeserializer(), StringDeserializer())
     }
 

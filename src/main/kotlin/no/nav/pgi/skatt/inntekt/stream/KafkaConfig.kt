@@ -3,7 +3,7 @@ package no.nav.pgi.skatt.inntekt.stream
 import no.nav.pensjon.samhandling.env.getVal
 import org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
-import org.apache.kafka.common.serialization.StringSerializer
+import org.apache.kafka.common.serialization.Serdes.StringSerde
 import org.apache.kafka.streams.StreamsConfig.*
 import java.util.*
 
@@ -16,8 +16,8 @@ internal class KafkaConfig(environment: Map<String, String> = System.getenv(), p
 
     internal fun streamProperties(): Properties = Properties().apply {
         put(BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-        put(DEFAULT_KEY_SERDE_CLASS_CONFIG, StringSerializer::class.java)
-        put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, StringSerializer::class.java)
+        put(DEFAULT_KEY_SERDE_CLASS_CONFIG, StringSerde::class.java)
+        put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, StringSerde::class.java)
         put(APPLICATION_ID_CONFIG, STREAM_APPLICATION_ID)
         put(AUTO_OFFSET_RESET_CONFIG, "earliest")
         putAll(securityStrategy.securityConfig())

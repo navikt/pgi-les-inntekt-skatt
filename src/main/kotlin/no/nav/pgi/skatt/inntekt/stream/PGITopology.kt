@@ -1,16 +1,19 @@
 package no.nav.pgi.skatt.inntekt.stream
 
+import io.ktor.http.cio.websocket.*
 import io.prometheus.client.Counter
 import net.logstash.logback.marker.Markers
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
 import no.nav.pgi.domain.Hendelse
 import no.nav.pgi.domain.HendelseKey
 import no.nav.pgi.domain.PensjonsgivendeInntekt
+import no.nav.pgi.domain.serialization.PgiDomainSerializer
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.FetchPgiFromSkatt
 import no.nav.pgi.skatt.inntekt.stream.mapping.HandleErrorCodeFromSkatt
 import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiDomain
 import no.nav.pgi.skatt.inntekt.stream.mapping.PgiResponse
+import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.KStream
@@ -28,14 +31,27 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
 
     internal fun topology(): Topology {
         val streamBuilder = StreamsBuilder()
-        val stream: KStream<HendelseKey, Hendelse> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
+        val stream: KStream<String, String> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
 
-        stream.peek(logHendelseAboutToBeProcessed())
+        stream
+            .map {
+                    key, value ->
+                KeyValue(
+                    PgiDomainSerializer().fromJson(HendelseKey::class,key),
+                    PgiDomainSerializer().fromJson(Hendelse::class,value))
+            }
+            .peek(logHendelseAboutToBeProcessed())
             .mapValues(FetchPgiFromSkatt(pgiClient))
             .mapValues(HandleErrorCodeFromSkatt())
             .filter(pgiResponseNotNull())
             .mapValues(MapToPgiDomain())
             .peek(logAndCountInntektProcessed())
+            .map { key, value ->
+                KeyValue(
+                    PgiDomainSerializer().toJson(key),
+                    PgiDomainSerializer().toJson(value)
+                )
+            }
             .to(PGI_INNTEKT_TOPIC)
 
         return streamBuilder.build()
@@ -43,7 +59,10 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
 
     private fun logHendelseAboutToBeProcessed(): (HendelseKey, Hendelse) -> Unit =
         { _: HendelseKey, hendelse: Hendelse ->
-            LOG.info(Markers.append("sekvensnummer", hendelse.sekvensnummer.toString()),"""Started processing hendelse ${hendelse.toString().maskFnr()}""")
+            LOG.info(
+                Markers.append("sekvensnummer", hendelse.sekvensnummer.toString()),
+                """Started processing hendelse ${hendelse.toString().maskFnr()}"""
+            )
         }
 
     private fun pgiResponseNotNull(): (HendelseKey, PgiResponse?) -> Boolean = { _, pgiResponse -> pgiResponse != null }
@@ -52,7 +71,10 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
         { key: HendelseKey, pgi: PensjonsgivendeInntekt ->
             hendelserToinntektProcessedTotal.inc()
             hendelserToinntektProcessedByYear.labels(key.gjelderPeriode).inc()
-            LOG.info(Markers.append("sekvensnummer", pgi.metaData?.sekvensnummer.toString()), "Lest inntekt Skatt: ${pgi.toString().maskFnr()}")
+            LOG.info(
+                Markers.append("sekvensnummer", pgi.metaData?.sekvensnummer.toString()),
+                "Lest inntekt Skatt: ${pgi.toString().maskFnr()}"
+            )
         }
 
     private companion object {

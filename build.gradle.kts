@@ -4,10 +4,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorSupportVersion = "0.0.30"
 val ktorVersion = "1.6.8"
-val maskinportenClientVersion = "0.0.4"
+val maskinportenClientVersion = "0.0.9"
 val joseJwtVersion = "9.40"
 val kafkaVersion = "3.8.0"
-val confluentVersion = "5.5.1"
+val confluentVersion = "7.7.0"
 val avroSchemaVersion = "0.0.7"
 val pgiDomainVersion = "0.0.5"
 val micrometerVersion = "1.11.4"
@@ -98,9 +98,16 @@ dependencies {
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
 
     // TODO: foreløpig for å få inn kafka
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.2")
     testImplementation("org.springframework.kafka:spring-kafka-test:3.2.2")
-//    implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
-    implementation("no.nav.pgi:pgi-schema:$avroSchemaVersion")
+    testImplementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
+
+    // TODO: midlertidig
+//    testImplementation("io.confluent:kafka-schema-registry:$confluentVersion")
+//    testImplementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
+//    testImplementation("org.apache.kafka:kafka-clients:$kafkaVersion")
+
+
     implementation("no.nav.pgi:pgi-domain:$pgiDomainVersion")
 
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
@@ -121,9 +128,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("com.github.tomakehurst:wiremock:$wiremockVersion")
+/*
     testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion") {
         exclude(group = "org.slf4j", module = "slf4j-log4j12")
     }
+ */
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVerion")

@@ -12,13 +12,15 @@ import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.skatt.RateLimit
 import no.nav.pgi.skatt.inntekt.stream.mapping.FeilmedlingFraSkattException
+import org.apache.kafka.streams.errors.StreamsException
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import kotlin.time.Duration.Companion.seconds
 
 private const val ONE_HUNDRED = 100
@@ -28,7 +30,7 @@ private const val INNTEKTSAAR = "2019"
 private const val IDENTIFIKATOR = "12345678901"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class PGITopologyTest<PensjonsgivendeInntekt> {
+internal class PGITopologyTest {
     private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
     private val pgiDomainSerializer = PgiDomainSerializer()
@@ -41,8 +43,8 @@ internal class PGITopologyTest<PensjonsgivendeInntekt> {
     private val topologyDriver =
         PgiTopologyTestDriver(PGITopology(pgiClient).topology(), kafkaConfig.streamProperties())
 
-    private val testInputTopic = topologyDriver.createInputTopic(PGI_HENDELSE_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
-    private val testOutputTopic = topologyDriver.createOutputTopic(PGI_INNTEKT_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
+    private val testInputTopic = topologyDriver.createInputTopic(PGI_HENDELSE_TOPIC)
+    private val testOutputTopic = topologyDriver.createOutputTopic(PGI_INNTEKT_TOPIC)
 
     @BeforeAll
     fun init() {
@@ -103,8 +105,13 @@ internal class PGITopologyTest<PensjonsgivendeInntekt> {
 
         addToHendelseTopic(TEN)
 
-        assertThrows<FeilmedlingFraSkattException> { addToTopic(failingHendelse) }
-        assertEquals(TEN, testOutputTopic.readKeyValuesToList().size)
+        assertThatThrownBy {
+            addToTopic(failingHendelse)
+        }
+            .isInstanceOf(StreamsException::class.java)
+            .hasRootCauseInstanceOf(FeilmedlingFraSkattException::class.java)
+
+        assertThat(testOutputTopic.readKeyValuesToList()).hasSize(TEN)
     }
 
     private fun getKafkaTestEnv() =
