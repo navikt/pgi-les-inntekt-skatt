@@ -1,6 +1,7 @@
 package no.nav.pgi.skatt.inntekt.stream
 
 import org.apache.kafka.streams.KafkaStreams
+import org.apache.kafka.streams.errors.StreamsException
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -14,8 +15,13 @@ internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology)
     }
 
     internal fun setUncaughtStreamExceptionHandler(handleException: (e: Throwable?) -> Unit) {
+        // TODO: erstatt med StreamsUncaughtExceptionHandler
         pgiStream.setUncaughtExceptionHandler { thread: Thread?, e: Throwable? ->
-            LOG.error("Uncaught exception in thread $thread", e)
+            if (e is StreamsException && e.cause != null) {
+                LOG.error("Uncaught StreamsException in thread $thread", e.cause)
+            } else {
+                LOG.error("Uncaught exception in thread $thread", e)
+            }
             handleException(e)
         }
     }
@@ -42,4 +48,3 @@ internal class PGIStream(streamProperties: Properties, pgiTopology: PGITopology)
         private val LOG = LoggerFactory.getLogger(PGIStream::class.java)
     }
 }
-
