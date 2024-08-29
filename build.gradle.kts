@@ -7,7 +7,7 @@ val maskinportenClientVersion = "0.0.4"
 val joseJwtVersion = "9.36"
 val kafkaVersion = "2.5.0"
 val confluentVersion = "5.5.1"
-val avroSchemaVersion = "0.0.7"
+val pgiDomainVersion = "0.0.5"
 val micrometerVersion = "1.11.4"
 val logbackVersion = "1.4.11"
 val logstashVersion = "5.2"
@@ -54,6 +54,12 @@ repositories {
             password = System.getenv("GITHUB_TOKEN")
         }
     }
+    maven("https://maven.pkg.github.com/navikt/pgi-domain") {
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
     maven("https://maven.pkg.github.com/navikt/pensjon-opptjening-gcp-maskinporten-client") {
         credentials {
             username = System.getenv("GITHUB_ACTOR")
@@ -75,7 +81,7 @@ dependencies {
     implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
     implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
-    implementation("no.nav.pgi:pgi-schema:$avroSchemaVersion")
+    implementation("no.nav.pgi:pgi-domain:$pgiDomainVersion")
 
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
