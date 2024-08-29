@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorSupportVersion = "0.0.22"
@@ -27,14 +28,14 @@ val commonsCompressVersion = "1.24.0"
 group = "no.nav.pgi"
 
 plugins {
-    kotlin("jvm") version "1.9.10"
-    kotlin("plugin.serialization") version "1.9.10"
+    kotlin("jvm") version "2.0.20"
+    kotlin("plugin.serialization") version "2.0.20"
     id("com.github.ben-manes.versions") version "0.51.0"
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -109,9 +110,10 @@ dependencies {
     implementation(kotlin("stdlib"))
 }
 
-
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_21
+    }
 }
 
 tasks.named<Jar>("jar") {
