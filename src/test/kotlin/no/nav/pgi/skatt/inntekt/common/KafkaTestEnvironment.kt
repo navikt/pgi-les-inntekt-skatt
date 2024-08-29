@@ -4,12 +4,12 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import no.nav.common.KafkaEnvironment
+import no.nav.pgi.domain.Hendelse
+import no.nav.pgi.domain.HendelseKey
+import no.nav.pgi.domain.PensjonsgivendeInntekt
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PGI_HENDELSE_TOPIC
 import no.nav.pgi.skatt.inntekt.stream.PGI_INNTEKT_TOPIC
-import no.nav.samordning.pgi.schema.Hendelse
-import no.nav.samordning.pgi.schema.HendelseKey
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig.*
 import org.apache.kafka.clients.consumer.ConsumerRecord
