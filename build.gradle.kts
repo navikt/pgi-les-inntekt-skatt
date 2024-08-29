@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorSupportVersion = "0.0.22"
 val ktorVersion = "1.5.4"
-val maskinportenClientVersion = "0.0.4"
+val maskinportenClientVersion = "0.1.0"
 val joseJwtVersion = "9.36"
 val kafkaVersion = "2.5.0"
 val confluentVersion = "5.5.1"
