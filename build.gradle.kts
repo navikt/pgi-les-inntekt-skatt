@@ -18,8 +18,8 @@ val junitJupiterVersion = "5.11.0"
 val assertJVersion = "3.26.3"
 val wiremockVersion = "2.27.2"
 val mockkVerion = "1.13.12"
-val springBootVersion = "3.3.3"
-val springKafkaTestVersion = "3.2.3"
+// val springBootVersion = "3.3.3"
+// val springKafkaTestVersion = "3.2.3"
 
 // overstyrte transitive avhengigheter
 val guavaVersion = "32.1.2-jre"
@@ -90,12 +90,12 @@ dependencies {
     implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
 
-    // TODO: foreløpig for å få inn kafka
+/*
     implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
     testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
     testImplementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
+*/
 
     implementation("no.nav.pgi:pgi-domain:$pgiDomainVersion")
 
