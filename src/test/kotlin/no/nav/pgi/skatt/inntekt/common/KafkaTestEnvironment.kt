@@ -1,93 +1,52 @@
 package no.nav.pgi.skatt.inntekt.common
 
-import io.confluent.kafka.serializers.KafkaAvroDeserializer
-import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
-import io.confluent.kafka.serializers.KafkaAvroSerializer
-import no.nav.common.KafkaEnvironment
-import no.nav.pgi.domain.Hendelse
-import no.nav.pgi.domain.HendelseKey
-import no.nav.pgi.domain.PensjonsgivendeInntekt
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PGI_HENDELSE_TOPIC
 import no.nav.pgi.skatt.inntekt.stream.PGI_INNTEKT_TOPIC
-import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.consumer.ConsumerConfig.*
-import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.clients.producer.ProducerRecord
-import java.time.Duration.ofSeconds
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.kafka.test.EmbeddedKafkaBroker
+import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.kafka.test.utils.KafkaTestUtils
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 
+@ExtendWith(SpringExtension::class)
+@EmbeddedKafka(partitions = 1, topics = [PGI_INNTEKT_TOPIC, PGI_HENDELSE_TOPIC])
+@SpringBootTest
 internal class KafkaTestEnvironment {
 
-    private val kafkaTestEnvironment: KafkaEnvironment = KafkaEnvironment(
-            withSchemaRegistry = true,
-            topicInfos = listOf(
-                    KafkaEnvironment.TopicInfo(PGI_INNTEKT_TOPIC, partitions = 1),
-                    KafkaEnvironment.TopicInfo(PGI_HENDELSE_TOPIC, partitions = 1)
-            ),
-    )
+    @Autowired
+    lateinit var embeddedKafka: EmbeddedKafkaBroker
 
     private val inntektTestConsumer = inntektTestConsumer()
     private val hendelseTestProducer = hendelseTestProducer()
 
     init {
-        kafkaTestEnvironment.start()
         inntektTestConsumer.subscribe(listOf(PGI_INNTEKT_TOPIC))
     }
 
-    private val schemaRegistryUrl: String
-        get() = kafkaTestEnvironment.schemaRegistry!!.url
-
-    internal fun tearDown() = kafkaTestEnvironment.tearDown()
-
+    // TODO: bli kvitt denne?
     internal fun testConfiguration() = mapOf(
-            KafkaConfig.BOOTSTRAP_SERVERS to kafkaTestEnvironment.brokersURL,
-            KafkaConfig.SCHEMA_REGISTRY to schemaRegistryUrl,
-            KafkaConfig.SCHEMA_REGISTRY_USERNAME to "mrOpenSource",
-            KafkaConfig.SCHEMA_REGISTRY_PASSWORD to "opensourcedPassword"
+//        KafkaConfig.BOOTSTRAP_SERVERS to kafkaTestEnvironment.brokersURL,
+//        KafkaConfig.SCHEMA_REGISTRY to schemaRegistryUrl,
+        KafkaConfig.SCHEMA_REGISTRY_USERNAME to "mrOpenSource",
+        KafkaConfig.SCHEMA_REGISTRY_PASSWORD to "opensourcedPassword"
     )
 
-    private fun inntektTestConsumer() = KafkaConsumer<HendelseKey, PensjonsgivendeInntekt>(
-            mapOf(
-                    CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to kafkaTestEnvironment.brokersURL,
-                    "schema.registry.url" to schemaRegistryUrl,
-                    KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to true,
-                    KEY_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
-                    VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
-                    GROUP_ID_CONFIG to "LOL",
-                    AUTO_OFFSET_RESET_CONFIG to "earliest",
-                    ENABLE_AUTO_COMMIT_CONFIG to false
-            )
-    )
 
-    private fun hendelseTestProducer() = KafkaProducer<HendelseKey, Hendelse>(
-            mapOf(
-                    CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to kafkaTestEnvironment.brokersURL,
-                    "schema.registry.url" to schemaRegistryUrl,
-                    ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
-                    ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
-                    ProducerConfig.ACKS_CONFIG to "all",
-                    ProducerConfig.RETRIES_CONFIG to Integer.MAX_VALUE
-            )
-    )
-
-    //Duration 4 seconds to allow for hendelse to be added to topic
-    fun consumeInntektTopic(): List<ConsumerRecord<HendelseKey, PensjonsgivendeInntekt>> = inntektTestConsumer.poll(ofSeconds(4L)).records(PGI_INNTEKT_TOPIC).toList()
-
-    internal fun writeHendelse(hendelseKey: HendelseKey, hendelse: Hendelse) {
-        val record = ProducerRecord(PGI_HENDELSE_TOPIC, hendelseKey, hendelse)
-        hendelseTestProducer.send(record).get()
+    private fun inntektTestConsumer(): KafkaConsumer<String, String> {
+        return KafkaConsumer<String, String>(
+            KafkaTestUtils.consumerProps("group", "false", embeddedKafka)
+        )
     }
 
-    fun pgiHendelseTopicOffsett(){
-        kafkaTestEnvironment
+    private fun hendelseTestProducer(): KafkaProducer<String, String> {
+        return KafkaProducer<String, String>(
+            KafkaTestUtils.producerProps(embeddedKafka)
+        )
     }
-
-    fun getFirstRecordOnInntektTopic() = consumeInntektTopic()[0]
-
-
-    fun closeTestConsumer() = inntektTestConsumer.close()
 }
