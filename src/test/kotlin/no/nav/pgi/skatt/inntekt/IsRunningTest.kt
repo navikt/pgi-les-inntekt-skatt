@@ -8,9 +8,8 @@ import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.KafkaConfig
 import no.nav.pgi.skatt.inntekt.stream.PGIStream
 import no.nav.pgi.skatt.inntekt.stream.PGITopology
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -34,11 +33,12 @@ internal class IsRunningTest {
 
     @Test
     fun `isRunning() should return false when stream is not started`() {
-        assertFalse(PGIStream(kafkaConfig.streamProperties(), PGITopology(pgiClient)).isRunning())
+        val pgiStream = PGIStream(kafkaConfig.streamProperties(), PGITopology(pgiClient))
+        assertThat(pgiStream.isRunning()).isFalse()
     }
 
     @Test
     fun `isRunning() should return true when app is started`() {
-        assertTrue(pgiStream.isRunning())
+        assertThat(pgiStream.isRunning()).isTrue()
     }
 }

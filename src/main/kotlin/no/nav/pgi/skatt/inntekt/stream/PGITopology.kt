@@ -45,6 +45,12 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
             .filter(pgiResponseNotNull())
             .mapValues(MapToPgi())
             .peek(logAndCountInntektProcessed())
+            .map { key, value ->
+                KeyValue(
+                    PgiDomainSerializer().toJson(key),
+                    PgiDomainSerializer().toJson(value)
+                )
+            }
             .to(PGI_INNTEKT_TOPIC)
 
         return streamBuilder.build()

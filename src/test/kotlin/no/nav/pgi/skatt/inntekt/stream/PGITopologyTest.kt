@@ -12,6 +12,8 @@ import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.skatt.RateLimit
 import no.nav.pgi.skatt.inntekt.stream.mapping.FeilmedlingFraSkattException
+import org.apache.kafka.streams.errors.StreamsException
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -105,7 +107,11 @@ internal class PGITopologyTest {
 
         addToHendelseTopic(TEN)
 
-        assertThrows<FeilmedlingFraSkattException> { addToTopic(failingHendelse) }
+        assertThatThrownBy {
+            addToTopic(failingHendelse)
+        }
+            .isInstanceOf(StreamsException::class.java)
+            .hasRootCauseInstanceOf(FeilmedlingFraSkattException::class.java)
         assertEquals(TEN, testOutputTopic.readKeyValuesToList().size)
     }
 
@@ -118,11 +124,13 @@ internal class PGITopologyTest {
         )
 
     private fun addToHendelseTopic(amount: Int) = createHendelseList(amount).forEach { addToTopic(it) }
-    private fun addToHendelseTopic(hendelser: List<Hendelse>) = hendelser.forEach { addToTopic(it) }
+
     private fun addToTopic(hendelse: Hendelse) {
-        val key = PgiDomainSerializer().toJson(hendelse.key())
-        val value = PgiDomainSerializer().toJson(hendelse)
+        val key : String = PgiDomainSerializer().toJson(hendelse.key())
+        val value : String = PgiDomainSerializer().toJson(hendelse)
+        println("Adding to topic: $key $value")
         testInputTopic.pipeInput(key, value)
+        println("Added to topic: $key $value")
     }
 
     private fun createHendelseList(count: Int) =
