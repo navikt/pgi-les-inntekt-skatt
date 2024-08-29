@@ -10,7 +10,7 @@ Dokumentasjon REST tjeneste vi bruker fra Skatteetaten: [Pensjonsgivende inntekt
 ## Bygge lokalt
 
 ### Java
-Java 17 temurin
+Java 21 temurin
 ### gradle
 Prosjektet bruker gradle og har en egen gradlew fil. Vi anbefaler å bruke gradlew filen ved bygging lokalt.
 ```
