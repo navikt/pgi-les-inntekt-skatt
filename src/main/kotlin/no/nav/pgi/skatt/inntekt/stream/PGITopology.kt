@@ -1,5 +1,6 @@
 package no.nav.pgi.skatt.inntekt.stream
 
+import com.fasterxml.jackson.core.JacksonException
 import io.prometheus.client.Counter
 import net.logstash.logback.marker.Markers
 import no.nav.pensjon.samhandling.maskfnr.maskFnr
@@ -33,6 +34,7 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
         val stream: KStream<String, String> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
 
         stream
+            .filter(kafkaHendelseParsable())
             .map { key, value ->
                 KeyValue(
                     PgiDomainSerializer().fromJson(HendelseKey::class, key),
@@ -65,6 +67,18 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
         }
 
     private fun pgiResponseNotNull(): (HendelseKey, PgiResponse?) -> Boolean = { _, pgiResponse -> pgiResponse != null }
+
+    private fun kafkaHendelseParsable(): (String, String) -> Boolean =
+        { key, value ->
+            try {
+                PgiDomainSerializer().fromJson(HendelseKey::class, key)
+                PgiDomainSerializer().fromJson(Hendelse::class, value)
+                true
+            } catch (e: JacksonException) {
+                LOG.error("Failed to deserialize kafka message, discarding it", e)
+                false
+            }
+        }
 
     private fun logAndCountInntektProcessed(): (HendelseKey, PensjonsgivendeInntekt) -> Unit =
         { key: HendelseKey, pgi: PensjonsgivendeInntekt ->
