@@ -13,13 +13,10 @@ import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.skatt.RateLimit
 import no.nav.pgi.skatt.inntekt.stream.mapping.FeilmedlingFraSkattException
 import org.apache.kafka.streams.errors.StreamsException
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import kotlin.time.Duration.Companion.seconds
 
 private const val ONE_HUNDRED = 100
@@ -98,6 +95,12 @@ internal class PGITopologyTest {
 //    }
 
     @Test
+    internal fun `should discard unparseable kafka messages`() {
+        addGarbageToHendelseTopic()
+        assertThat(testOutputTopic.readKeyValuesToList()).isEmpty()
+    }
+
+    @Test
     internal fun `should fail with Exception if exception is thrown in stream`() {
         val failingHendelse = Hendelse(1L, IDENTIFIKATOR, INNTEKTSAAR, HendelseMetadata(0))
 
@@ -130,6 +133,10 @@ internal class PGITopologyTest {
         println("Adding to topic: $key $value")
         testInputTopic.pipeInput(key, value)
         println("Added to topic: $key $value")
+    }
+
+    private fun addGarbageToHendelseTopic() {
+        testInputTopic.pipeInput("[[Banana","[[Banana!!")
     }
 
     private fun createHendelseList(count: Int) =
