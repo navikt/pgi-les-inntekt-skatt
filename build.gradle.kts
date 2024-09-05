@@ -14,7 +14,8 @@ val logbackVersion = "1.4.11"
 val logstashVersion = "5.2"
 val slf4jVersion = "2.0.9"
 val log4jVersion = "2.20.0"
-val junitJupiterVersion = "5.11.0"
+// spring-dependency-management krever denne, roter det til med 5.11
+val junitJupiterVersion = "5.10.3"
 val assertJVersion = "3.26.3"
 val wiremockVersion = "2.27.2"
 val mockkVerion = "1.13.12"
@@ -34,8 +35,11 @@ val jacksonVersion = "2.17.2"
 group = "no.nav.pgi"
 
 plugins {
-    kotlin("jvm") version "2.0.20"
-    kotlin("plugin.serialization") version "2.0.20"
+    val kotlinVersion = "2.0.20"
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.serialization") version kotlinVersion
+    id("org.springframework.boot") version "3.3.2"
+    id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("com.github.ben-manes.versions") version "0.51.0"
 }
 
@@ -44,6 +48,8 @@ java {
         languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
+
+apply(plugin = "io.spring.dependency-management")
 
 repositories {
     mavenCentral()
@@ -117,23 +123,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("com.github.tomakehurst:wiremock:$wiremockVersion")
-    /*
-    testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion") {
-        exclude(group = "org.slf4j", module = "slf4j-log4j12")
-    }
-     */
+
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVerion")
     implementation(kotlin("stdlib"))
-
-    /*
-    // tvinger scala-versjoner pga avhengighetsrot i embedded-env, jackson osv
-    implementation("org.scala-lang:scala-library:$scalaVersion")
-    implementation("org.scala-lang:scala-reflect:$scalaVersion")
-    testImplementation("org.scala-lang:scala-library:$scalaVersion")
-    testImplementation("org.scala-lang:scala-reflect:$scalaVersion")
-     */
 }
 
 tasks.withType<KotlinCompile> {
