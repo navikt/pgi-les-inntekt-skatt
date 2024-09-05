@@ -5,7 +5,7 @@ import no.nav.pensjon.samhandling.env.getVal
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import javax.ws.rs.core.UriBuilder
+import jakarta.ws.rs.core.UriBuilder
 import no.nav.pensjon.samhandling.env.verifyEnvironmentVariables
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
