@@ -6,7 +6,7 @@ val ktorSupportVersion = "0.0.22"
 val ktorVersion = "1.5.4"
 val maskinportenClientVersion = "0.1.0"
 val joseJwtVersion = "9.40"
-val kafkaVersion = "3.8.0"
+// val kafkaVersion = "3.8.0"
 val confluentVersion = "5.5.1"
 val pgiDomainVersion = "0.0.5"
 val micrometerVersion = "1.11.4"
@@ -19,8 +19,8 @@ val junitJupiterVersion = "5.10.3"
 val assertJVersion = "3.26.3"
 val wiremockVersion = "2.27.2"
 val mockkVerion = "1.13.12"
-// val springBootVersion = "3.3.3"
-// val springKafkaTestVersion = "3.2.3"
+val springBootVersion = "3.3.3"
+val springKafkaTestVersion = "3.2.3"
 
 // overstyrte transitive avhengigheter
 val guavaVersion = "32.1.2-jre"
@@ -93,15 +93,17 @@ dependencies {
     implementation("no.nav.pensjonopptjening:pensjon-opptjening-gcp-maskinporten-client:$maskinportenClientVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:$joseJwtVersion")
 
-    implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
-    implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
+    implementation("org.apache.kafka:kafka-streams")
+    implementation("org.apache.kafka:kafka-clients")
 
-/*
+
     implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
     testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
-    testImplementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
-*/
+//    testImplementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 
     implementation("no.nav.pgi:pgi-domain:$pgiDomainVersion")
 
@@ -124,7 +126,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("com.github.tomakehurst:wiremock:$wiremockVersion")
 
-    testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
+    testImplementation("org.apache.kafka:kafka-streams-test-utils")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVerion")
     implementation(kotlin("stdlib"))
