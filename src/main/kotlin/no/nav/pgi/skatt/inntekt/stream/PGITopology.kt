@@ -3,7 +3,7 @@ package no.nav.pgi.skatt.inntekt.stream
 import com.fasterxml.jackson.core.JacksonException
 import io.prometheus.client.Counter
 import net.logstash.logback.marker.Markers
-import no.nav.pensjon.samhandling.maskfnr.maskFnr
+import no.nav.pgi.skatt.inntekt.util.maskFnr
 import no.nav.pgi.domain.Hendelse
 import no.nav.pgi.domain.HendelseKey
 import no.nav.pgi.domain.PensjonsgivendeInntekt
@@ -34,6 +34,7 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
         val stream: KStream<String, String> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
 
         stream
+            .peek { key, value -> println("PEEK 1: $key -> $value")}
             .filter(kafkaHendelseParsable())
             .map { key, value ->
                 KeyValue(
@@ -41,6 +42,7 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
                     PgiDomainSerializer().fromJson(Hendelse::class, value)
                 )
             }
+            .peek { key, value -> println("PEEK 2: $key -> $value")}
             .peek(logHendelseAboutToBeProcessed())
             .mapValues(FetchPgiFromSkatt(pgiClient))
             .mapValues(HandleErrorCodeFromSkatt())

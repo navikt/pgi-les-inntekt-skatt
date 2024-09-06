@@ -1,6 +1,6 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import no.nav.pensjon.samhandling.env.getVal
+import no.nav.pgi.skatt.inntekt.util.getVal
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.security.auth.SecurityProtocol

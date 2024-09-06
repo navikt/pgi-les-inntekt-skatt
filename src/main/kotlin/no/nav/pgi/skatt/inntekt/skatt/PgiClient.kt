@@ -1,12 +1,12 @@
 package no.nav.pgi.skatt.inntekt.skatt
 
 import no.nav.pensjon.opptjening.gcp.maskinporten.client.MaskinportenClient
-import no.nav.pensjon.samhandling.env.getVal
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import jakarta.ws.rs.core.UriBuilder
-import no.nav.pensjon.samhandling.env.verifyEnvironmentVariables
+import no.nav.pgi.skatt.inntekt.util.getVal
+import no.nav.pgi.skatt.inntekt.util.verifyEnvironmentVariables
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 

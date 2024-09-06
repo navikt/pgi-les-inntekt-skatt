@@ -1,18 +1,18 @@
 package no.nav.pgi.skatt.inntekt.skatt
 
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.nimbusds.jwt.SignedJWT
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock.Companion.MASKINPORTEN_CLIENT_ENV_VARIABLES
-import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
-import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.Companion.PGI_CLIENT_ENV_VARIABLES
-import org.junit.jupiter.api.AfterAll
+import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.PGI_CLIENT_ENV_VARIABLES
+import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.PORT
+import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.`stub 401 from skatt`
+import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.`stub pensjongivende inntekt`
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.net.http.HttpResponse
 
 private const val INNTEKTSAAR = "2018"
@@ -22,7 +22,6 @@ private const val NORSK_PERSONIDENTIFIKATOR = "12345678901"
 class PgiClientTest {
     private val pgiClient: PgiClient = PgiClient(PGI_CLIENT_ENV_VARIABLES + MASKINPORTEN_CLIENT_ENV_VARIABLES)
 
-    private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
 
     @BeforeAll
@@ -32,12 +31,12 @@ class PgiClientTest {
 
     @BeforeEach
     internal fun beforeEach() {
-        pensjonsgivendeInntektMock.reset()
+//        pensjonsgivendeInntektMock.reset()
     }
 
     @AfterAll
     internal fun teardown() {
-        pensjonsgivendeInntektMock.stop()
+//        pensjonsgivendeInntektMock.stop()
         maskinportenMock.stop()
     }
 
@@ -58,7 +57,7 @@ class PgiClientTest {
 
     @Test
     fun `should return response for pensjonsgivende inntekt endpoint when status 200`() {
-        pensjonsgivendeInntektMock.`stub pensjongivende inntekt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
+        mock.`stub pensjongivende inntekt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
 
         val response = pgiClient.getPgi(
             pgiClient.createPgiRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR),
@@ -70,7 +69,7 @@ class PgiClientTest {
 
     @Test
     fun `should return response for pensjonsgivende inntekt endpoint when status is not 200`() {
-        pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
+        mock.`stub 401 from skatt`(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR)
 
         val response = pgiClient.getPgi(
             pgiClient.createPgiRequest(INNTEKTSAAR, NORSK_PERSONIDENTIFIKATOR),
@@ -80,6 +79,17 @@ class PgiClientTest {
         assertEquals(401, response.statusCode())
     }
 
+    companion object {
+        @JvmStatic
+        @RegisterExtension
+        private val mock =
+            WireMockExtension.newInstance()
+                .options(
+                    WireMockConfiguration.wireMockConfig().port(PORT)
+                        .templatingEnabled(false)
+                )
+                .build()!!
+    }
 }
 
 private fun parseJwt(bearerToken: String) = SignedJWT.parse(bearerToken.split("""Bearer """)[1])

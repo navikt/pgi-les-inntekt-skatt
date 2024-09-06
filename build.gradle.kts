@@ -2,12 +2,9 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorSupportVersion = "0.0.22"
-val ktorVersion = "1.5.4"
 val maskinportenClientVersion = "0.1.0"
 val joseJwtVersion = "9.40"
 // val kafkaVersion = "3.8.0"
-val confluentVersion = "5.5.1"
 val pgiDomainVersion = "0.0.5"
 val micrometerVersion = "1.11.4"
 val logbackVersion = "1.4.11"
@@ -17,7 +14,7 @@ val log4jVersion = "2.20.0"
 // spring-dependency-management krever denne, roter det til med 5.11
 val junitJupiterVersion = "5.10.3"
 val assertJVersion = "3.26.3"
-val wiremockVersion = "2.27.2"
+val wiremockVersion = "3.9.1"
 val mockkVerion = "1.13.12"
 val springBootVersion = "3.3.3"
 val springKafkaTestVersion = "3.2.3"
@@ -30,6 +27,8 @@ val commonsCompressVersion = "1.24.0"
 
 // påkrevd av pgi-domain
 val jacksonVersion = "2.17.2"
+
+val jerseyVersion = "3.1.8"
 
 
 group = "no.nav.pgi"
@@ -82,14 +81,6 @@ dependencies {
 
 
     // TODO: Disse var avhengigheter fra confluent-avro
-    implementation("org.glassfish.jersey.core:jersey-common:2.30")
-
-    implementation("no.nav.pensjonsamhandling:pensjon-samhandling-ktor-support:$ktorSupportVersion")
-    implementation("io.ktor:ktor-jackson:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-metrics-micrometer:$ktorVersion")
-
     implementation("no.nav.pensjonopptjening:pensjon-opptjening-gcp-maskinporten-client:$maskinportenClientVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:$joseJwtVersion")
 
@@ -124,7 +115,15 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testImplementation("org.assertj:assertj-core:$assertJVersion")
-    testImplementation("com.github.tomakehurst:wiremock:$wiremockVersion")
+    testImplementation("org.wiremock:wiremock-jetty12:$wiremockVersion")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    testImplementation(("org.glassfish.jersey.core:jersey-server:$jerseyVersion"))
+    testImplementation(("org.glassfish.jersey.core:jersey-common:$jerseyVersion"))
+    testImplementation(("org.glassfish.jersey.core:jersey-client:$jerseyVersion"))
+    testImplementation(("org.glassfish.jersey.inject:jersey-hk2:$jerseyVersion"))
+    testImplementation("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
+    implementation("jakarta.ws.rs:jakarta.ws.rs-api:3.1.0")
 
     testImplementation("org.apache.kafka:kafka-streams-test-utils")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
@@ -135,25 +134,6 @@ dependencies {
 tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_21
-    }
-}
-
-tasks.named<Jar>("jar") {
-    archiveBaseName.set("app")
-
-    manifest {
-        attributes["Main-Class"] = "no.nav.pgi.skatt.inntekt.ApplicationKt"
-        attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
-            it.name
-        }
-    }
-
-    doLast {
-        configurations.runtimeClasspath.get().forEach {
-            val file = File("$buildDir/libs/${it.name}")
-            if (!file.exists())
-                it.copyTo(file)
-        }
     }
 }
 

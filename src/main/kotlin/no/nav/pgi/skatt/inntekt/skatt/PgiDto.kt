@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import net.logstash.logback.marker.Markers
-import no.nav.pensjon.samhandling.maskfnr.maskFnr
+import no.nav.pgi.skatt.inntekt.util.maskFnr
 import no.nav.pgi.skatt.inntekt.stream.mapping.PgiResponse
 import org.slf4j.LoggerFactory
 
@@ -15,6 +15,7 @@ private val LOG = LoggerFactory.getLogger(PgiDto::class.java)
 private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
 
 internal fun PgiResponse.mapToPGIDto(): PgiDto = try {
+    println("INPUT: ${this.body()}")
     objectMapper.readValue<PgiDto>(this.body())
         .also { it.validate(sekvensnummer()) }
 } catch (e: UnrecognizedPropertyException) {
