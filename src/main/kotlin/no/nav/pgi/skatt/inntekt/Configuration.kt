@@ -31,6 +31,4 @@ class Configuration {
     companion object {
         private val log = LoggerFactory.getLogger(ApplicationService::class.java)!!
     }
-
-
 }
