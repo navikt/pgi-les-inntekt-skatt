@@ -1,8 +1,10 @@
 package no.nav.pgi.skatt.inntekt.stream.mapping
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.pgi.domain.PensjonsgivendeInntektMetadata
+import no.nav.pgi.skatt.inntekt.Counters
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -14,7 +16,11 @@ private const val DUMMY_BODY = "test body"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class HandleErrorCodeFromSkattTest {
-    private val handleErrorCodesMapper: ValueMapper<PgiResponse, PgiResponse> = HandleErrorCodeFromSkatt()
+    private val handleErrorCodesMapper: ValueMapper<PgiResponse, PgiResponse> =
+        HandleErrorCodeFromSkatt(
+            counters = Counters(SimpleMeterRegistry())
+        )
+
 
     @Test
     internal fun `should return body when status 200`() {
@@ -28,7 +34,8 @@ internal class HandleErrorCodeFromSkattTest {
 
     @Test
     internal fun `should throw FeilmedlingFraSkattException when error message contains PGIF-whatever`() {
-        val httpStatus = 500 //ikke representativ for det man får for hver kode, men vi sjekker bare på !200.. tilstrekkelig for test.
+        val httpStatus =
+            500 //ikke representativ for det man får for hver kode, men vi sjekker bare på !200.. tilstrekkelig for test.
 
         (1..9).map { "PGIF-00$it" }.forEach {
             assertThrows<FeilmedlingFraSkattException> {
@@ -114,6 +121,6 @@ internal class HandleErrorCodeFromSkattTest {
         val mockHttpResponse = mockk<HttpResponse<String>>()
         every { mockHttpResponse.hint(String::class).body() } returns body
         every { mockHttpResponse.statusCode() } returns (statusCode)
-        return PgiResponse(mockHttpResponse, PensjonsgivendeInntektMetadata(0,0))
+        return PgiResponse(mockHttpResponse, PensjonsgivendeInntektMetadata(0, 0))
     }
 }

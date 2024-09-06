@@ -1,13 +1,13 @@
 package no.nav.pgi.skatt.inntekt.stream
 
 import com.fasterxml.jackson.core.JacksonException
-import io.prometheus.client.Counter
 import net.logstash.logback.marker.Markers
 import no.nav.pgi.skatt.inntekt.util.maskFnr
 import no.nav.pgi.domain.Hendelse
 import no.nav.pgi.domain.HendelseKey
 import no.nav.pgi.domain.PensjonsgivendeInntekt
 import no.nav.pgi.domain.serialization.PgiDomainSerializer
+import no.nav.pgi.skatt.inntekt.Counters
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.FetchPgiFromSkatt
 import no.nav.pgi.skatt.inntekt.stream.mapping.HandleErrorCodeFromSkatt
@@ -19,22 +19,14 @@ import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.KStream
 import org.slf4j.LoggerFactory
 
-private val hendelserToinntektProcessedTotal = Counter.build()
-    .name("pgi_hendelse_to_inntekt_processed_total")
-    .help("Antall hendelser hvor det er hentet inntekt totalt").register()
-private val hendelserToinntektProcessedByYear = Counter.build()
-    .name("pgi_hendelse_to_inntekt_processed_by_year")
-    .labelNames("year")
-    .help("Antall hendelser  hvor det er hentet inntekt per år").register()
 
-internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
+internal class PGITopology(val counters: Counters, private val pgiClient: PgiClient = PgiClient()) {
 
     internal fun topology(): Topology {
         val streamBuilder = StreamsBuilder()
         val stream: KStream<String, String> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
 
         stream
-            .peek { key, value -> println("PEEK 1: $key -> $value")}
             .filter(kafkaHendelseParsable())
             .map { key, value ->
                 KeyValue(
@@ -42,10 +34,9 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
                     PgiDomainSerializer().fromJson(Hendelse::class, value)
                 )
             }
-            .peek { key, value -> println("PEEK 2: $key -> $value")}
             .peek(logHendelseAboutToBeProcessed())
             .mapValues(FetchPgiFromSkatt(pgiClient))
-            .mapValues(HandleErrorCodeFromSkatt())
+            .mapValues(HandleErrorCodeFromSkatt(counters = counters))
             .filter(pgiResponseNotNull())
             .mapValues(MapToPgi())
             .peek(logAndCountInntektProcessed())
@@ -84,8 +75,8 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
 
     private fun logAndCountInntektProcessed(): (HendelseKey, PensjonsgivendeInntekt) -> Unit =
         { key: HendelseKey, pgi: PensjonsgivendeInntekt ->
-            hendelserToinntektProcessedTotal.inc()
-            hendelserToinntektProcessedByYear.labels(key.gjelderPeriode).inc()
+            counters.increaseHendelserToinntektProcessedTotal()
+            counters.increaseHendelserToInntektProcessedByYear(key.gjelderPeriode)
             LOG.info(
                 Markers.append("sekvensnummer", pgi.metaData.sekvensnummer.toString()),
                 "Lest inntekt Skatt: ${pgi.toString().maskFnr()}"

@@ -2,10 +2,12 @@ package no.nav.pgi.skatt.inntekt.stream
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import no.nav.pgi.domain.Hendelse
 import no.nav.pgi.domain.HendelseKey
 import no.nav.pgi.domain.HendelseMetadata
 import no.nav.pgi.domain.serialization.PgiDomainSerializer
+import no.nav.pgi.skatt.inntekt.Counters
 import no.nav.pgi.skatt.inntekt.common.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
@@ -42,7 +44,13 @@ internal class PGITopologyTest {
     )
     private val kafkaConfig = KafkaConfig(getKafkaTestEnv(), PlaintextStrategy())
     private val topologyDriver =
-        PgiTopologyTestDriver(PGITopology(pgiClient).topology(), kafkaConfig.streamProperties())
+        PgiTopologyTestDriver(
+            topology = PGITopology(
+                counters = Counters(SimpleMeterRegistry()),
+                pgiClient = pgiClient
+            ).topology(),
+            properties = kafkaConfig.streamProperties()
+        )
 
     val testInputTopic =
         topologyDriver.createInputTopic(PGI_HENDELSE_TOPIC)

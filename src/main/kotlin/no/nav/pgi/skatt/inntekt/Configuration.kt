@@ -16,10 +16,12 @@ class Configuration {
     @Bean
     fun applicationService(
         meterRegistry: MeterRegistry,
-    ) : ApplicationService {
+    ): ApplicationService {
         try {
             log.info("Configuration.applicationService: Starting ApplicationService")
-            val application = ApplicationService()
+            val application = ApplicationService(
+                counters = Counters(meterRegistry)
+            )
             application.start()
             log.info("Configuration.applicationService: Started ApplicationService")
             return application
