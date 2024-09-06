@@ -10,7 +10,7 @@ WORKDIR /app
 COPY java-opts.sh /app
 RUN chmod +x /app/java-opts.sh
 
-COPY build/libs/pgi-les-inntekt-skatt-plain.jar /app/app.jar
+COPY build/libs/pgi-les-inntekt-skatt.jar /app/app.jar
 
 ENV TZ="Europe/Oslo"
 
