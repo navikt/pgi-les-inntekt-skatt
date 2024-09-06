@@ -1,7 +1,7 @@
 package no.nav.pgi.skatt.inntekt.stream.mapping
 
-import io.prometheus.client.Counter
 import net.logstash.logback.marker.Markers
+import no.nav.pgi.skatt.inntekt.Counters
 import no.nav.pgi.skatt.inntekt.util.maskFnr
 import no.nav.pgi.skatt.inntekt.skatt.PgiFolketrygdenErrorCodes.Companion.pgiFolketrygdenErrorCodes
 import no.nav.pgi.skatt.inntekt.skatt.getFirstMatch
@@ -9,22 +9,18 @@ import org.apache.kafka.streams.kstream.ValueMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-private val pgiLesInntektSkattResponseCounter = Counter.build()
-    .name("pgi_les_inntekt_skatt_response_counter")
-    .labelNames("statusCode")
-    .help("Count response status codes from popp")
-    .register()
 
-internal class HandleErrorCodeFromSkatt : ValueMapper<PgiResponse, PgiResponse> {
+internal class HandleErrorCodeFromSkatt(val counters: Counters) : ValueMapper<PgiResponse, PgiResponse> {
     override fun apply(response: PgiResponse): PgiResponse {
         return when {
             response.statusCode() == 200 -> {
-                pgiLesInntektSkattResponseCounter.labels("${response.statusCode()}").inc()
+                counters.increasePgiLesInntektSkattResponseCounter("${response.statusCode()}")
                 response
             }
 
             else -> {
-                pgiLesInntektSkattResponseCounter.labels(createErrorLabel(response)).inc()
+
+                counters.increasePgiLesInntektSkattResponseCounter(createErrorLabel(response))
                 val marker = Markers.append("sekvensnummer", response.sekvensnummer().toString())
                 LOG.error(marker, "Call to pgi failed with code: ${response.statusCode()}, body: ${response.body()} and fnr ${response.identifikator().maskFnr()} ")
                 SECURE_LOG.error(marker, "Call to pgi failed with code: ${response.statusCode()}, body: ${response.body()} and fnr ${response.identifikator()} ")

@@ -6,8 +6,18 @@ import no.nav.pgi.skatt.inntekt.stream.PGIStream
 import no.nav.pgi.skatt.inntekt.stream.PGITopology
 import org.slf4j.LoggerFactory
 
-class ApplicationService(kafkaConfig: KafkaConfig = KafkaConfig(), pgiClient: PgiClient = PgiClient()) {
-    private val pgiStream = PGIStream(kafkaConfig.streamProperties(), PGITopology(pgiClient))
+class ApplicationService(
+    counters: Counters,
+    kafkaConfig: KafkaConfig = KafkaConfig(),
+    pgiClient: PgiClient = PgiClient()
+) {
+    private val pgiStream = PGIStream(
+        streamProperties = kafkaConfig.streamProperties(),
+        pgiTopology = PGITopology(
+            counters = counters,
+            pgiClient = pgiClient
+        )
+    )
 
     internal fun start() {
         addShutdownHook()
