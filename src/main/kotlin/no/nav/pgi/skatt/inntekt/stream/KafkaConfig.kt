@@ -1,6 +1,6 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import no.nav.pensjon.samhandling.env.getVal
+import no.nav.pgi.skatt.inntekt.util.getVal
 import org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
 import org.apache.kafka.common.serialization.Serdes

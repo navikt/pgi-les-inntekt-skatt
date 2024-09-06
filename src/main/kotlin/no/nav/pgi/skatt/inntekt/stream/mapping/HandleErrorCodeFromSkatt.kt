@@ -2,7 +2,7 @@ package no.nav.pgi.skatt.inntekt.stream.mapping
 
 import io.prometheus.client.Counter
 import net.logstash.logback.marker.Markers
-import no.nav.pensjon.samhandling.maskfnr.maskFnr
+import no.nav.pgi.skatt.inntekt.util.maskFnr
 import no.nav.pgi.skatt.inntekt.skatt.PgiFolketrygdenErrorCodes.Companion.pgiFolketrygdenErrorCodes
 import no.nav.pgi.skatt.inntekt.skatt.getFirstMatch
 import org.apache.kafka.streams.kstream.ValueMapper

@@ -1,38 +1,33 @@
 package no.nav.pgi.skatt.inntekt.mock
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.aResponse
-import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.client.WireMock.matching
-import com.github.tomakehurst.wiremock.client.WireMock.ok
-import com.github.tomakehurst.wiremock.client.WireMock.serverError
-import com.github.tomakehurst.wiremock.client.WireMock.unauthorized
-import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
-import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
-import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pgi.domain.Hendelse
 import no.nav.pgi.skatt.inntekt.skatt.PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY
 import no.nav.pgi.skatt.inntekt.skatt.SKATT_INNTEKT_PATH_ENV_KEY
+import org.junit.jupiter.api.extension.RegisterExtension
 
 
-class PensjonsgivendeInntektMock {
-    private var config = wireMockConfig().port(PORT)
-        .extensions(ResponseTemplateTransformer(false))
-    private var mock = WireMockServer(config).also { it.start() }
+object PensjonsgivendeInntektMock {
 
-    internal fun reset() {
-        mock.resetAll()
-    }
+    const val PORT = 8097
+    private const val YEAR_FNR = """/[0-9]{4}/[0-9]{11}"""
+    private const val TOKEN = """.*\..*\..*"""
 
-    internal fun stop() {
-        mock.stop()
-    }
+    internal const val HOST = "http://localhost:$PORT"
+    internal const val VERSJON_RETTIGHETSPAKKE = "/v1/navPensjonOpptjening"
 
-    internal fun callsToMock() = mock.serveEvents.requests.size
+    internal val PGI_CLIENT_ENV_VARIABLES = mapOf(
+        PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to HOST,
+        SKATT_INNTEKT_PATH_ENV_KEY to VERSJON_RETTIGHETSPAKKE,
+    )
 
-    internal fun `stub pensjongivende inntekt endpoint`() {
-        mock.stubFor(
+    fun WireMockExtension.callsToMock() = this.serveEvents.requests.size
+
+    internal fun WireMockExtension.`stub pensjongivende inntekt endpoint`() {
+        this.stubFor(
             get(urlPathMatching("$VERSJON_RETTIGHETSPAKKE$YEAR_FNR"))
                 .atPriority(10)
                 .withName("ape")
@@ -46,24 +41,27 @@ class PensjonsgivendeInntektMock {
         )
     }
 
-    internal fun `stub pensjongivende inntekt`(inntektsaar: String, norskPersonidentifikator: String) {
-        mock.stubFor(
+    internal fun WireMockExtension.`stub pensjongivende inntekt`(
+        inntektsaar: String,
+        norskPersonidentifikator: String
+    ) {
+        this.stubFor(
             get(urlPathEqualTo("""$VERSJON_RETTIGHETSPAKKE/$inntektsaar/$norskPersonidentifikator"""))
                 .atPriority(9)
                 .willReturn(ok(createResponse(inntektsaar, norskPersonidentifikator)))
         )
     }
 
-    internal fun `stub error code from skatt`(hendelse: Hendelse, errorCode: String) {
-        mock.stubFor(
+    internal fun WireMockExtension.`stub error code from skatt`(hendelse: Hendelse, errorCode: String) {
+        this.stubFor(
             get(urlPathMatching("$VERSJON_RETTIGHETSPAKKE/${hendelse.gjelderPeriode}/${hendelse.identifikator}"))
                 .atPriority(1)
                 .willReturn(serverError().withBody(errorCode))
         )
     }
 
-    internal fun `stub 401 from skatt`(inntektsaar: String, norskPersonidentifikator: String) {
-        mock.stubFor(
+    internal fun WireMockExtension.`stub 401 from skatt`(inntektsaar: String, norskPersonidentifikator: String) {
+        this.stubFor(
             get(urlPathMatching("$VERSJON_RETTIGHETSPAKKE/$inntektsaar/$norskPersonidentifikator"))
                 .atPriority(1)
                 .willReturn(unauthorized())
@@ -101,19 +99,4 @@ class PensjonsgivendeInntektMock {
                     }
                   ]
                 }"""
-
-
-    companion object {
-        private const val PORT = 8097
-        private const val YEAR_FNR = """/[0-9]{4}/[0-9]{11}"""
-        private const val TOKEN = """.*\..*\..*"""
-
-        internal const val HOST = "http://localhost:$PORT"
-        internal const val VERSJON_RETTIGHETSPAKKE = "/v1/navPensjonOpptjening"
-
-        internal val PGI_CLIENT_ENV_VARIABLES = mapOf(
-            PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY to HOST,
-            SKATT_INNTEKT_PATH_ENV_KEY to VERSJON_RETTIGHETSPAKKE,
-        )
-    }
 }

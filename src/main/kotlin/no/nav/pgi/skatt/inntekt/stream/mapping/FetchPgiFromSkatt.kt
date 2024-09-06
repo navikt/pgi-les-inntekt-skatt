@@ -1,6 +1,6 @@
 package no.nav.pgi.skatt.inntekt.stream.mapping
 
-import no.nav.pensjon.samhandling.maskfnr.maskFnr
+import no.nav.pgi.skatt.inntekt.util.maskFnr
 import no.nav.pgi.domain.Hendelse
 import no.nav.pgi.domain.PensjonsgivendeInntektMetadata
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
