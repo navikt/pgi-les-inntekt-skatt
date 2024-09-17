@@ -27,7 +27,7 @@ class ApplicationService(
     }
 
     internal fun stop() {
-        LOG.info("Stop is called closing pgiStream and naisServer")
+        LOG.info("Stop is called closing pgiStream")
         Thread { pgiStream.close() }.start()
     }
 
@@ -35,7 +35,7 @@ class ApplicationService(
         LOG.info("Adding shutdown hook")
         Runtime.getRuntime().addShutdownHook(Thread {
             try {
-                LOG.info("Shutdown hook triggered closing pgiStream and naisServer")
+                LOG.info("Shutdown hook triggered closing pgiStream")
                 pgiStream.close()
             } catch (e: Exception) {
                 LOG.error("Error while shutting down", e)

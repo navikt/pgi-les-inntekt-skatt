@@ -4,9 +4,9 @@ import no.nav.pensjon.opptjening.gcp.maskinporten.client.MaskinportenClient
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import jakarta.ws.rs.core.UriBuilder
 import no.nav.pgi.skatt.inntekt.util.getVal
 import no.nav.pgi.skatt.inntekt.util.verifyEnvironmentVariables
+import java.net.URI
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
@@ -57,18 +57,20 @@ class PgiClient(
     ): HttpResponse<T> = rateLimit.limit { httpClient.send(httpRequest, responseBodyHandler) }
 
 
-    internal fun createPgiRequest(inntektsaar: String, norskPersonidentifikator: String) =
-        HttpRequest.newBuilder().uri(
-            UriBuilder.fromPath(skattHost)
-                .path(skattPath)
-                .path(inntektsaar)
-                .path(norskPersonidentifikator)
-                .build()
-        )
+    internal fun createPgiRequest(
+        inntektsaar: String,
+        norskPersonidentifikator: String
+    ): HttpRequest {
+
+        val requestUrl = URI("$skattHost$skattPath/$inntektsaar/$norskPersonidentifikator")
+
+        return HttpRequest.newBuilder()
+            .uri(requestUrl)
             .GET()
             .setHeader("Authorization", "Bearer ${maskinporten.token(scope)}")
             .setHeader("Accept", "application/json")
             .build()
+    }
 }
 
 class RateLimit(
