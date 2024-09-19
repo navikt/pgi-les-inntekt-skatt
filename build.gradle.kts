@@ -6,8 +6,8 @@ val maskinportenClientVersion = "0.1.0"
 val joseJwtVersion = "9.40"
 // val kafkaVersion = "3.8.0"
 val pgiDomainVersion = "0.0.5"
-val micrometerVersion = "1.13.3"
-val logbackVersion = "1.4.11"
+val micrometerVersion = "1.13.4"
+val logbackVersion = "1.4.14"
 val logstashVersion = "5.2"
 val slf4jVersion = "2.0.9"
 val log4jVersion = "2.20.0"
@@ -20,9 +20,9 @@ val springBootVersion = "3.3.3"
 val springKafkaTestVersion = "3.2.3"
 
 // overstyrte transitive avhengigheter
-val guavaVersion = "32.1.2-jre"
-val snappyJavaVersion = "1.1.10.5"
-val snakeYamlVersion = "2.2"
+val guavaVersion = "33.3.0-jre"
+val snappyJavaVersion = "1.1.10.6"
+// val snakeYamlVersion = "2.2"
 val commonsCompressVersion = "1.24.0"
 
 // påkrevd av pgi-domain
@@ -75,23 +75,21 @@ repositories {
 }
 
 dependencies {
-// påkrevd av pgi-domain
+    implementation(kotlin("stdlib"))
+    implementation("jakarta.ws.rs:jakarta.ws.rs-api:3.1.0")
+
+    // påkrevd av pgi-domain
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 
-
-    // TODO: Disse var avhengigheter fra confluent-avro
     implementation("no.nav.pensjonopptjening:pensjon-opptjening-gcp-maskinporten-client:$maskinportenClientVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:$joseJwtVersion")
 
     implementation("org.apache.kafka:kafka-streams")
     implementation("org.apache.kafka:kafka-clients")
 
-
     implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
-    testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
-//    testImplementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
+    //    testImplementation("org.apache.kafka:kafka_2.13:$kafkaVersion")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus")
@@ -109,8 +107,11 @@ dependencies {
     // Overstyrer noen transitive avhengigheter (pga sikkerhet m.m.)
     implementation("com.google.guava:guava:$guavaVersion")
     implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion")
-    implementation("org.yaml:snakeyaml:$snakeYamlVersion")
+//    implementation("org.yaml:snakeyaml:$snakeYamlVersion")
     implementation("org.apache.commons:commons-compress:$commonsCompressVersion")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+    testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
@@ -123,12 +124,10 @@ dependencies {
     testImplementation(("org.glassfish.jersey.core:jersey-client:$jerseyVersion"))
     testImplementation(("org.glassfish.jersey.inject:jersey-hk2:$jerseyVersion"))
     testImplementation("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
-    implementation("jakarta.ws.rs:jakarta.ws.rs-api:3.1.0")
 
     testImplementation("org.apache.kafka:kafka-streams-test-utils")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVerion")
-    implementation(kotlin("stdlib"))
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }
 
 tasks.withType<KotlinCompile> {
@@ -146,5 +145,5 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "8.10"
+    gradleVersion = "8.10.1"
 }

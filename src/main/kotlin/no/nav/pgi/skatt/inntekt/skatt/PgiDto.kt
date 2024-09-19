@@ -15,7 +15,6 @@ private val LOG = LoggerFactory.getLogger(PgiDto::class.java)
 private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
 
 internal fun PgiResponse.mapToPGIDto(): PgiDto = try {
-    println("INPUT: ${this.body()}")
     objectMapper.readValue<PgiDto>(this.body())
         .also { it.validate(sekvensnummer()) }
 } catch (e: UnrecognizedPropertyException) {
