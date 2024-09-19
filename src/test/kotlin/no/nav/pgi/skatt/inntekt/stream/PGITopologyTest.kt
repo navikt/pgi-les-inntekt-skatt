@@ -168,7 +168,6 @@ internal class PGITopologyTest {
             WireMockExtension.newInstance()
                 .options(
                     WireMockConfiguration.wireMockConfig().port(PORT)
-//                        .templatingEnabled(false)
                 )
                 .build()!!
     }
