@@ -23,7 +23,7 @@ val springKafkaTestVersion = "3.2.3"
 val guavaVersion = "33.3.0-jre"
 val snappyJavaVersion = "1.1.10.6"
 // val snakeYamlVersion = "2.2"
-val commonsCompressVersion = "1.24.0"
+val commonsCompressVersion = "1.26.0"
 
 // påkrevd av pgi-domain
 val jacksonVersion = "2.17.2"
