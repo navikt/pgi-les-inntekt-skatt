@@ -1,41 +1,51 @@
 package no.nav.pgi.skatt.inntekt.stream
 
-import io.prometheus.client.Counter
+import com.fasterxml.jackson.core.JacksonException
 import net.logstash.logback.marker.Markers
-import no.nav.pensjon.samhandling.maskfnr.maskFnr
+import no.nav.pgi.skatt.inntekt.util.maskFnr
+import no.nav.pgi.domain.Hendelse
+import no.nav.pgi.domain.HendelseKey
+import no.nav.pgi.domain.PensjonsgivendeInntekt
+import no.nav.pgi.domain.serialization.PgiDomainSerializer
+import no.nav.pgi.skatt.inntekt.Counters
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.stream.mapping.FetchPgiFromSkatt
 import no.nav.pgi.skatt.inntekt.stream.mapping.HandleErrorCodeFromSkatt
-import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgiAvro
+import no.nav.pgi.skatt.inntekt.stream.mapping.MapToPgi
 import no.nav.pgi.skatt.inntekt.stream.mapping.PgiResponse
-import no.nav.samordning.pgi.schema.Hendelse
-import no.nav.samordning.pgi.schema.HendelseKey
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
+import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.KStream
 import org.slf4j.LoggerFactory
 
-private val hendelserToinntektProcessedTotal = Counter.build()
-    .name("pgi_hendelse_to_inntekt_processed_total")
-    .help("Antall hendelser hvor det er hentet inntekt totalt").register()
-private val hendelserToinntektProcessedByYear = Counter.build()
-    .name("pgi_hendelse_to_inntekt_processed_by_year")
-    .labelNames("year")
-    .help("Antall hendelser  hvor det er hentet inntekt per år").register()
 
-internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
+internal class PGITopology(val counters: Counters, private val pgiClient: PgiClient = PgiClient()) {
 
     internal fun topology(): Topology {
         val streamBuilder = StreamsBuilder()
-        val stream: KStream<HendelseKey, Hendelse> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
+        val stream: KStream<String, String> = streamBuilder.stream(PGI_HENDELSE_TOPIC)
 
-        stream.peek(logHendelseAboutToBeProcessed())
+        stream
+            .filter(kafkaHendelseParsable())
+            .map { key, value ->
+                KeyValue(
+                    PgiDomainSerializer().fromJson(HendelseKey::class, key),
+                    PgiDomainSerializer().fromJson(Hendelse::class, value)
+                )
+            }
+            .peek(logHendelseAboutToBeProcessed())
             .mapValues(FetchPgiFromSkatt(pgiClient))
-            .mapValues(HandleErrorCodeFromSkatt())
+            .mapValues(HandleErrorCodeFromSkatt(counters = counters))
             .filter(pgiResponseNotNull())
-            .mapValues(MapToPgiAvro())
+            .mapValues(MapToPgi())
             .peek(logAndCountInntektProcessed())
+            .map { key, value ->
+                KeyValue(
+                    PgiDomainSerializer().toJson(key),
+                    PgiDomainSerializer().toJson(value)
+                )
+            }
             .to(PGI_INNTEKT_TOPIC)
 
         return streamBuilder.build()
@@ -43,16 +53,34 @@ internal class PGITopology(private val pgiClient: PgiClient = PgiClient()) {
 
     private fun logHendelseAboutToBeProcessed(): (HendelseKey, Hendelse) -> Unit =
         { _: HendelseKey, hendelse: Hendelse ->
-            LOG.info(Markers.append("sekvensnummer", hendelse.getSekvensnummer().toString()),"""Started processing hendelse ${hendelse.toString().maskFnr()}""")
+            LOG.info(
+                Markers.append("sekvensnummer", hendelse.sekvensnummer.toString()),
+                """Started processing hendelse ${hendelse.toString().maskFnr()}"""
+            )
         }
 
     private fun pgiResponseNotNull(): (HendelseKey, PgiResponse?) -> Boolean = { _, pgiResponse -> pgiResponse != null }
 
+    private fun kafkaHendelseParsable(): (String, String) -> Boolean =
+        { key, value ->
+            try {
+                PgiDomainSerializer().fromJson(HendelseKey::class, key)
+                PgiDomainSerializer().fromJson(Hendelse::class, value)
+                true
+            } catch (e: JacksonException) {
+                LOG.error("Failed to deserialize kafka message, discarding it", e)
+                false
+            }
+        }
+
     private fun logAndCountInntektProcessed(): (HendelseKey, PensjonsgivendeInntekt) -> Unit =
         { key: HendelseKey, pgi: PensjonsgivendeInntekt ->
-            hendelserToinntektProcessedTotal.inc()
-            hendelserToinntektProcessedByYear.labels(key.getGjelderPeriode()).inc()
-            LOG.info(Markers.append("sekvensnummer", pgi.getMetaData().getSekvensnummer().toString()), "Lest inntekt Skatt: ${pgi.toString().maskFnr()}")
+            counters.increaseHendelserToinntektProcessedTotal()
+            counters.increaseHendelserToInntektProcessedByYear(key.gjelderPeriode)
+            LOG.info(
+                Markers.append("sekvensnummer", pgi.metaData.sekvensnummer.toString()),
+                "Lest inntekt Skatt: ${pgi.toString().maskFnr()}"
+            )
         }
 
     private companion object {

@@ -1,6 +1,6 @@
 package no.nav.pgi.skatt.inntekt.stream.mapping
 
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntektMetadata
+import no.nav.pgi.domain.PensjonsgivendeInntektMetadata
 import java.net.http.HttpResponse
 
 data class PgiResponse(
@@ -12,5 +12,5 @@ data class PgiResponse(
     internal fun body() = httpResponse.body()
     internal fun metadata() = metadata
     internal fun identifikator() = identifikator
-    internal fun sekvensnummer() = metadata.getSekvensnummer()
+    internal fun sekvensnummer() = metadata.sekvensnummer
 }

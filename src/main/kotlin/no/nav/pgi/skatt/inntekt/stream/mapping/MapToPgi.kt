@@ -1,23 +1,23 @@
 package no.nav.pgi.skatt.inntekt.stream.mapping
 
+import no.nav.pgi.domain.PensjonsgivendeInntekt
+import no.nav.pgi.domain.PensjonsgivendeInntektPerOrdning
+import no.nav.pgi.domain.Skatteordning
 import no.nav.pgi.skatt.inntekt.skatt.PgiPerOrdningDto
 import no.nav.pgi.skatt.inntekt.skatt.mapToPGIDto
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntektPerOrdning
-import no.nav.samordning.pgi.schema.Skatteordning
 import org.apache.kafka.streams.kstream.ValueMapper
 
 private const val FASTLAND = "FASTLAND"
 private const val SVALBARD = "SVALBARD"
 private const val KILDESKATT_PAA_LOENN = "KILDESKATT_PAA_LOENN"
 
-internal class MapToPgiAvro : ValueMapper<PgiResponse, PensjonsgivendeInntekt> {
+internal class MapToPgi : ValueMapper<PgiResponse, PensjonsgivendeInntekt> {
 
     override fun apply(pgiResponse: PgiResponse): PensjonsgivendeInntekt {
         val pgiDto = pgiResponse.mapToPGIDto()
         return PensjonsgivendeInntekt(
-            pgiDto.norskPersonidentifikator,
-            pgiDto.inntektsaar,
+            pgiDto.norskPersonidentifikator!!, // TODO: !!
+            pgiDto.inntektsaar!!,
             toPensjonsgivendeInntektPerOrdning(pgiDto.pensjonsgivendeInntekt),
             pgiResponse.metadata()
         )
@@ -27,7 +27,7 @@ internal class MapToPgiAvro : ValueMapper<PgiResponse, PensjonsgivendeInntekt> {
         pensjonsgivendeInntekt.map {
             PensjonsgivendeInntektPerOrdning(
                 toSkatteordningEnum(it.skatteordning),
-                it.datoForFastsetting,
+                it.datoForFastsetting!!, // TODO: !!
                 it.pensjonsgivendeInntektAvLoennsinntekt,
                 it.pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel,
                 it.pensjonsgivendeInntektAvNaeringsinntekt,

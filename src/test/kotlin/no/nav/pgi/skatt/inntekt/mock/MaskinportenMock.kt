@@ -10,15 +10,11 @@ import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import no.nav.pensjon.opptjening.gcp.maskinporten.client.config.MaskinportenEnvVariableConfigCreator.Companion.MASKINPORTEN_CLIENT_ID_KEY
-import no.nav.pensjon.opptjening.gcp.maskinporten.client.config.MaskinportenEnvVariableConfigCreator.Companion.MASKINPORTEN_WELL_KNOWN_URL_KEY
-import no.nav.pensjon.opptjening.gcp.maskinporten.client.config.MaskinportenEnvVariableConfigCreator.Companion.MASKINPORTEN_CLIENT_JWK_KEY
-import no.nav.pensjon.opptjening.gcp.maskinporten.client.config.MaskinportenEnvVariableConfigCreator.Companion.MASKINPORTEN_JWT_EXPIRATION_TIME_IN_SECONDS_KEY
-import no.nav.pensjon.opptjening.gcp.maskinporten.client.config.MaskinportenEnvVariableConfigCreator.Companion.MASKINPORTEN_SCOPES_KEY
 import java.util.*
 
 
 internal class MaskinportenMock {
+
     private var mock = WireMockServer(PORT).also { it.start() }
     private val privateKey: RSAKey = RSAKeyGenerator(2048).keyID("123").generate()
 
@@ -56,6 +52,12 @@ internal class MaskinportenMock {
         private const val PORT = 8096
         private const val TOKEN_PATH = "/token"
         private const val MASKINPORTEN_MOCK_HOST = "http://localhost:$PORT"
+
+        internal val MASKINPORTEN_WELL_KNOWN_URL_KEY = "MASKINPORTEN_WELL_KNOWN_URL"
+        internal val MASKINPORTEN_CLIENT_ID_KEY = "MASKINPORTEN_CLIENT_ID"
+        internal val MASKINPORTEN_CLIENT_JWK_KEY = "MASKINPORTEN_CLIENT_JWK"
+        internal val MASKINPORTEN_SCOPES_KEY = "MASKINPORTEN_SCOPES"
+        internal val MASKINPORTEN_JWT_EXPIRATION_TIME_IN_SECONDS_KEY = "MASKINPORTEN_JWT_EXPIRATION_TIME_IN_SECONDS"
 
         val MASKINPORTEN_CLIENT_ENV_VARIABLES = mapOf(
             MASKINPORTEN_SCOPES_KEY to "testScope",
