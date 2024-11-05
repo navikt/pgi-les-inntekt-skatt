@@ -7,6 +7,8 @@ For å se hvordan hendelsene publiseres til ```privat-pgi-hendelse```, se følge
 
 Dokumentasjon REST tjeneste vi bruker fra Skatteetaten: [Pensjonsgivende inntekt for folketrygden API](https://skatteetaten.github.io/api-dokumentasjon/api/pgi_folketrygden) 
 
+Dokumentassjon Pensjonsgivendeinntekt for folketrygden API: [SwaggerHub]([Pensjonsgivendeinntekt for folketrygden API](https://app.swaggerhub.com/apis/skatteetaten/pensjonsgivendeinntekt-for-folketrygden-api)
+
 ## Bygge lokalt
 
 ### Java
