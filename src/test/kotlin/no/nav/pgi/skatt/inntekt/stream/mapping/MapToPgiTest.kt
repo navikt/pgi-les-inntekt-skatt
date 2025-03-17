@@ -2,11 +2,11 @@ package no.nav.pgi.skatt.inntekt.stream.mapping
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.pgi.domain.PensjonsgivendeInntekt
+import no.nav.pgi.domain.PensjonsgivendeInntektMetadata
 import no.nav.pgi.skatt.inntekt.skatt.InntektDtoException
 import no.nav.pgi.skatt.inntekt.skatt.InntektPerOrdningDtoException
 import no.nav.pgi.skatt.inntekt.skatt.InvalidJsonMappingException
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntektMetadata
 import org.apache.kafka.streams.kstream.ValueMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -26,18 +26,18 @@ private const val INNTEKT_AV_LOENNSINNTEKT_BARE_PENSJONSDEL = 2L
 private const val INNTEKT_AV_NAERINGSINNTEKT = 3L
 private const val INNTEKT_AV_NAERINGSINNTEKT_FRA_FISKE_FANGST_ELLER_FAMILIEBARNEHAGE = 4L
 
-internal class MapToPgiAvroTest {
+internal class MapToPgiTest {
 
-    private val mapper: ValueMapper<PgiResponse, PensjonsgivendeInntekt> = MapToPgiAvro()
+    private val mapper: ValueMapper<PgiResponse, PensjonsgivendeInntekt> = MapToPgi()
 
     @Test
     fun `Should map fnr and inntektsaar from PgiResponse to avro`() {
         val pgiResponse = createPgiResponse(pensjonsgivendeInntekt = emptyList())
         val pensjonsgivendeInntekt: PensjonsgivendeInntekt = mapper.apply(pgiResponse)
 
-        assertEquals(FNR, pensjonsgivendeInntekt.getNorskPersonidentifikator())
-        assertEquals(INNTEKTS_AAR, pensjonsgivendeInntekt.getInntektsaar())
-        assertTrue(pensjonsgivendeInntekt.getPensjonsgivendeInntekt().isEmpty())
+        assertEquals(FNR, pensjonsgivendeInntekt.norskPersonidentifikator)
+        assertEquals(INNTEKTS_AAR, pensjonsgivendeInntekt.inntektsaar)
+        assertTrue(pensjonsgivendeInntekt.pensjonsgivendeInntekt.isEmpty())
     }
 
     @Test
@@ -56,17 +56,23 @@ internal class MapToPgiAvroTest {
         val kildeskattPaaLoennInntekt = pensjonsgivendeInntekt.getPgiPerOrdning(SKATTEORDNING_KILDESKATT_PAA_LOENN)
         val svalbardInntekt = pensjonsgivendeInntekt.getPgiPerOrdning(SKATTEORDNING_SVALBARD)
 
-        assertEquals(3, pensjonsgivendeInntekt.getPensjonsgivendeInntekt().size)
+        assertEquals(3, pensjonsgivendeInntekt.pensjonsgivendeInntekt.size)
 
-        assertEquals(DATO_FOR_FASTSETTING, fastlandInntekt.getDatoForFastsetting())
-        assertEquals(INNTEKT_AV_LOENNSINNTEKT, fastlandInntekt.getPensjonsgivendeInntektAvLoennsinntekt())
-        assertEquals(INNTEKT_AV_LOENNSINNTEKT_BARE_PENSJONSDEL, fastlandInntekt.getPensjonsgivendeInntektAvLoennsinntektBarePensjonsdel())
-        assertEquals(INNTEKT_AV_NAERINGSINNTEKT, fastlandInntekt.getPensjonsgivendeInntektAvNaeringsinntekt())
-        assertEquals(INNTEKT_AV_NAERINGSINNTEKT_FRA_FISKE_FANGST_ELLER_FAMILIEBARNEHAGE, fastlandInntekt.getPensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage())
+        assertEquals(DATO_FOR_FASTSETTING, fastlandInntekt.datoForFastsetting)
+        assertEquals(INNTEKT_AV_LOENNSINNTEKT, fastlandInntekt.pensjonsgivendeInntektAvLoennsinntekt)
+        assertEquals(
+            INNTEKT_AV_LOENNSINNTEKT_BARE_PENSJONSDEL,
+            fastlandInntekt.pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel
+        )
+        assertEquals(INNTEKT_AV_NAERINGSINNTEKT, fastlandInntekt.pensjonsgivendeInntektAvNaeringsinntekt)
+        assertEquals(
+            INNTEKT_AV_NAERINGSINNTEKT_FRA_FISKE_FANGST_ELLER_FAMILIEBARNEHAGE,
+            fastlandInntekt.pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage
+        )
 
-        assertEquals(SKATTEORDNING_FASTLAND, fastlandInntekt.getSkatteordning().name)
-        assertEquals(SKATTEORDNING_KILDESKATT_PAA_LOENN, kildeskattPaaLoennInntekt.getSkatteordning().name)
-        assertEquals(SKATTEORDNING_SVALBARD, svalbardInntekt.getSkatteordning().name)
+        assertEquals(SKATTEORDNING_FASTLAND, fastlandInntekt.skatteordning.name)
+        assertEquals(SKATTEORDNING_KILDESKATT_PAA_LOENN, kildeskattPaaLoennInntekt.skatteordning.name)
+        assertEquals(SKATTEORDNING_SVALBARD, svalbardInntekt.skatteordning.name)
     }
 
     @Test
@@ -85,11 +91,11 @@ internal class MapToPgiAvroTest {
         val pensjonsgivendeInntekt = mapper.apply(pgiResponse)
         val fastland = pensjonsgivendeInntekt.getPgiPerOrdning(SKATTEORDNING_FASTLAND)
 
-        assertEquals(FNR, pensjonsgivendeInntekt.getNorskPersonidentifikator())
-        assertEquals(INNTEKTS_AAR, pensjonsgivendeInntekt.getInntektsaar())
-        assertEquals(1, pensjonsgivendeInntekt.getPensjonsgivendeInntekt().size)
-        assertEquals(SKATTEORDNING_FASTLAND, fastland.getSkatteordning().name)
-        assertEquals(DATO_FOR_FASTSETTING, fastland.getDatoForFastsetting())
+        assertEquals(FNR, pensjonsgivendeInntekt.norskPersonidentifikator)
+        assertEquals(INNTEKTS_AAR, pensjonsgivendeInntekt.inntektsaar)
+        assertEquals(1, pensjonsgivendeInntekt.pensjonsgivendeInntekt.size)
+        assertEquals(SKATTEORDNING_FASTLAND, fastland.skatteordning.name)
+        assertEquals(DATO_FOR_FASTSETTING, fastland.datoForFastsetting)
     }
 
     @Test
@@ -100,8 +106,8 @@ internal class MapToPgiAvroTest {
         val pgiResponse = createPgiResponse(metadata = PensjonsgivendeInntektMetadata(retries, sekvensnummer))
         val pensjonsgivendeInntekt: PensjonsgivendeInntekt = mapper.apply(pgiResponse)
 
-        assertEquals(retries,pensjonsgivendeInntekt.getMetaData().getRetries())
-        assertEquals(sekvensnummer, pensjonsgivendeInntekt.getMetaData().getSekvensnummer())
+        assertEquals(retries, pensjonsgivendeInntekt.metaData.retries)
+        assertEquals(sekvensnummer, pensjonsgivendeInntekt.metaData.sekvensnummer)
     }
 
     @Test
@@ -112,14 +118,15 @@ internal class MapToPgiAvroTest {
               "pensjonsgivendeInntekt": []
             }
         """
-        val pgiResponse = PgiResponse(mockkHttpResponse(body), PensjonsgivendeInntektMetadata())
+        val pgiResponse = PgiResponse(mockkHttpResponse(body), PensjonsgivendeInntektMetadata(0, 0))
 
         assertThrows<InntektDtoException> { mapper.apply(pgiResponse) }
     }
 
     @Test
     fun `Throws MissingSkatteordningException when skatteordning string does not exist in skatteordning enum`() {
-        val pgiResponse = createPgiResponse(pensjonsgivendeInntekt = listOf(createInntektPerSkatteordning(skatteordning = "NotValidSkatteordning")))
+        val pgiResponse =
+            createPgiResponse(pensjonsgivendeInntekt = listOf(createInntektPerSkatteordning(skatteordning = "NotValidSkatteordning")))
         assertThrows<MissingSkatteordningException> { mapper.apply(pgiResponse) }
     }
 
@@ -141,13 +148,15 @@ internal class MapToPgiAvroTest {
 
     @Test
     fun `Throws InntektPerOrdningDtoException when skatteordning is null`() {
-        val pgiResponse = createPgiResponse(pensjonsgivendeInntekt = listOf(createInntektPerSkatteordning(skatteordning = null)))
+        val pgiResponse =
+            createPgiResponse(pensjonsgivendeInntekt = listOf(createInntektPerSkatteordning(skatteordning = null)))
         assertThrows<InntektPerOrdningDtoException> { mapper.apply(pgiResponse) }
     }
 
     @Test
     fun `Throws InntektPerOrdningDtoException when datoForFastsetting is null`() {
-        val pgiResponse = createPgiResponse(pensjonsgivendeInntekt = listOf(createInntektPerSkatteordning(datoForFastsetting = null)))
+        val pgiResponse =
+            createPgiResponse(pensjonsgivendeInntekt = listOf(createInntektPerSkatteordning(datoForFastsetting = null)))
         assertThrows<InntektPerOrdningDtoException> { mapper.apply(pgiResponse) }
     }
 
@@ -156,7 +165,7 @@ internal class MapToPgiAvroTest {
         inntektsaar: Long? = INNTEKTS_AAR,
         pensjonsgivendeInntekt: List<String> = emptyList(),
         extraValue: Long? = null,
-        metadata: PensjonsgivendeInntektMetadata = PensjonsgivendeInntektMetadata()
+        metadata: PensjonsgivendeInntektMetadata = PensjonsgivendeInntektMetadata(0, 0)
     ): PgiResponse {
         val mockHttpResponse = mockkHttpResponse(
             createPgiResponseBody(
@@ -204,5 +213,5 @@ internal class MapToPgiAvroTest {
             }"""
 
     private fun PensjonsgivendeInntekt.getPgiPerOrdning(skatteordning: String) =
-        getPensjonsgivendeInntekt().find { it.getSkatteordning().name == skatteordning }!!
+        pensjonsgivendeInntekt.find { it.skatteordning.name == skatteordning }!!
 }

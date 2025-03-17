@@ -1,24 +1,31 @@
 package no.nav.pgi.skatt.inntekt.stream
 
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import no.nav.pgi.domain.Hendelse
+import no.nav.pgi.domain.HendelseKey
+import no.nav.pgi.domain.HendelseMetadata
+import no.nav.pgi.domain.serialization.PgiDomainSerializer
+import no.nav.pgi.skatt.inntekt.Counters
 import no.nav.pgi.skatt.inntekt.common.PlaintextStrategy
 import no.nav.pgi.skatt.inntekt.mock.MaskinportenMock
 import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock
+import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.PORT
+import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.callsToMock
+import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.`stub 401 from skatt`
+import no.nav.pgi.skatt.inntekt.mock.PensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver
 import no.nav.pgi.skatt.inntekt.mock.PgiTopologyTestDriver.Companion.MOCK_SCHEMA_REGISTRY_URL
 import no.nav.pgi.skatt.inntekt.skatt.PgiClient
 import no.nav.pgi.skatt.inntekt.skatt.RateLimit
 import no.nav.pgi.skatt.inntekt.stream.mapping.FeilmedlingFraSkattException
-import no.nav.samordning.pgi.schema.Hendelse
-import no.nav.samordning.pgi.schema.HendelseKey
-import no.nav.samordning.pgi.schema.HendelseMetadata
-import no.nav.samordning.pgi.schema.PensjonsgivendeInntekt
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
+import org.apache.kafka.streams.errors.StreamsException
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 import kotlin.time.Duration.Companion.seconds
 
 private const val ONE_HUNDRED = 100
@@ -29,7 +36,6 @@ private const val IDENTIFIKATOR = "12345678901"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PGITopologyTest {
-    private val pensjonsgivendeInntektMock = PensjonsgivendeInntektMock()
     private val maskinportenMock = MaskinportenMock()
 
     private val pgiClient = PgiClient(
@@ -38,13 +44,18 @@ internal class PGITopologyTest {
     )
     private val kafkaConfig = KafkaConfig(getKafkaTestEnv(), PlaintextStrategy())
     private val topologyDriver =
-        PgiTopologyTestDriver(PGITopology(pgiClient).topology(), kafkaConfig.streamProperties())
+        PgiTopologyTestDriver(
+            topology = PGITopology(
+                counters = Counters(SimpleMeterRegistry()),
+                pgiClient = pgiClient
+            ).topology(),
+            properties = kafkaConfig.streamProperties()
+        )
 
     val testInputTopic =
-        topologyDriver.createInputTopic<HendelseKey, Hendelse>(PGI_HENDELSE_TOPIC, MOCK_SCHEMA_REGISTRY_URL)
-    val testOutputTopic = topologyDriver.createOutputTopic<HendelseKey, PensjonsgivendeInntekt>(
-        PGI_INNTEKT_TOPIC,
-        MOCK_SCHEMA_REGISTRY_URL
+        topologyDriver.createInputTopic(PGI_HENDELSE_TOPIC)
+    val testOutputTopic = topologyDriver.createOutputTopic(
+        PGI_INNTEKT_TOPIC
     )
 
     @BeforeAll
@@ -54,25 +65,25 @@ internal class PGITopologyTest {
 
     @AfterEach
     fun afterEach() {
-        pensjonsgivendeInntektMock.reset()
+//        pensjonsgivendeInntektMock.reset()
     }
 
     @AfterAll
     fun tearDown() {
         maskinportenMock.stop()
-        pensjonsgivendeInntektMock.stop()
+//        pensjonsgivendeInntektMock.stop()
         topologyDriver.close()
     }
 
     @Test
     internal fun `should add 100 PensjonsgivendeInntekt to pgi-inntekt topic when 100 hendelser is added to pgi-hendelse topic`() {
-        pensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`()
+        mock.`stub pensjongivende inntekt endpoint`()
 
         addToHendelseTopic(ONE_HUNDRED)
 
         val output = testOutputTopic.readKeyValuesToList()
 
-        assertEquals(ONE_HUNDRED, pensjonsgivendeInntektMock.callsToMock())
+        assertEquals(ONE_HUNDRED, mock.callsToMock())
         assertEquals(ONE_HUNDRED, output.size)
     }
 
@@ -98,15 +109,25 @@ internal class PGITopologyTest {
 //    }
 
     @Test
+    internal fun `should discard unparseable kafka messages`() {
+        addGarbageToHendelseTopic()
+        assertThat(testOutputTopic.readKeyValuesToList()).isEmpty()
+    }
+
+    @Test
     internal fun `should fail with Exception if exception is thrown in stream`() {
         val failingHendelse = Hendelse(1L, IDENTIFIKATOR, INNTEKTSAAR, HendelseMetadata(0))
 
-        pensjonsgivendeInntektMock.`stub pensjongivende inntekt endpoint`()
-        pensjonsgivendeInntektMock.`stub 401 from skatt`(INNTEKTSAAR, IDENTIFIKATOR)
+        mock.`stub pensjongivende inntekt endpoint`()
+        mock.`stub 401 from skatt`(INNTEKTSAAR, IDENTIFIKATOR)
 
         addToHendelseTopic(TEN)
 
-        assertThrows<FeilmedlingFraSkattException> { addToTopic(failingHendelse) }
+        assertThatThrownBy {
+            addToTopic(failingHendelse)
+        }
+            .isInstanceOf(StreamsException::class.java)
+            .hasRootCauseInstanceOf(FeilmedlingFraSkattException::class.java)
         assertEquals(TEN, testOutputTopic.readKeyValuesToList().size)
     }
 
@@ -119,13 +140,40 @@ internal class PGITopologyTest {
         )
 
     private fun addToHendelseTopic(amount: Int) = createHendelseList(amount).forEach { addToTopic(it) }
-    private fun addToHendelseTopic(hendelser: List<Hendelse>) = hendelser.forEach { addToTopic(it) }
-    private fun addToTopic(hendelse: Hendelse) = testInputTopic.pipeInput(hendelse.key(), hendelse)
-    private fun createHendelseList(count: Int) =
-        (1..count).map { Hendelse(it.toLong(), (10000000000 + it).toString(), "2018", HendelseMetadata(0)) }
+
+    private fun addToTopic(hendelse: Hendelse) {
+        val key: String = PgiDomainSerializer().toJson(hendelse.key())
+        val value: String = PgiDomainSerializer().toJson(hendelse)
+        println("Adding to topic: $key $value")
+        testInputTopic.pipeInput(key, value)
+        println("Added to topic: $key $value")
+    }
+
+    private fun addGarbageToHendelseTopic() {
+        testInputTopic.pipeInput("[[Banana", "[[Banana!!")
+    }
+
+    private fun createHendelseList(count: Int) : List<Hendelse> {
+        return (1..count).map {
+            Hendelse(it.toLong(), (10000000000 + it).toString(),
+                "2018",
+                HendelseMetadata(0))
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        @RegisterExtension
+        private val mock =
+            WireMockExtension.newInstance()
+                .options(
+                    WireMockConfiguration.wireMockConfig().port(PORT)
+                )
+                .build()!!
+    }
 }
 
-private fun Hendelse.key() = HendelseKey(getIdentifikator(), getGjelderPeriode())
+private fun Hendelse.key() = HendelseKey(identifikator, gjelderPeriode)
 
 
 
