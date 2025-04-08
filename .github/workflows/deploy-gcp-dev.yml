@@ -16,8 +16,8 @@ jobs:
       packages: write
       id-token: write
     steps:
-      # Checkout
-      - uses: actions/checkout@v4
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
 
       - name: 'Java 21'
         uses: actions/setup-java@v4
@@ -37,11 +37,7 @@ jobs:
         id: docker-push
         with:
           team: pensjonopptjening
-          tag: ${{ github.sha }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
 
-      # Deploy to GCP dev
       - name: 'Deploy pgi-les-inntekt-skatt (dev-gcp)'
         uses: nais/deploy/actions/deploy@v2
         env:

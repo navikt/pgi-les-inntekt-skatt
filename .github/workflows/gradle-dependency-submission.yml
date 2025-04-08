@@ -7,11 +7,11 @@ jobs:
   dependabot:
     name: Monitor dependencies with Dependabot
     runs-on: ubuntu-latest
-    permissions: # The Dependency Submission API requires write permission
+    permissions:
       contents: write
     steps:
 
-      - name: 'Checkout'
+      - name: 'Checkout repository'
         uses: actions/checkout@v4
 
       - name: 'Java 21'
@@ -20,6 +20,7 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           cache: 'gradle'
+
       - name: 'Run snapshot action'
         uses: mikepenz/gradle-dependency-submission@v1
         with:
