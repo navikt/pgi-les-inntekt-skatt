@@ -1,4 +1,6 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -39,7 +41,7 @@ plugins {
     kotlin("plugin.serialization") version kotlinVersion
     id("org.springframework.boot") version "3.3.2"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
-    id("com.github.ben-manes.versions") version "0.51.0"
+    id("com.github.ben-manes.versions") version "0.52.0"
 }
 
 java {
@@ -142,6 +144,16 @@ tasks.withType<Test> {
         events("passed", "skipped", "failed")
         exceptionFormat = FULL
     }
+}
+
+tasks.withType<DependencyUpdatesTask>().configureEach {
+    rejectVersionIf {
+        isNonStableVersion(candidate.version)
+    }
+}
+
+fun isNonStableVersion(version: String): Boolean {
+    return listOf("BETA","RC", "-M").any { version.uppercase().contains(it) }
 }
 
 tasks.withType<Wrapper> {
