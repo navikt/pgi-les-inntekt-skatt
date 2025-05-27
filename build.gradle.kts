@@ -155,7 +155,3 @@ tasks.withType<DependencyUpdatesTask>().configureEach {
 fun isNonStableVersion(version: String): Boolean {
     return listOf("BETA","RC", "-M").any { version.uppercase().contains(it) }
 }
-
-tasks.withType<Wrapper> {
-    gradleVersion = "8.10.1"
-}
