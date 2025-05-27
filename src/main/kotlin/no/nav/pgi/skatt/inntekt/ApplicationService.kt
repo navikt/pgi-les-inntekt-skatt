@@ -21,14 +21,7 @@ class ApplicationService(
 
     internal fun start() {
         addShutdownHook()
-        addCloseOnExceptionInStream()
-
         pgiStream.start()
-    }
-
-    internal fun stop() {
-        LOG.info("Stop is called closing pgiStream")
-        Thread { pgiStream.close() }.start()
     }
 
     private fun addShutdownHook() {
@@ -42,8 +35,6 @@ class ApplicationService(
             }
         })
     }
-
-    private fun addCloseOnExceptionInStream() = pgiStream.setUncaughtStreamExceptionHandler { stop() }
 
     companion object {
         private val LOG = LoggerFactory.getLogger(ApplicationService::class.java)
