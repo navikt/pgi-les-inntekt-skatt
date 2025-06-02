@@ -4,7 +4,6 @@ import no.nav.pgi.skatt.inntekt.util.getVal
 import org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
 import org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG
-import org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.StreamsConfig.*
 import java.util.*
@@ -25,8 +24,7 @@ class KafkaConfig(
         put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.StringSerde::class.java)
         put(APPLICATION_ID_CONFIG, STREAM_APPLICATION_ID)
         put(AUTO_OFFSET_RESET_CONFIG, "earliest")
-        put(MAX_POLL_RECORDS_CONFIG, "100") //Standard er 500. (På 500 behandles ca. 6 - 7 i sekundet.)
-        put(MAX_POLL_INTERVAL_MS_CONFIG, "600000") //Standard er 5 minutter (300000 ms).
+        put(MAX_POLL_INTERVAL_MS_CONFIG, "600000") // Dobler for å håndtere potensiell variabel responsstid.
         putAll(securityStrategy.securityConfig())
     }
 
