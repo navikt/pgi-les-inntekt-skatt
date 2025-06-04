@@ -4,6 +4,7 @@ import no.nav.pgi.skatt.inntekt.util.getVal
 import org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
 import org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG
+import org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.StreamsConfig.*
 import java.util.*
@@ -25,6 +26,7 @@ class KafkaConfig(
         put(APPLICATION_ID_CONFIG, STREAM_APPLICATION_ID)
         put(AUTO_OFFSET_RESET_CONFIG, "earliest")
         put(MAX_POLL_INTERVAL_MS_CONFIG, "600000") // Dobler for å håndtere potensiell variabel responsstid.
+        put(MAX_POLL_RECORDS_CONFIG, "250") // Halverer for å unngå feil: poll loop is spending too much time processing messages
         putAll(securityStrategy.securityConfig())
     }
 
