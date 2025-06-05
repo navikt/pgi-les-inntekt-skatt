@@ -37,7 +37,7 @@ class Counters(val meterRegistry: MeterRegistry) {
     }
 
     fun increaseHendelserToInntektProcessedByYear(year: String) {
-        hendelserToinntektProcessedByYear(year)
+        hendelserToinntektProcessedByYear(year).increment()
     }
 
     fun increasePgiLesInntektSkattResponseCounter(statusCode: String) {
