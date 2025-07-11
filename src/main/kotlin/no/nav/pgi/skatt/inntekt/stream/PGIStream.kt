@@ -6,11 +6,11 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
+import org.apache.kafka.common.serialization.ByteArrayDeserializer
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler
 import org.slf4j.LoggerFactory
-import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.kafka.common.serialization.ByteArrayDeserializer
 
 
 internal class PGIStream(val streamProperties: Properties, val pgiTopology: PGITopology) {
@@ -42,6 +42,7 @@ internal class PGIStream(val streamProperties: Properties, val pgiTopology: PGIT
         val groupId = streamProperties.getProperty("application.id")
         val bootstrapServers = streamProperties.getProperty("bootstrap.servers")
         val inputTopics = pgiTopology.inputTopics()
+
         val consumerProps = Properties().apply {
             put("bootstrap.servers", bootstrapServers)
             put("group.id", groupId)
@@ -49,18 +50,32 @@ internal class PGIStream(val streamProperties: Properties, val pgiTopology: PGIT
             put("key.deserializer", StringDeserializer::class.java.name)
             put("value.deserializer", ByteArrayDeserializer::class.java.name)
         }
-        KafkaConsumer<String, ByteArray>(consumerProps).use { consumer ->
-            val partitions = inputTopics.flatMap { topic ->
-                consumer.partitionsFor(topic).map { TopicPartition(topic, it.partition()) }
+
+        try {
+            KafkaConsumer<String, ByteArray>(consumerProps).use { consumer ->
+                val partitions = inputTopics.flatMap { topic ->
+                    consumer.partitionsFor(topic).map { TopicPartition(it.topic(), it.partition()) }
+                }
+
+                if (partitions.isEmpty()) {
+                    LOG.info("[${context}] No partitions found for topics: $inputTopics")
+                    return
+                }
+
+                val committed = consumer.committed(partitions.toSet())
+                val endOffsets = consumer.endOffsets(partitions)
+
+                committed.forEach { (tp, offsetAndMetadata) ->
+                    val offset = offsetAndMetadata?.offset()
+                    val logTimestamp = System.currentTimeMillis()
+                    val endOffset = endOffsets[tp]
+                    val lag = if (offset != null && endOffset != null) (endOffset - offset).coerceAtLeast(0) else null
+
+                    LOG.info("[${context}] Committed offset for ${tp.topic()}-${tp.partition()}: offset=$offset, timestamp=$logTimestamp, logEndOffset=$endOffset${if (lag != null) ", lag=$lag" else ""}")
+                }
             }
-            val committed = consumer.committed(partitions.toSet())
-            val endOffsets = consumer.endOffsets(partitions)
-            committed.forEach { (tp, offsetAndMetadata) ->
-                val offset = offsetAndMetadata?.offset()
-                val logTimestamp = System.currentTimeMillis()
-                val endOffset = endOffsets[tp]
-                LOG.info("[${context}] Committed offset for ${tp.topic()}-${tp.partition()}: offset=$offset, partition=${tp.partition()}, timestamp=$logTimestamp, logEndOffset=$endOffset")
-            }
+        } catch (e: Exception) {
+            LOG.warn("[${context}] Could not log committed offsets", e)
         }
     }
 
@@ -68,7 +83,11 @@ internal class PGIStream(val streamProperties: Properties, val pgiTopology: PGIT
         LOG.info("Starting PgiStream")
         logCommittedOffsets("startup")
         pgiStream.start()
-        scheduler = Executors.newSingleThreadScheduledExecutor()
+        scheduler = Executors.newSingleThreadScheduledExecutor { runnable ->
+            Thread(runnable, "PGIStream-Scheduler").apply {
+                isDaemon = true
+            }
+        }
         scheduler?.scheduleAtFixedRate({ logCommittedOffsets("running") }, 30, 30, TimeUnit.SECONDS)
     }
 
@@ -81,9 +100,10 @@ internal class PGIStream(val streamProperties: Properties, val pgiTopology: PGIT
             }
         } catch (e: InterruptedException) {
             scheduler?.shutdownNow()
+            Thread.currentThread().interrupt()
         }
-        logCommittedOffsets("shutdown")
         pgiStream.close()
+        logCommittedOffsets("shutdown")
     }
 
     private companion object {
