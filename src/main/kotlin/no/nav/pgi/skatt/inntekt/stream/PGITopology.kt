@@ -85,6 +85,7 @@ internal class PGITopology(val counters: Counters, private val pgiClient: PgiCli
 
     private companion object {
         private val LOG = LoggerFactory.getLogger(PGITopology::class.java)
-    }
-}
+        }
 
+    fun inputTopics(): List<String> = listOf(PGI_HENDELSE_TOPIC)
+}
