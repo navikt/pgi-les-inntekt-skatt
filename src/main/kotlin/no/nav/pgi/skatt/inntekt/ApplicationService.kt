@@ -46,7 +46,7 @@ class ApplicationService(
             try {
                 LOG.info("Shutdown hook triggered closing pgiStream")
                 pgiStream.close()
-                scheduler.shutdownNow()
+                scheduler.shutdown()
             } catch (e: Exception) {
                 LOG.error("Error while shutting down", e)
             }
