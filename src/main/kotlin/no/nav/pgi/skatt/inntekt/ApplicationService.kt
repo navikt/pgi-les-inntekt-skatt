@@ -36,6 +36,7 @@ class ApplicationService(
 
         scheduler.schedule({
             LOG.info("Scheduled shutdown initiated. Exiting application to trigger pod restart.")
+            pgiStream.close()
             exitProcess(0)
         }, delayInHours, TimeUnit.HOURS)
     }
@@ -47,6 +48,7 @@ class ApplicationService(
                 LOG.info("Shutdown hook triggered closing pgiStream")
                 pgiStream.close()
                 scheduler.shutdown()
+                LOG.info("pgiStream and scheduler closed. Exiting.")
             } catch (e: Exception) {
                 LOG.error("Error while shutting down", e)
             }
