@@ -7,8 +7,13 @@ import java.net.http.HttpResponse
 import no.nav.pgi.skatt.inntekt.util.getVal
 import no.nav.pgi.skatt.inntekt.util.verifyEnvironmentVariables
 import java.net.URI
+import kotlin.div
+import kotlin.math.log
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import no.nav.pgi.skatt.inntekt.ApplicationService
+import no.nav.pgi.skatt.inntekt.stream.PGIStream
+import org.slf4j.LoggerFactory
 
 internal const val PENSJONGIVENDE_INNTEKT_HOST_ENV_KEY = "SKATT_INNTEKT_HOST"
 internal const val SKATT_INNTEKT_PATH_ENV_KEY = "SKATT_INNTEKT_PATH"
@@ -78,20 +83,33 @@ class RateLimit(
     timeInterval: Duration,
 ) {
     val timeslot = timeInterval.inWholeMilliseconds / rate
+    val timeslotNanos = timeInterval.inWholeNanoseconds / rate
 
     inline fun <reified T> limit(action: () -> T): T {
         val startTime = System.currentTimeMillis()
+        val startNanos = System.nanoTime()
 
         val res = action()
 
         val endTime = System.currentTimeMillis()
         val elapsed = endTime - startTime
 
+        val elapsedNanos = System.nanoTime() - startNanos
+
         return if (elapsed >= timeslot) {
             res
         } else {
-            Thread.sleep(timeslot - elapsed)
+            val sleepMillisNanos = (timeslotNanos - elapsedNanos) / 1_000_000
+            val sleepMillis = timeslot - elapsed
+
+            LOG.info("sleepMillis: $sleepMillis. sleepMillisNanos $sleepMillisNanos")
+
+            Thread.sleep(sleepMillis)
             res
         }
+    }
+
+    companion object {
+        val LOG = LoggerFactory.getLogger(RateLimit::class.java)
     }
 }
