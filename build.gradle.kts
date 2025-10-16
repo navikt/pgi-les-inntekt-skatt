@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val maskinportenClientVersion = "0.1.0"
-val joseJwtVersion = "9.40"
+val joseJwtVersion = "10.0.2"
 // val kafkaVersion = "3.8.0"
 val pgiDomainVersion = "0.0.5"
 val micrometerVersion = "1.13.4"
