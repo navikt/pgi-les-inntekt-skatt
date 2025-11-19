@@ -30,7 +30,7 @@ val commonsCompressVersion = "1.24.0"
 // påkrevd av pgi-domain
 val jacksonVersion = "2.17.2"
 
-val jerseyVersion = "3.1.8"
+val jerseyVersion = "4.0.0"
 
 
 group = "no.nav.pgi"
