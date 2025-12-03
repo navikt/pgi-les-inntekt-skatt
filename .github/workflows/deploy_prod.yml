@@ -41,7 +41,7 @@ jobs:
         run: |
           echo "DATETIME: $DATETIME"
           echo "IMAGE: $IMAGE"
-          echo "IMAGE: $REPO"
+          echo "REPO: $REPO"
           echo "IMAGE_BASE: $IMAGE_BASE"
 
       - name: 'Tag image'
