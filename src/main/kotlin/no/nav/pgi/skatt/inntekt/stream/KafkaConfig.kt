@@ -11,7 +11,7 @@ import java.util.*
 
 const val STREAM_APPLICATION_ID = "pgi-les-inntekt-skatt-asfas2131d"
 const val PGI_INNTEKT_TOPIC = "pensjonopptjening.privat-pgi-inntekt"
-const val PGI_HENDELSE_TOPIC = "pensjonopptjening.privat-pgi-hendelse"
+const val PGI_HENDELSE_TOPIC = "pensjonopptjening.privat-pgi-hendelse-ny"
 
 class KafkaConfig(
     environment: Map<String, String> = System.getenv(),
