@@ -17,6 +17,7 @@ import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.KStream
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
@@ -77,14 +78,21 @@ internal class PGITopology(val counters: Counters, private val pgiClient: PgiCli
         { key: HendelseKey, pgi: PensjonsgivendeInntekt ->
             counters.increaseHendelserToinntektProcessedTotal()
             counters.increaseHendelserToInntektProcessedByYear(key.gjelderPeriode)
+            val marker = Markers.append("sekvensnummer", pgi.metaData.sekvensnummer.toString())
+            val sekvensnummer = pgi.metaData.sekvensnummer
             LOG.info(
-                Markers.append("sekvensnummer", pgi.metaData.sekvensnummer.toString()),
-                "Lest inntekt Skatt: ${pgi.toString().maskFnr()}"
+                marker,
+                "Lest inntekt Skatt: ${pgi.toString().maskFnr()}. Sekvensnummer: $sekvensnummer"
+            )
+            SECURE_LOG.info(
+                marker,
+                "Lest inntekt Skatt: ${pgi}. Sekvensnummer: $sekvensnummer"
             )
         }
 
     private companion object {
         private val LOG = LoggerFactory.getLogger(PGITopology::class.java)
+        private val SECURE_LOG: Logger = LoggerFactory.getLogger("team")
     }
 }
 

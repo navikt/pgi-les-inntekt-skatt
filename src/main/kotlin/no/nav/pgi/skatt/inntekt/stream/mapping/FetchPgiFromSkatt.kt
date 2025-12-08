@@ -29,9 +29,6 @@ internal class FetchPgiFromSkatt(private val pgiClient: PgiClient) :
                 hendelse.identifikator
             )
 
-            LOG.info(marker, "Fetched pgi from skatt for ${pgiResponse.toString().maskFnr()}. Sekvensnummer: $sekvensnummer")
-            SECURE_LOG.info(marker, "Fetched pgi from skatt for ${pgiResponse}. Sekvensnummer: $sekvensnummer")
-
             return pgiResponse
         } catch (e: Exception) {
             throw PensjonsgivendeInntektClientException("Call to pgi failed with exception: ${e.javaClass.simpleName}. Message: ${e.message} ")
