@@ -33,7 +33,7 @@ internal class HandleErrorCodeFromSkatt(val counters: Counters) : ValueMapper<Pg
         "${response.statusCode()}${(response.body() getFirstMatch pgiFolketrygdenErrorCodes)?.let { "_$it" } ?: ""}"
 
     companion object {
-        private val SECURE_LOG: Logger = LoggerFactory.getLogger("tjenestekall")
+        private val SECURE_LOG: Logger = LoggerFactory.getLogger("team")
         private val LOG = LoggerFactory.getLogger(HandleErrorCodeFromSkatt::class.java)
     }
 }

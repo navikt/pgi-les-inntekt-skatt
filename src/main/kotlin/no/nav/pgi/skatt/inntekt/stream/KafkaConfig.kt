@@ -26,7 +26,7 @@ class KafkaConfig(
         put(APPLICATION_ID_CONFIG, STREAM_APPLICATION_ID)
         put(AUTO_OFFSET_RESET_CONFIG, "earliest")
         put(MAX_POLL_INTERVAL_MS_CONFIG, "600000") // Dobler for å håndtere potensiell variabel responsstid.
-        put(MAX_POLL_RECORDS_CONFIG, "100") // Reduserer fra 250 til 100 for å unngå feil: poll loop is spending too much time processing messages
+        put(MAX_POLL_RECORDS_CONFIG, "250") // Setter til 250 for å unngå feil: poll loop is spending too much time processing messages
         putAll(securityStrategy.securityConfig())
     }
 

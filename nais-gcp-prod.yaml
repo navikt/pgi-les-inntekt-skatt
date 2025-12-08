@@ -30,8 +30,10 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
-  secureLogs:
-    enabled: true
+  logging:
+    destinations:
+      - id: loki
+      - id: elastic
   replicas:
     min: 1
     max: 1
@@ -46,5 +48,8 @@ spec:
       value: /v1/navPensjonOpptjening
   accessPolicy:
     outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
       external:
         - host: pgiforfolketrygden.api.skatteetaten.no
