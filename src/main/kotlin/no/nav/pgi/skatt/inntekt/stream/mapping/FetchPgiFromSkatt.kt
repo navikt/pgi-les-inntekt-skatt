@@ -15,18 +15,22 @@ internal class FetchPgiFromSkatt(private val pgiClient: PgiClient) :
 
     override fun apply(hendelse: Hendelse): PgiResponse {
         try {
+            val sekvensnummer = hendelse.sekvensnummer
+            val marker = Markers.append("sekvensnummer", sekvensnummer.toString())
+
+            LOG.info(marker, "Leser pgi fra skatt for ${hendelse.toString().maskFnr()}. Sekvensnummer: $sekvensnummer")
+            SECURE_LOG.info(marker, "Leser pgi fra skatt for ${hendelse}. Sekvensnummer: $sekvensnummer")
+
             val request = pgiClient.createPgiRequest(hendelse.gjelderPeriode, hendelse.identifikator)
+
             val pgiResponse =  PgiResponse(
                 pgiClient.getPgi(request, HttpResponse.BodyHandlers.ofString()),
                 createPgiMetadata(hendelse),
                 hendelse.identifikator
             )
 
-            val sekvensnummer = pgiResponse.metadata().sekvensnummer
-            val marker = Markers.append("sekvensnummer", sekvensnummer.toString())
-
-            LOG.info(marker, "Fetched pgi from skatt for ${hendelse.toString().maskFnr()}. Sekvensnummer: $sekvensnummer")
-            SECURE_LOG.info(marker, "Fetched pgi from skatt for ${hendelse}. Sekvensnummer: $sekvensnummer")
+            LOG.info(marker, "Fetched pgi from skatt for ${pgiResponse.toString().maskFnr()}. Sekvensnummer: $sekvensnummer")
+            SECURE_LOG.info(marker, "Fetched pgi from skatt for ${pgiResponse}. Sekvensnummer: $sekvensnummer")
 
             return pgiResponse
         } catch (e: Exception) {
