@@ -12,7 +12,7 @@ val micrometerVersion = "1.13.4"
 val logbackVersion = "1.4.14"
 val logstashVersion = "5.2"
 val slf4jVersion = "2.0.9"
-val log4jVersion = "2.20.0"
+val log4jVersion = "2.25.3"
 // spring-dependency-management krever denne, roter det til med 5.11
 val junitJupiterVersion = "5.10.3"
 val assertJVersion = "3.26.3"
