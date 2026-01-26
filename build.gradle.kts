@@ -15,7 +15,7 @@ val slf4jVersion = "2.0.9"
 val log4jVersion = "2.20.0"
 // spring-dependency-management krever denne, roter det til med 5.11
 val junitJupiterVersion = "5.10.3"
-val assertJVersion = "3.26.3"
+val assertJVersion = "3.27.7"
 val wiremockVersion = "3.9.1"
 val mockkVerion = "1.13.12"
 val springBootVersion = "3.3.3"
