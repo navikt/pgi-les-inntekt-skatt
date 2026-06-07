@@ -1,14 +1,13 @@
-name: 'Deploy to dev gcp'
+name: 'Build and deploy'
 
 on:
   workflow_dispatch:
     inputs:
       deploy_to_prod:
         description: 'Deploy to prod'
-        options:
-          - yes
-          - no
-        default: no
+        type: boolean
+        default: false
+        required: true
 
   push:
     branches:
@@ -73,7 +72,7 @@ jobs:
 
       - name: 'Deploy pgi-les-inntekt-skatt (prod-gcp)'
         uses: nais/deploy/actions/deploy@v2
-        if: ${{ inputs.deploy_to_prod == 'yes' }}
+        if: ${{ inputs.deploy_to_prod == true }}
         env:
           CLUSTER: prod-gcp
           RESOURCE: nais-gcp-prod.yaml
