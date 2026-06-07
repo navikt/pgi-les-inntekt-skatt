@@ -1,7 +1,14 @@
-name: Deploy to dev gcp
+name: 'Deploy to dev gcp'
 
 on:
   workflow_dispatch:
+    inputs:
+      deploy_to_prod:
+        description: 'Deploy to prod'
+        options:
+          - yes
+          - no
+        default: no
 
   push:
     branches:
@@ -61,5 +68,14 @@ jobs:
         env:
           CLUSTER: dev-gcp
           RESOURCE: nais-gcp-dev.yaml
+          IMAGE: ${{ steps.docker-push.outputs.image }}
+          TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
+
+      - name: 'Deploy pgi-les-inntekt-skatt (prod-gcp)'
+        uses: nais/deploy/actions/deploy@v2
+        if: ${{ inputs.deploy_to_prod == 'yes' }}
+        env:
+          CLUSTER: prod-gcp
+          RESOURCE: nais-gcp-prod.yaml
           IMAGE: ${{ steps.docker-push.outputs.image }}
           TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
