@@ -1,5 +1,6 @@
 name: 'Monitor dependencies with Dependabot'
 on:
+  workflow_dispatch:
   schedule:
     - cron: '25 8,13 * * 1,2,3,4,5'
     - cron: '25 13 * * 0,6'
