@@ -28,7 +28,7 @@ val snappyJavaVersion = "1.1.10.6"
 val commonsCompressVersion = "1.24.0"
 
 // påkrevd av pgi-domain
-val jacksonVersion = "2.17.2"
+val jacksonVersion = "2.22.0"
 
 val jerseyVersion = "3.1.8"
 
